@@ -4,6 +4,7 @@ import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 import pl.myc22ka.mathapp.model.Point;
 
+import java.util.List;
 import java.util.Locale;
 
 public class Quadratic extends Function {
@@ -37,7 +38,7 @@ public class Quadratic extends Function {
     }
 
     // Quadratic from answers
-    public Quadratic(double[] answers, char variable){
+    public Quadratic(List<Double> answers, char variable){
         super(FunctionTypes.QUADRATIC, variable);
 
         generateFunctionFromAnswers(answers);
@@ -75,28 +76,27 @@ public class Quadratic extends Function {
         StringBuilder sb = new StringBuilder();
 
         if (coefficientA != 0) {
-            sb.append(String.format(Locale.US, "%.2f%s^2", coefficientA, variable));
+            sb.append(String.format(Locale.US, "%.2f*%s^2", coefficientA, variable));
         }
 
         if (coefficientB != 0) {
             if (coefficientB > 0) {
-                sb.append(" + ").append(String.format(Locale.US, "%.2f%s", coefficientB, variable));
+                sb.append("+").append(String.format(Locale.US, "%.2f*%s", coefficientB, variable));
             } else {
-                sb.append(" - ").append(String.format(Locale.US, "%.2f%s", -coefficientB, variable));
+                sb.append("-").append(String.format(Locale.US, "%.2f*%s", -coefficientB, variable));
             }
         }
 
         if (constant != 0) {
             if (constant > 0) {
-                sb.append(" + ").append(String.format(Locale.US, "%.2f", constant));
+                sb.append("+").append(String.format(Locale.US, "%.2f", constant));
             } else {
-                sb.append(" - ").append(String.format(Locale.US, "%.2f", -constant));
+                sb.append("-").append(String.format(Locale.US, "%.2f", -constant));
             }
         }
 
         return sb.toString();
     }
-
 
     // Canonical form: a(x - p)^2 + q
     public String getCanonicalForm() {
@@ -131,13 +131,13 @@ public class Quadratic extends Function {
     }
 
     @Override
-    public void generateFunctionFromAnswers(double... answers) {
-        if (answers.length != 2) {
+    public void generateFunctionFromAnswers(List<Double> answers) {
+        if (answers.size() != 2) {
             throw new IllegalArgumentException("Quadratic function requires exactly two roots.");
         }
 
-        double r1 = answers[0];
-        double r2 = answers[1];
+        double r1 = answers.getFirst();
+        double r2 = answers.get(1);
 
         // Expand (x - r1)(x - r2) = x^2 - (r1 + r2)x + (r1 * r2)
         this.coefficientA = 1;          // need to be gathered trough generator...

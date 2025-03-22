@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.utils.MathUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class Function implements FunctionInterface{
@@ -20,7 +24,26 @@ public abstract class Function implements FunctionInterface{
         this.variable = variable;
     }
 
-    public IExpr getRoots() { return evaluator.eval("Solve(" + getFunctionString() + " == 0, " + variable + ")"); }
+    /**
+     * Returns a list of real roots of the equation.
+     * @return List of real roots
+     */
+    public List<String> getRealRoots() {
+        IExpr result = evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
+
+        var solutions = MathUtils.extractRootsFromExpr(result);
+
+        return solutions.stream().filter(solution -> solution.matches("-?\\d+(\\.\\d+)?")).toList();
+    }
+
+    /**
+     * Returns a list of all roots (including complex/imaginary) of the equation.
+     * @return List of complex roots
+     */
+    public List<String> getAllRoots() {
+        IExpr result = evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
+        return MathUtils.extractRootsFromExpr(result);
+    }
 
     public IExpr getDerivative(){ return evaluator.eval("D(" + getFunctionString() + ", " + variable + ")"); }
 
@@ -44,6 +67,8 @@ public abstract class Function implements FunctionInterface{
 
         var slopeAtX = getFunctionValue(derivative.toString(), point.getX());
 
+        System.out.println(functionValue);
+
         // Check if the point satisfies the slope equation: y = f(x) + m(x - x0)
         return point.getY() == functionValue + slopeAtX * (variable - point.getX());
     }
@@ -53,5 +78,5 @@ public abstract class Function implements FunctionInterface{
 
     public abstract String getFunctionString();
 
-    public abstract void generateFunctionFromAnswers(double... answers);
+    public abstract void generateFunctionFromAnswers(List<Double> answers);
 }

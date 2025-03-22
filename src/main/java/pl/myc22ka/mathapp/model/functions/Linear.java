@@ -1,9 +1,9 @@
 package pl.myc22ka.mathapp.model.functions;
 
-import org.matheclipse.core.eval.ExprEvaluator;
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -27,12 +27,6 @@ public class Linear extends Function {
         this.constant = constant;
     }
 
-    public Linear(double answer, char variable){
-        super(FunctionTypes.LINEAR, variable);
-
-        generateFunctionFromAnswers(answer);
-    }
-
     @Override
     public void generateRandomFunction() {
         coefficient = RANDOM.nextDouble() * 20 - 10;
@@ -54,11 +48,12 @@ public class Linear extends Function {
     }
 
     @Override
-    public void generateFunctionFromAnswers(double... answers) {
-        do {
-            this.coefficient = RANDOM.nextDouble() * 20 - 10; // Random value in range (-10,10)
-        } while (this.coefficient == 0);
+    public void generateFunctionFromAnswers(List<Double> answers) {
+        if (answers.size() != 1) {
+            throw new IllegalArgumentException("Linear function requires exactly one root.");
+        }
 
-        this.constant = -this.coefficient * answers[0];
+        this.coefficient = 1;          // need to be gathered trough generator...
+        this.constant = -this.coefficient * answers.getFirst();
     }
 }
