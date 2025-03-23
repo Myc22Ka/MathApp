@@ -4,10 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.expression.F;
 import pl.myc22ka.mathapp.utils.MathUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public abstract class Function implements FunctionInterface{
@@ -28,21 +28,16 @@ public abstract class Function implements FunctionInterface{
      * Returns a list of real roots of the equation.
      * @return List of real roots
      */
-    public List<String> getRealRoots() {
-        IExpr result = evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
-
-        var solutions = MathUtils.extractRootsFromExpr(result);
-
-        return solutions.stream().filter(solution -> solution.matches("-?\\d+(\\.\\d+)?")).toList();
+    public IExpr getRealRoots() {
+        return evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
     }
 
     /**
      * Returns a list of all roots (including complex/imaginary) of the equation.
      * @return List of complex roots
      */
-    public List<String> getAllRoots() {
-        IExpr result = evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
-        return MathUtils.extractRootsFromExpr(result);
+    public IExpr getAllRoots() {
+        return evaluator.eval("Solve[" + getFunctionString() + " == 0, " + variable + "]");
     }
 
     public IExpr getDerivative(){ return evaluator.eval("D(" + getFunctionString() + ", " + variable + ")"); }
@@ -73,10 +68,13 @@ public abstract class Function implements FunctionInterface{
         return point.getY() == functionValue + slopeAtX * (variable - point.getX());
     }
 
+    public IExpr getFactoredForm(){
+        return evaluator.eval("Factor("+ getFunctionString() +")");
+    }
 
     public abstract void generateRandomFunction();
 
     public abstract String getFunctionString();
 
-    public abstract void generateFunctionFromAnswers(List<Double> answers);
+    public abstract void generateFunctionFromAnswers(List<IExpr> answers);
 }

@@ -43,4 +43,21 @@ public class MathUtils {
 
         return roots;
     }
+
+    /**
+     * Calculates the greatest common divisor (GCD) of all coefficients.
+     */
+    public static int getPolynomialGCD(List<Double> coefficients) {
+        return coefficients.stream()
+                .mapToInt(coef -> (int) Math.round(coef))
+                .reduce((a, b) -> {
+                    while (b != 0) {
+                        int temp = b;
+                        b = a % b;
+                        a = temp;
+                    }
+                    return Math.abs(a);
+                })
+                .orElse(1);
+    }
 }

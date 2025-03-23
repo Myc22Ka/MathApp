@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: mathapp
+
+logging:
+  level:
+    edu.jas: WARN

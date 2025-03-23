@@ -1,16 +1,16 @@
 package pl.myc22ka.mathapp.model.functions;
 
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public class Linear extends Function {
-    private double coefficient;                             // Współczynnik
-    private double constant;                                // Wyraz wolny
-    private static final Random RANDOM = new Random();
+    private IExpr coefficient;
+    private IExpr constant;
 
     // Constructor to generate random Linear Function
     public Linear(char variable) {
@@ -20,7 +20,7 @@ public class Linear extends Function {
     }
 
     // Constructor to get Linear Function with correct coefficients
-    public Linear(double coefficient, double constant, char variable){
+    public Linear(IExpr coefficient, IExpr  constant, char variable){
         super(FunctionTypes.LINEAR, variable);
 
         this.coefficient = coefficient;
@@ -29,31 +29,29 @@ public class Linear extends Function {
 
     @Override
     public void generateRandomFunction() {
-        coefficient = RANDOM.nextDouble() * 20 - 10;
-        constant = RANDOM.nextDouble() * 20 - 10;
+        coefficient = F.ZZ(1);       // need to be gathered trough generator...
+        constant = F.ZZ(1);          // need to be gathered trough generator...
 
-        if (coefficient == 0) {
-            coefficient = RANDOM.nextDouble() * 10 + 1;
-        }
+        // not implemented yet ...
     }
 
     @Override
     public String getFunctionString() {
-        return String.format(Locale.US, "%.2f%c%s%.2f",
-                coefficient,
+        return String.format(Locale.US, "%s%c%s%s",
+                coefficient.toString(),
                 variable,
-                (constant < 0 ? "" : "+"),
-                constant
+                (constant.isNegative() ? "" : "+"),
+                constant.toString()
         );
     }
 
     @Override
-    public void generateFunctionFromAnswers(List<Double> answers) {
+    public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 1) {
             throw new IllegalArgumentException("Linear function requires exactly one root.");
         }
 
-        this.coefficient = 1;          // need to be gathered trough generator...
-        this.constant = -this.coefficient * answers.getFirst();
+        this.coefficient = F.ZZ(1);                 // need to be gathered trough generator...
+        this.constant = coefficient.negate().multiply(answers.getFirst());
     }
 }
