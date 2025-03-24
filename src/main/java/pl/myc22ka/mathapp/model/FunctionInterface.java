@@ -8,7 +8,5 @@ public interface FunctionInterface {
 
     void generateRandomFunction();
 
-    String getFunctionString();
-
     void generateFunctionFromAnswers(List<IExpr> answers);
 }

@@ -3,14 +3,11 @@ package pl.myc22ka.mathapp.model.functions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class LinearTest {
     private Linear linearFunction;
 
     @BeforeEach
     void setUp() {
-        linearFunction = new Linear('x'); // Test with a random function generation
     }
 
     @Test

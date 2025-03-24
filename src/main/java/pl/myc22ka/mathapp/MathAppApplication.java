@@ -20,14 +20,15 @@ public class MathAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MathAppApplication.class, args);
 
-		Function function1 = new Linear('x');
+		Function function1 = new Linear(F.x);
 		function1.generateFunctionFromAnswers(List.of(S.Rational.of(1, 2)));
 
-		System.out.println("Function: " + function1.getFunctionString());
-//		System.out.println("Domain: " + function1.getDomain());
+		System.out.println("Function: " + function1);
+		System.out.println("Domain: " + function1.getDomain());
 		System.out.println("Roots: " + function1.getRealRoots());
-//		System.out.println("Range: " + function1.getRange());
-//		System.out.println("Integral: " + function1.getIntegral());
+		System.out.println("Range: " + function1.getRange());
+		System.out.println("Integral: " + function1.getIntegral());
+		System.out.println("Derivative: " + function1.getDerivative());
 		System.out.println("Factored form: " + function1.getFactoredForm());
 
 		System.out.println("----------------------------------------------------");

@@ -2,29 +2,32 @@ package pl.myc22ka.mathapp.model.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 
 import java.util.List;
-import java.util.Locale;
 
 public class Linear extends Function {
     private IExpr coefficient;
     private IExpr constant;
 
     // Constructor to generate random Linear Function
-    public Linear(char variable) {
+    public Linear(ISymbol variable) {
         super(FunctionTypes.LINEAR, variable);
 
         generateRandomFunction();
+        updateExpression();
     }
 
     // Constructor to get Linear Function with correct coefficients
-    public Linear(IExpr coefficient, IExpr  constant, char variable){
+    public Linear(IExpr coefficient, IExpr  constant, ISymbol variable){
         super(FunctionTypes.LINEAR, variable);
 
         this.coefficient = coefficient;
         this.constant = constant;
+
+        updateExpression();
     }
 
     @Override
@@ -35,14 +38,18 @@ public class Linear extends Function {
         // not implemented yet ...
     }
 
-    @Override
-    public String getFunctionString() {
-        return String.format(Locale.US, "%s%c%s%s",
-                coefficient.toString(),
-                variable,
-                (constant.isNegative() ? "" : "+"),
-                constant.toString()
+    /**
+     * Updates the expression field in the parent class based on coefficient and constant
+     */
+    private void updateExpression() {
+        // Create the expression: coefficient * variable + constant
+        IExpr expr = F.Plus(
+                F.Times(coefficient, variable),
+                constant
         );
+
+        // Set the parent class expression field
+        setExpression(expr);
     }
 
     @Override
