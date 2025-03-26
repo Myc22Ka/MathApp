@@ -21,7 +21,7 @@ public class Linear extends Function {
     }
 
     // Constructor to get Linear Function with correct coefficients
-    public Linear(IExpr coefficient, IExpr  constant, ISymbol variable){
+    public Linear(IExpr coefficient, IExpr constant, ISymbol variable) {
         super(FunctionTypes.LINEAR, variable);
 
         this.coefficient = coefficient;
@@ -32,21 +32,21 @@ public class Linear extends Function {
 
     @Override
     public void generateRandomFunction() {
-        coefficient = F.ZZ(1);       // need to be gathered trough generator...
-        constant = F.ZZ(1);          // need to be gathered trough generator...
+        coefficient = F.ZZ(1); // need to be gathered trough generator...
+        constant = F.ZZ(1); // need to be gathered trough generator...
 
         // not implemented yet ...
     }
 
     /**
-     * Updates the expression field in the parent class based on coefficient and constant
+     * Updates the expression field in the parent class based on coefficient and
+     * constant
      */
     private void updateExpression() {
         // Create the expression: coefficient * variable + constant
         IExpr expr = F.Plus(
                 F.Times(coefficient, variable),
-                constant
-        );
+                constant);
 
         // Set the parent class expression field
         setExpression(expr);
@@ -58,7 +58,7 @@ public class Linear extends Function {
             throw new IllegalArgumentException("Linear function requires exactly one root.");
         }
 
-        this.coefficient = F.ZZ(1);                 // need to be gathered trough generator...
+        this.coefficient = F.ZZ(1); // need to be gathered trough generator...
         this.constant = coefficient.negate().multiply(answers.getFirst());
     }
 }

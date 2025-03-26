@@ -71,24 +71,21 @@ public abstract class Function implements FunctionInterface {
     /**
      * Evaluates the function at a given x value.
      */
-    public double getFunctionValue(double x) {
-        IExpr substituted = expression.replaceAll(F.Rule(variable, F.num(x)));
-        return substituted.evalf();
+    public IExpr getFunctionValue(IExpr x) {
+        return expression.replaceAll(F.Rule(variable, x)).eval();
     }
 
     /**
      * Evaluates a provided function at a given x value.
      */
-    public double getFunctionValue(String function, double x) {
-        IExpr expr = F.eval(function);
-        IExpr substituted = expr.replaceAll(F.Rule(variable, F.num(x)));
-        return substituted.evalf();
+    public IExpr getFunctionValue(String function, IExpr x) {
+        return F.eval(function).replaceAll(F.Rule(variable, x)).eval();
     }
 
     public boolean isPointOnSlope(Point point) {
-        double functionValue = getFunctionValue(point.getX());
+        IExpr functionValue = getFunctionValue(point.getX());
 
-        return Math.abs(point.getY() - functionValue) < 1e-10;
+        return false;
     }
 
     /**
