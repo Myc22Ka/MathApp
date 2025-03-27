@@ -1,13 +1,16 @@
 package pl.myc22ka.mathapp.model.functions;
 
+import lombok.Getter;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;
 
+@Getter
 public class Linear extends Function {
     private IExpr coefficient;
     private IExpr constant;
@@ -31,6 +34,7 @@ public class Linear extends Function {
     }
 
     @Override
+    @NotFullyImplemented
     public void generateRandomFunction() {
         coefficient = F.ZZ(1); // need to be gathered trough generator...
         constant = F.ZZ(1); // need to be gathered trough generator...
@@ -42,17 +46,11 @@ public class Linear extends Function {
      * Updates the expression field in the parent class based on coefficient and
      * constant
      */
-    private void updateExpression() {
-        // Create the expression: coefficient * variable + constant
-        IExpr expr = F.Plus(
-                F.Times(coefficient, variable),
-                constant);
-
-        // Set the parent class expression field
-        setExpression(expr);
-    }
+    @Override
+    protected void updateExpression() { setExpression(F.Plus(F.Times(coefficient, variable), constant)); }
 
     @Override
+    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 1) {
             throw new IllegalArgumentException("Linear function requires exactly one root.");

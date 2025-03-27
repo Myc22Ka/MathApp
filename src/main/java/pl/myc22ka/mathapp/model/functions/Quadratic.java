@@ -7,6 +7,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 import pl.myc22ka.mathapp.model.Point;
+import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;
 
@@ -35,12 +36,12 @@ public class Quadratic extends Function {
     }
 
     // Quadratic from derivative
-    public Quadratic(IExpr derivativeA, IExpr derivativeB, ISymbol variable) {
+    public Quadratic(Linear derivative, ISymbol variable) {
         super(FunctionTypes.QUADRATIC, variable);
 
-        this.coefficientA = F.Divide(derivativeA, 2);
-        this.coefficientB = derivativeB;
-        this.constant = F.C0; // need to be gathered trough generator...
+        this.coefficientA = F.Divide(derivative.getCoefficient(), 2);
+        this.coefficientB = derivative.getConstant();
+        this.constant = F.C0;           // need to be gathered trough generator...
 
         updateExpression();
     }
@@ -54,20 +55,12 @@ public class Quadratic extends Function {
     }
 
     // Quadratic from vertex
-    public Quadratic(IExpr vertex, ISymbol variable) {
+    public Quadratic(Point vertex, ISymbol variable) {
         super(FunctionTypes.QUADRATIC, variable);
 
-        // Assuming vertex is a Symja point with getX() and getY() methods returning
-        // IExpr
-        this.coefficientA = F.C1; // Default coefficient of 1
-
-        // Calculate B coefficient: -2 * a * x
-        this.coefficientB = F.Times(F.CN2, this.coefficientA, vertex.getAt(0));
-
-        // Calculate constant term: a * x^2 + y
-        this.constant = F.Plus(
-                F.Times(this.coefficientA, F.Power(vertex.getAt(0), F.C2)),
-                vertex.getAt(1));
+        this.coefficientA = F.C1;           // need to be gathered trough generator...
+        this.coefficientB = F.Times(F.CN2, this.coefficientA, vertex.getX());
+        this.constant = F.Plus(F.Times(this.coefficientA, F.Power(vertex.getX(), F.C2)), vertex.getY());
 
         updateExpression();
     }
@@ -82,17 +75,11 @@ public class Quadratic extends Function {
         updateExpression();
     }
 
-    // Create the expression: a * x^2 + b * x + c
-    private void updateExpression() {
-        IExpr expr = F.Plus(
-                F.Times(coefficientA, F.Power(variable, F.C2)),
-                F.Times(coefficientB, variable),
-                constant);
-
-        setExpression(expr.eval());
-    }
+    @Override
+    protected void updateExpression() { setExpression(F.Plus(F.Times(coefficientA, F.Power(variable, F.C2)), F.Times(coefficientB, variable), constant)); }
 
     @Override
+    @NotFullyImplemented
     public void generateRandomFunction() {
         coefficientA = F.ZZ(1); // need to be gathered trough generator...
         coefficientB = F.ZZ(-1); // need to be gathered trough generator...
@@ -102,6 +89,7 @@ public class Quadratic extends Function {
     }
 
     @Override
+    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 2) {
             throw new IllegalArgumentException("Quadratic function requires exactly two roots.");
@@ -110,7 +98,6 @@ public class Quadratic extends Function {
         IExpr r1 = answers.getFirst();
         IExpr r2 = answers.get(1);
 
-        // Expand (x - r1)(x - r2) = x^2 - (r1 + r2)x + (r1 * r2)
         this.coefficientA = F.ZZ(1); // need to be gathered trough generator...
         this.coefficientB = F.Negate(F.Plus(r1, r2));
         this.constant = F.Times(r1, r2);

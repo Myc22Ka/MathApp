@@ -1,13 +1,12 @@
 package pl.myc22ka.mathapp.model.functions;
 
-import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
 import pl.myc22ka.mathapp.model.Function;
 import pl.myc22ka.mathapp.model.FunctionTypes;
-import pl.myc22ka.mathapp.utils.MathUtils;
+import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.*;
 
@@ -31,7 +30,8 @@ public class Polynomial extends Function {
     /**
      * Updates the expression field in the parent class based on the coefficients.
      */
-    private void updateExpression() {
+    @Override
+    protected void updateExpression() {
         if (coefficients == null || coefficients.isEmpty()) {
             setExpression(F.C0);
             return;
@@ -49,6 +49,7 @@ public class Polynomial extends Function {
     }
 
     @Override
+    @NotFullyImplemented
     public void generateRandomFunction() {
         coefficients = List.of(F.ZZ(1), F.ZZ(3), F.ZZ(1), F.ZZ(3)); // need to be gathered trough generator...
 
@@ -56,6 +57,7 @@ public class Polynomial extends Function {
     }
 
     @Override
+    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers == null || answers.isEmpty()) {
             throw new IllegalArgumentException("Musisz podać przynajmniej jedno miejsce zerowe.");

@@ -16,8 +16,8 @@ public class MathUtils {
      * @param expr Symja expression containing equation solutions.
      * @return List of extracted roots as strings.
      */
-    public static List<String> extractRootsFromExpr(IExpr expr) {
-        List<String> roots = new ArrayList<>();
+    public static List<IExpr> extractRootsFromExpr(IExpr expr) {
+        List<IExpr> roots = new ArrayList<>();
 
         if (expr.isList()) {
             for (int i = 0; i < expr.size(); i++) {
@@ -28,36 +28,13 @@ public class MathUtils {
                 for (int j = 0; j < solution.size(); j++) {
                     IExpr result = solution.getAt(j);
 
-                    if(result.isRuleAST()){
-                        String valueStr = result.second().toString();
+                    if(!result.isRuleAST()) continue;
 
-                        // Remove surrounding parentheses using regex
-                        valueStr = valueStr.replaceAll("^\\((.*)\\)$", "$1");
-
-                        roots.add(valueStr);
-                    }
+                    roots.add(result.second());
                 }
-
             }
         }
 
         return roots;
-    }
-
-    /**
-     * Calculates the greatest common divisor (GCD) of all coefficients.
-     */
-    public static int getPolynomialGCD(List<Double> coefficients) {
-        return coefficients.stream()
-                .mapToInt(coef -> (int) Math.round(coef))
-                .reduce((a, b) -> {
-                    while (b != 0) {
-                        int temp = b;
-                        b = a % b;
-                        a = temp;
-                    }
-                    return Math.abs(a);
-                })
-                .orElse(1);
     }
 }
