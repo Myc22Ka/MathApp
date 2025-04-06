@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.model;
+package pl.myc22ka.mathapp.utils.functions;
 
 import org.matheclipse.core.interfaces.IExpr;
 

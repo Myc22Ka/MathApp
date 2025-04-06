@@ -4,5 +4,7 @@ public enum FunctionTypes {
     CONSTANT,
     LINEAR,
     QUADRATIC,
-    POLYNOMIAL
+    POLYNOMIAL,
+    TRIGONOMETRIC,
+    FUNCTION
 }

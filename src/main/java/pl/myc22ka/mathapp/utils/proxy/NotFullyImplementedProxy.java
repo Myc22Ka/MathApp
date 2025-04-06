@@ -26,15 +26,15 @@ public class NotFullyImplementedProxy implements InvocationHandler {
         return method.invoke(target, args);
     }
 
-    private Object getDefaultValue(Class<?> returnType) {
-        if (returnType == boolean.class) return false;
-        if (returnType == char.class) return '\u0000';
-        if (returnType == byte.class) return (byte) 0;
-        if (returnType == short.class) return (short) 0;
-        if (returnType == int.class) return 0;
-        if (returnType == long.class) return 0L;
-        if (returnType == float.class) return 0.0f;
-        if (returnType == double.class) return 0.0d;
+    private static Object getDefaultValue(Class<?> type) {
+        if (type == boolean.class) return false;
+        if (type == char.class) return '\u0000';
+        if (type == byte.class) return (byte) 0;
+        if (type == short.class) return (short) 0;
+        if (type == int.class) return 0;
+        if (type == long.class) return 0L;
+        if (type == float.class) return 0.0f;
+        if (type == double.class) return 0.0d;
         return null;
     }
 
