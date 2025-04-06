@@ -10,32 +10,33 @@ import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import java.util.List;
 
 public class Function extends Expression {
-    private IExpr function;
-
     public Function(FunctionTypes type, ISymbol variable) {
         super(type, variable);
+
+        generateRandomFunction();
     }
 
-    public Function(ISymbol variable, IExpr function) {
-        super(FunctionTypes.FUNCTION, variable);
+    public Function(String function, ISymbol variable) {
+        super(FunctionTypes.FUNCTION, variable, F.eval(function));
 
-        this.function = function;
-
-        updateExpression();
+        setExpression(F.eval(function));
     }
 
-    @Override
-    protected void updateExpression() {
-        expression = F.eval(function);
-    }
+    protected void updateExpression() {}
 
     @NotFullyImplemented
     public void generateRandomFunction() {
+        setExpression(F.eval("Cos(x)*Sin(3*x)"));
 
+        // TO DO...
     }
 
-    @Override
     @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
+        // TO DO...
+    }
+
+    public final Function plus(Function other) {
+        return new Function( F.Plus(this.getExpression(), other.getExpression()).toString(), this.getVariable());
     }
 }

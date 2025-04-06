@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import pl.myc22ka.mathapp.model.functions.Function;
+import pl.myc22ka.mathapp.model.functions.Linear;
 import pl.myc22ka.mathapp.model.functions.Trigonometric;
 import pl.myc22ka.mathapp.utils.MathUtils;
 
@@ -74,12 +75,17 @@ public class MathAppApplication {
 //
 //		System.out.println("----------------------------------------------------");
 
-		ExprEvaluator util = new ExprEvaluator();
+		var linear1 = new Function("x+1", F.x);
+		var linear2 = new Function("x+3", F.x);
 
-		var function = new Function(F.x, F.eval("Cos(x)+Sin(3*x)"));
+		var linear3 = linear1.plus(linear2);
 
-		var res2 = MathUtils.getAllRoots(function.getRealConditionRoots(F.k));
+		System.out.println(linear3);
 
-		System.out.println(res2);
+//		var function = new Function("Cos(x)+Sin(3*x)", F.x);
+//
+//		var res2 = MathUtils.getAllRoots(function.getRealConditionRoots(F.k));
+//
+//		System.out.println(res2);
 	}
 }

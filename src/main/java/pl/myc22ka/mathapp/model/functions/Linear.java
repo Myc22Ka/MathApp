@@ -19,7 +19,6 @@ public class Linear extends Function {
         super(FunctionTypes.LINEAR, variable);
 
         generateRandomFunction();
-        updateExpression();
     }
 
     // Constructor to get Linear Function with correct coefficients
@@ -37,6 +36,8 @@ public class Linear extends Function {
     public void generateRandomFunction() {
         coefficient = F.ZZ(1); // need to be gathered trough generator...
         constant = F.ZZ(1); // need to be gathered trough generator...
+
+        updateExpression();
 
         // not implemented yet ...
     }

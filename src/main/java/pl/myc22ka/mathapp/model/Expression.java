@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.expression.F;
@@ -18,11 +19,18 @@ public abstract class Expression implements FunctionInterface {
 
     protected FunctionTypes type;
     protected ISymbol variable;
+
+    @Setter
     protected IExpr expression;
 
     public Expression(FunctionTypes type, ISymbol variable) {
+        this(type, variable, null);
+    }
+
+    public Expression(FunctionTypes type, ISymbol variable, IExpr expression) {
         this.type = type;
         this.variable = variable;
+        this.expression = expression;
     }
 
     @Override
@@ -95,11 +103,5 @@ public abstract class Expression implements FunctionInterface {
     public boolean isPointOnSlope(Point point) { return getFunctionValue(point.getX()).equals(point.getY()); }
 
     @Override
-    public String toString() { return expression.toString(); }
-
-    protected void setExpression(IExpr expr) { this.expression = expr; }
-
-    protected abstract void updateExpression();
-
-    public abstract void generateFunctionFromAnswers(List<IExpr> answers);
+    public String toString() { return expression != null ? expression.toString() : "undefined"; }
 }
