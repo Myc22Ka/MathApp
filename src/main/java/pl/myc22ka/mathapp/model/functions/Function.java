@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.model.functions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
+
 import pl.myc22ka.mathapp.model.Expression;
 import pl.myc22ka.mathapp.model.FunctionTypes;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -17,16 +18,15 @@ public class Function extends Expression {
     }
 
     public Function(String function, ISymbol variable) {
-        super(FunctionTypes.FUNCTION, variable, F.eval(function));
-
-        setExpression(F.eval(function));
+        super(FunctionTypes.FUNCTION, variable, function);
     }
 
-    protected void updateExpression() {}
+    protected void updateExpression() {
+    }
 
     @NotFullyImplemented
     public void generateRandomFunction() {
-        setExpression(F.eval("Cos(x)*Sin(3*x)"));
+        setExpression("Cos(x)*Sin(3*x)");
 
         // TO DO...
     }
@@ -37,6 +37,26 @@ public class Function extends Expression {
     }
 
     public final Function plus(Function other) {
-        return new Function( F.Plus(this.getExpression(), other.getExpression()).toString(), this.getVariable());
+        return new Function((F.Plus(parseExpression(), F.Parenthesis(other.parseExpression()))).toString(), variable);
+    }
+
+    public final Function minus(Function other) {
+        return new Function(F.Subtract(parseExpression(), F.Parenthesis(other.parseExpression())).toString(), variable);
+    }
+
+    public final Function times(Function other) {
+        return new Function(F.Times(parseExpression(), other.parseExpression()).toString(), variable);
+    }
+
+    public final Function divide(Function other) {
+        return new Function(F.Divide(parseExpression(), other.parseExpression()).toString(), variable);
+    }
+
+    public final Function composition(Function other) {
+        var rule = F.Rule(evaluator.eval(variable + "_"), evaluator.eval("HoldForm[" + expression + "]"));
+
+        IExpr result = other.parseExpression().replaceAll(rule);
+
+        return new Function(result.toString(), variable);
     }
 }

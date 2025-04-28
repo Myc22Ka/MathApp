@@ -32,7 +32,7 @@ public class Polynomial extends Function {
     @Override
     protected void updateExpression() {
         if (coefficients == null || coefficients.isEmpty()) {
-            setExpression(F.C0);
+            setExpression("0");
             return;
         }
 
@@ -44,7 +44,7 @@ public class Polynomial extends Function {
             expr = expr.isZero() ? term : F.Plus(expr, term);
         }
 
-        setExpression(expr.eval());
+        setExpression(expr.toString());
     }
 
     @Override

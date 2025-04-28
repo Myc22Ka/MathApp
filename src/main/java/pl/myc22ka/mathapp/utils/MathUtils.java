@@ -14,7 +14,8 @@ public class MathUtils {
     }
 
     /**
-     * Extracts numerical roots from a Symja expression returned by the `Solve` function.
+     * Extracts numerical roots from a Symja expression returned by the `Solve`
+     * function.
      *
      * @param expr Symja expression containing equation solutions.
      * @return List of extracted roots as strings.
@@ -26,12 +27,14 @@ public class MathUtils {
             for (int i = 0; i < expr.size(); i++) {
                 IExpr solution = expr.getAt(i);
 
-                if(!solution.isList()) continue;
+                if (!solution.isList())
+                    continue;
 
                 for (int j = 0; j < solution.size(); j++) {
                     IExpr result = solution.getAt(j);
 
-                    if(!result.isRuleAST()) continue;
+                    if (!result.isRuleAST())
+                        continue;
 
                     IExpr rhs = result.second();
 
@@ -50,7 +53,8 @@ public class MathUtils {
             for (int i = 0; i < expr.size(); i++) {
                 IExpr solution = expr.getAt(i);
 
-                if(!solution.isList()) continue;
+                if (!solution.isList())
+                    continue;
 
                 var conditionalExpression = solution.first().second();
 

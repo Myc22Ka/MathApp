@@ -40,7 +40,7 @@ public class Quadratic extends Function {
 
         this.coefficientA = F.Divide(derivative.getCoefficient(), 2);
         this.coefficientB = derivative.getConstant();
-        this.constant = F.C0;           // need to be gathered trough generator...
+        this.constant = F.C0; // need to be gathered trough generator...
 
         updateExpression();
     }
@@ -57,7 +57,7 @@ public class Quadratic extends Function {
     public Quadratic(Point vertex, ISymbol variable) {
         super(FunctionTypes.QUADRATIC, variable);
 
-        this.coefficientA = F.C1;           // need to be gathered trough generator...
+        this.coefficientA = F.C1; // need to be gathered trough generator...
         this.coefficientB = F.Times(F.CN2, this.coefficientA, vertex.getX());
         this.constant = F.Plus(F.Times(this.coefficientA, F.Power(vertex.getX(), F.C2)), vertex.getY());
 
@@ -75,7 +75,11 @@ public class Quadratic extends Function {
     }
 
     @Override
-    protected void updateExpression() { setExpression(F.Plus(F.Times(coefficientA, F.Power(variable, F.C2)), F.Times(coefficientB, variable), constant)); }
+    protected void updateExpression() {
+        setExpression(
+                F.Plus(F.Times(coefficientA, F.Power(variable, F.C2)), F.Times(coefficientB, variable), constant)
+                        .toString());
+    }
 
     @Override
     @NotFullyImplemented

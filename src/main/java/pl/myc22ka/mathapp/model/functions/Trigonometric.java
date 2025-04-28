@@ -36,7 +36,7 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
     @Override
     protected void updateExpression() {
         if (coefficient == null || angle == null || trigFunction == null) {
-            setExpression(F.C0);
+            setExpression("0");
             return;
         }
 
@@ -44,7 +44,7 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
         IExpr trigExpr = trigFunction.apply(inner);
         IExpr fullExpr = F.Times(coefficient, trigExpr);
 
-        setExpression(fullExpr.eval());
+        setExpression(fullExpr.toString());
     }
 
     @NotFullyImplemented
@@ -60,7 +60,7 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
         IExpr deltaX = F.Subtract(x2, x1);
         this.angle = F.Divide(F.Pi, deltaX);
         this.coefficient = F.ZZ(1);
-        this.trigFunction = F::Sin;             // domyślnie SIN
+        this.trigFunction = F::Sin; // domyślnie SIN
 
         updateExpression();
     }
@@ -70,7 +70,7 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
     public void generateRandomFunction() {
         // Można później dodać generator dla różnych współczynników i funkcji
         this.coefficient = F.ZZ(1); // domyślnie 1
-        this.angle = F.ZZ(1);       // domyślnie 1
+        this.angle = F.ZZ(1); // domyślnie 1
         this.trigFunction = F::Cos; // np. domyślnie COS
     }
 

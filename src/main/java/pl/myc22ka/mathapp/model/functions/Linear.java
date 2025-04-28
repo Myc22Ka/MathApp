@@ -47,7 +47,9 @@ public class Linear extends Function {
      * constant
      */
     @Override
-    protected void updateExpression() { setExpression(F.Plus(F.Times(coefficient, variable), constant)); }
+    protected void updateExpression() {
+        setExpression(F.Plus(F.Times(coefficient, variable), constant).toString());
+    }
 
     @Override
     @NotFullyImplemented
