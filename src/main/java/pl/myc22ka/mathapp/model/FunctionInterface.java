@@ -15,6 +15,8 @@ public interface FunctionInterface {
 
     List<IExpr> getAllRoots();
 
+    IExpr getVaraibles();
+
     IExpr getDerivative();
 
     IExpr getRange();

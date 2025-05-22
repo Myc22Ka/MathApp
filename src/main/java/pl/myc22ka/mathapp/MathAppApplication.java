@@ -6,9 +6,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import pl.myc22ka.mathapp.model.functions.Function;
-import pl.myc22ka.mathapp.model.functions.Linear;
-import pl.myc22ka.mathapp.model.functions.Trigonometric;
+import pl.myc22ka.mathapp.model.functions.*;
 import pl.myc22ka.mathapp.utils.MathUtils;
 
 @SpringBootApplication
@@ -86,25 +84,88 @@ public class MathAppApplication {
 
 		// System.out.println(linear3);
 
-		var func1 = new Function("x^2", F.x);
-		var func2 = new Function("x+2", F.x);
-
-		var func3 = func1.times(func2);
-		var func4 = func1.minus(func2);
-		var func5 = func1.plus(func2);
-		var func6 = func1.divide(func2);
-		var func7 = func1.composition(func2);
-
-		System.out.println("* Func3: " + func3);
-		System.out.println("- Func4: " + func4);
-		System.out.println("+ Func5: " + func5);
-		System.out.println("/ Func6: " + func6);
-		System.out.println("c Func7: " + func7);
+//		var func1 = new Function("x^2", F.x);
+//		var func2 = new Function("x+2", F.x);
+//
+//		var func3 = func1.times(func2);
+//		var func4 = func1.minus(func2);
+//		var func5 = func1.plus(func2);
+//		var func6 = func1.divide(func2);
+//		var func7 = func1.composition(func2);
+//
+//		System.out.println("* Func3: " + func3);
+//		System.out.println("- Func4: " + func4);
+//		System.out.println("+ Func5: " + func5);
+//		System.out.println("/ Func6: " + func6);
+//		System.out.println("c Func7: " + func7);
 
 		// var function = new Function("Sin(x)+Cos(3*x)", F.x);
 
 		// var res2 = MathUtils.getAllRoots(function.getRealConditionRoots(F.k));
 
 		// System.out.println(res2);
+
+		var function = new Function("e^x");
+
+		System.out.println("Function: " + function);
+		System.out.println("Domain: " + function.getDomain());
+		System.out.println("Roots: " + function.getRealRoots());
+		System.out.println("All Roots: " + function.getAllRoots());
+		System.out.println("Canonical Form: " + function.getFactoredForm());
+		System.out.println("Range: " + function.getRange());
+		System.out.println("Integral: " + function.getIntegral());
+
+		System.out.println("----------------------------------------------------");
+
+//		var linear = new Linear(F.ZZ(1), F.ZZ(2), F.x);
+//
+//		var function = new SquareRoot(linear, 2);
+//
+//		 System.out.println("Function: " + function);
+//		 System.out.println("Domain: " + function.getDomain());
+//		 System.out.println("Roots: " + function.getRealRoots());
+//		 System.out.println("All Roots: " + function.getAllRoots());
+//		 System.out.println("Canonical Form: " + function.getFactoredForm());
+//		 System.out.println("Range: " + function.getRange());
+//		 System.out.println("Integral: " + function.getIntegral());
+
+		System.out.println("----------------------------------------------------");
+
+		var e = new Function(F.e);
+		var coef = F.ZZ(1);
+		var exp = new Function("x");
+
+		var expFunction = new Exponential(e, coef, exp);
+
+		System.out.println("Exponential Function: " + expFunction);
+		System.out.println("Domain: " + expFunction.getDomain());
+		System.out.println("Roots: " + expFunction.getRealRoots());
+		System.out.println("All Roots: " + expFunction.getAllRoots());
+		System.out.println("Range: " + expFunction.getRange());
+		System.out.println("Integral: " + expFunction.getIntegral());
+
+		System.out.println("----------------------------------------------------");
+
+		var logFunction = new Logarithmic(F.ZZ(2), F.ZZ(1));
+
+		System.out.println("Logarithmic Function: " + logFunction);
+		System.out.println("Domain: " + logFunction.getDomain());
+		System.out.println("Roots: " + logFunction.getRealRoots());
+		System.out.println("All Roots: " + logFunction.getAllRoots());
+		System.out.println("Range: " + logFunction.getRange());
+		System.out.println("Integral: " + logFunction.getIntegral());
+
+		System.out.println("----------------------------------------------------");
+
+		var numerator = F.Plus(F.x, F.ZZ(2));
+		var denominator = F.Plus(F.x, F.ZZ(-1));
+		var rationalFunction = new Rational(numerator, denominator);
+
+		System.out.println("Rational Function: " + rationalFunction);
+		System.out.println("Domain: " + rationalFunction.getDomain());
+		System.out.println("Roots: " + rationalFunction.getRealRoots());
+		System.out.println("All Roots: " + rationalFunction.getAllRoots());
+		System.out.println("Range: " + rationalFunction.getRange());
+		System.out.println("Integral: " + rationalFunction.getIntegral());
 	}
 }

@@ -6,5 +6,9 @@ public enum FunctionTypes {
     QUADRATIC,
     POLYNOMIAL,
     TRIGONOMETRIC,
+    SQUAREROOT,
+    EXPONENTIAL,
+    RATIONAL,
+    LOGARITHMIC,
     FUNCTION
 }

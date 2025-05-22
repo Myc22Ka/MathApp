@@ -11,22 +11,21 @@ import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import java.util.List;
 
 public class Function extends Expression {
-    public Function(FunctionTypes type, ISymbol variable) {
-        super(type, variable);
-
-        generateRandomFunction();
+    public Function(String function) {
+        super(FunctionTypes.FUNCTION, function);
     }
 
-    public Function(String function, ISymbol variable) {
-        super(FunctionTypes.FUNCTION, variable, function);
+    public Function(IExpr function) {
+        super(FunctionTypes.FUNCTION, function);
     }
 
-    protected void updateExpression() {
+    public Function(FunctionTypes type) {
+        super(type);
     }
 
     @NotFullyImplemented
     public void generateRandomFunction() {
-        setExpression("Cos(x)*Sin(3*x)");
+        rawExpression = "Cos(x)*Sin(3*x)";
 
         // TO DO...
     }
@@ -37,26 +36,24 @@ public class Function extends Expression {
     }
 
     public final Function plus(Function other) {
-        return new Function((F.Plus(parseExpression(), F.Parenthesis(other.parseExpression()))).toString(), variable);
+        return new Function((F.Plus(symjaExpression, F.Parenthesis(other.symjaExpression))));
     }
 
     public final Function minus(Function other) {
-        return new Function(F.Subtract(parseExpression(), F.Parenthesis(other.parseExpression())).toString(), variable);
+        return new Function(F.Subtract(symjaExpression, F.Parenthesis(other.symjaExpression)));
     }
 
     public final Function times(Function other) {
-        return new Function(F.Times(parseExpression(), other.parseExpression()).toString(), variable);
+        return new Function(F.Times(symjaExpression, other.symjaExpression));
     }
 
     public final Function divide(Function other) {
-        return new Function(F.Divide(parseExpression(), other.parseExpression()).toString(), variable);
+        return new Function(F.Divide(symjaExpression, other.symjaExpression));
     }
 
     public final Function composition(Function other) {
-        var rule = F.Rule(evaluator.eval(variable + "_"), evaluator.eval("HoldForm[" + expression + "]"));
+        var rule = F.Rule(evaluator.eval(getVariable() + "_"), evaluator.eval("HoldForm[" + rawExpression + "]"));
 
-        IExpr result = other.parseExpression().replaceAll(rule);
-
-        return new Function(result.toString(), variable);
+        return new Function(other.symjaExpression.replaceAll(rule));
     }
 }

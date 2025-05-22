@@ -16,16 +16,16 @@ public class Quadratic extends Function {
     private IExpr constant;
 
     // Random Quadratic
-    public Quadratic(ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+    public Quadratic() {
+        super(FunctionTypes.QUADRATIC);
 
         generateRandomFunction();
         updateExpression();
     }
 
     // Quadratic from a, b and c
-    public Quadratic(IExpr coefficientA, IExpr coefficientB, IExpr constant, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+    public Quadratic(IExpr coefficientA, IExpr coefficientB, IExpr constant) {
+        super(FunctionTypes.QUADRATIC);
 
         this.coefficientA = coefficientA;
         this.coefficientB = coefficientB;
@@ -35,8 +35,8 @@ public class Quadratic extends Function {
     }
 
     // Quadratic from derivative
-    public Quadratic(Linear derivative, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+    public Quadratic(Linear derivative) {
+        super(FunctionTypes.QUADRATIC);
 
         this.coefficientA = F.Divide(derivative.getCoefficient(), 2);
         this.coefficientB = derivative.getConstant();
@@ -46,16 +46,16 @@ public class Quadratic extends Function {
     }
 
     // Quadratic from answers
-    public Quadratic(List<IExpr> answers, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+    public Quadratic(List<IExpr> answers) {
+        super(FunctionTypes.QUADRATIC);
 
         generateFunctionFromAnswers(answers);
         updateExpression();
     }
 
     // Quadratic from vertex
-    public Quadratic(Point vertex, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+    public Quadratic(Point vertex) {
+        super(FunctionTypes.QUADRATIC);
 
         this.coefficientA = F.C1; // need to be gathered trough generator...
         this.coefficientB = F.Times(F.CN2, this.coefficientA, vertex.getX());
@@ -65,7 +65,7 @@ public class Quadratic extends Function {
     }
 
     public Quadratic(Point vertex, IExpr coefficientA, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC, variable);
+        super(FunctionTypes.QUADRATIC);
 
         this.coefficientA = coefficientA;
         this.coefficientB = F.Times(F.ZZ(-2), coefficientA, vertex.getX());
@@ -74,11 +74,8 @@ public class Quadratic extends Function {
         updateExpression();
     }
 
-    @Override
     protected void updateExpression() {
-        setExpression(
-                F.Plus(F.Times(coefficientA, F.Power(variable, F.C2)), F.Times(coefficientB, variable), constant)
-                        .toString());
+        setExpressions(F.Plus(F.Times(coefficientA, F.Power(variable, F.C2)), F.Times(coefficientB, variable), constant).toString());
     }
 
     @Override

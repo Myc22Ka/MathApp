@@ -15,17 +15,16 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
     private IExpr angle;
     private Function<IExpr, IExpr> trigFunction;
 
-    // Konstruktor dla losowej funkcji trygonometrycznej
-    public Trigonometric(ISymbol variable) {
-        super(FunctionTypes.TRIGONOMETRIC, variable);
+    public Trigonometric() {
+        super(FunctionTypes.TRIGONOMETRIC);
 
         generateRandomFunction();
         updateExpression();
     }
 
     // Konstruktor z pełnymi danymi
-    public Trigonometric(ISymbol variable, IExpr coefficient, IExpr angle, Function<IExpr, IExpr> trigFunction) {
-        super(FunctionTypes.TRIGONOMETRIC, variable);
+    public Trigonometric(IExpr coefficient, IExpr angle, Function<IExpr, IExpr> trigFunction) {
+        super(FunctionTypes.TRIGONOMETRIC);
         this.coefficient = coefficient;
         this.angle = angle;
         this.trigFunction = trigFunction;
@@ -33,18 +32,12 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
         updateExpression();
     }
 
-    @Override
     protected void updateExpression() {
-        if (coefficient == null || angle == null || trigFunction == null) {
-            setExpression("0");
-            return;
-        }
-
         IExpr inner = F.Times(angle, variable);
         IExpr trigExpr = trigFunction.apply(inner);
         IExpr fullExpr = F.Times(coefficient, trigExpr);
 
-        setExpression(fullExpr.toString());
+        setExpressions(fullExpr.toString());
     }
 
     @NotFullyImplemented
@@ -65,25 +58,16 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
         updateExpression();
     }
 
-    @NotFullyImplemented
-    @Override
-    public void generateRandomFunction() {
-        // Można później dodać generator dla różnych współczynników i funkcji
-        this.coefficient = F.ZZ(1); // domyślnie 1
-        this.angle = F.ZZ(1); // domyślnie 1
-        this.trigFunction = F::Cos; // np. domyślnie COS
+    public static Trigonometric sin(IExpr a, IExpr b) {
+        return new Trigonometric(a, b, F::Sin);
     }
 
-    public static Trigonometric sin(ISymbol variable, IExpr a, IExpr b) {
-        return new Trigonometric(variable, a, b, F::Sin);
+    public static Trigonometric cos(IExpr a, IExpr b) {
+        return new Trigonometric(a, b, F::Cos);
     }
 
-    public static Trigonometric cos(ISymbol variable, IExpr a, IExpr b) {
-        return new Trigonometric(variable, a, b, F::Cos);
-    }
-
-    public static Trigonometric tan(ISymbol variable, IExpr a, IExpr b) {
-        return new Trigonometric(variable, a, b, F::Tan);
+    public static Trigonometric tan(IExpr a, IExpr b) {
+        return new Trigonometric(a, b, F::Tan);
     }
 
     // itd. dla cot, sec, csc...

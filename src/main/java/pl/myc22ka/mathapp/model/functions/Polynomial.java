@@ -12,31 +12,23 @@ import java.util.*;
 public class Polynomial extends Function {
     private List<IExpr> coefficients;
 
-    public Polynomial(ISymbol variable) {
-        super(FunctionTypes.POLYNOMIAL, variable);
+    public Polynomial() {
+        super(FunctionTypes.POLYNOMIAL);
 
         generateRandomFunction();
         updateExpression();
     }
 
-    public Polynomial(List<IExpr> coefficients, ISymbol variable) {
-        super(FunctionTypes.POLYNOMIAL, variable);
+    public Polynomial(List<IExpr> coefficients) {
+        super(FunctionTypes.POLYNOMIAL);
         this.coefficients = new ArrayList<>(coefficients.reversed());
 
         updateExpression();
     }
 
-    /**
-     * Updates the expression field in the parent class based on the coefficients.
-     */
-    @Override
     protected void updateExpression() {
-        if (coefficients == null || coefficients.isEmpty()) {
-            setExpression("0");
-            return;
-        }
-
         IExpr expr = coefficients.getFirst();
+
         for (int i = 1; i < coefficients.size(); i++) {
             IExpr coefficient = coefficients.get(i);
 
@@ -44,15 +36,7 @@ public class Polynomial extends Function {
             expr = expr.isZero() ? term : F.Plus(expr, term);
         }
 
-        setExpression(expr.toString());
-    }
-
-    @Override
-    @NotFullyImplemented
-    public void generateRandomFunction() {
-        coefficients = List.of(F.ZZ(1), F.ZZ(3), F.ZZ(1), F.ZZ(3)); // need to be gathered trough generator...
-
-        // not implemented yet...
+        setExpressions(expr.toString());
     }
 
     @Override
