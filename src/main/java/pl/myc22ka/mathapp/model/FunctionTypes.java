@@ -10,5 +10,6 @@ public enum FunctionTypes {
     EXPONENTIAL,
     RATIONAL,
     LOGARITHMIC,
+    ABSOLUTE,
     FUNCTION
 }

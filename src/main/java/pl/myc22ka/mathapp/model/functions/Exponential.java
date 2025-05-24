@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.model.functions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 public class Exponential extends Function {
     private IExpr coefficient;
@@ -24,6 +25,7 @@ public class Exponential extends Function {
         updateExpression();
     }
 
+    @NotFullyImplemented
     @Override
     public void generateRandomFunction() {
         base = new Function(F.e); // Natural base e

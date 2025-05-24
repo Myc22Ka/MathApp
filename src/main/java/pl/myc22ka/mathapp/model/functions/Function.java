@@ -2,7 +2,6 @@ package pl.myc22ka.mathapp.model.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 
 import pl.myc22ka.mathapp.model.Expression;
 import pl.myc22ka.mathapp.model.FunctionTypes;
@@ -48,7 +47,7 @@ public class Function extends Expression {
     }
 
     public final Function divide(Function other) {
-        return new Function(F.Divide(symjaExpression, other.symjaExpression));
+        return new Function(F.Times(symjaExpression, F.Power(other.symjaExpression, F.CN1)));
     }
 
     public final Function composition(Function other) {
