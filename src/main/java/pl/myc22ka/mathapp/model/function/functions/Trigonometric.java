@@ -1,16 +1,15 @@
-package pl.myc22ka.mathapp.model.functions;
+package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.function.Function;
 
 import java.util.List;
 
-public class Trigonometric extends pl.myc22ka.mathapp.model.functions.Function {
+public class Trigonometric extends pl.myc22ka.mathapp.model.function.Function {
     private IExpr coefficient;
     private IExpr angle;
     private Function<IExpr, IExpr> trigFunction;

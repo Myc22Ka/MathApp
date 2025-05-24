@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.model;
+package pl.myc22ka.mathapp.model.function;
 
 public enum FunctionTypes {
     CONSTANT,

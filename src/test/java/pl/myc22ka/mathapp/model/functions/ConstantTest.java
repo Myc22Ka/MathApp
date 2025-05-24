@@ -5,7 +5,11 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.exceptions.FunctionException;
+import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
+import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.functions.Constant;
 import pl.myc22ka.mathapp.utils.MathRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,11 +91,11 @@ class ConstantTest {
     @Test
     void constructorThrowsExceptionOnNull() {
         // GIVEN / WHEN / THEN
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(FunctionException.class, () -> {
             new Constant(null);
         });
 
-        assertEquals("Value cannot be null", exception.getMessage());
+        assertEquals(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED.toString(), exception.getMessage());
     }
 
     @Test
@@ -105,6 +109,19 @@ class ConstantTest {
         Function result = c1.plus(c2);
 
         assertEquals(n1 + "+(" + n2 + ")", result.getRawExpression());
+    }
+
+    @Test
+    void testMinusWithConstant() {
+        var n1 = 4.0;
+        var n2 = 5.0;
+
+        Constant c1 = new Constant(F.num(n1));
+        Constant c2 = new Constant(F.num(n2));
+
+        Function result = c1.minus(c2);
+
+        assertEquals(n1 + "-(" + n2 + ")", result.getRawExpression());
     }
 
     @Test
@@ -133,17 +150,47 @@ class ConstantTest {
         assertEquals(c1 + "/" + c2, result.getRawExpression());
     }
 
-    // @Test
-    // void testCompositionWithConstant() {
-    // Constant c = new Constant(F.num(7));
-    // Function f = new Function("x+1");
+    @Test
+    void testDivideByZeroThrowsException() {
+        Constant c1 = new Constant(F.ZZ(5));
+        Constant zero = new Constant(F.ZZ(0));
 
-    // Function result = c.composition(f);
+        Exception exception = assertThrows(FunctionException.class, () -> {
+            c1.divide(zero);
+        });
 
-    // // Oczekiwany efekt zależy od implementacji composition,
-    // // więc tu możesz zweryfikować, że wynik nie jest null i jest zgodny z
-    // // oczekiwaniami
-    // assertNotNull(result);
-    // // Możesz tu doprecyzować asercje jeśli znasz dokładny wynik
-    // }
+        assertEquals(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
+    }
+
+    @Test
+    void compositionOfTwoConstantsShouldThrowException() {
+        // GIVEN
+        Constant c1 = new Constant(org.matheclipse.core.expression.F.num(5));
+        Constant c2 = new Constant(org.matheclipse.core.expression.F.num(10));
+
+        // WHEN & THEN
+        FunctionException exception = assertThrows(FunctionException.class, () -> {
+            c1.composition(c2);
+        });
+
+        assertEquals(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
+    }
+
+    @Test
+    void testGetRealRootsForConstantNoSolutions() {
+        Constant c1 = new Constant(F.ZZ(5));
+
+        Exception exception = assertThrows(FunctionException.class, c1::getRealRoots);
+
+        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception.getMessage());
+    }
+
+    @Test
+    void testGetRealRootsForConstantAllSolutions() {
+        Constant c1 = new Constant(F.ZZ(0));
+
+        Exception exception = assertThrows(FunctionException.class, c1::getRealRoots);
+
+        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception.getMessage());
+    }
 }

@@ -1,10 +1,11 @@
-package pl.myc22ka.mathapp.model.functions;
+package pl.myc22ka.mathapp.model.function.functions;
 
 import lombok.Getter;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
-import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;

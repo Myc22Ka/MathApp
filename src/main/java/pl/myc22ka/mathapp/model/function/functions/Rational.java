@@ -1,8 +1,9 @@
-package pl.myc22ka.mathapp.model.functions;
+package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.Function;
 
 public class Rational extends Function {
     private IExpr numerator;

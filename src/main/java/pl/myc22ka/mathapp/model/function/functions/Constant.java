@@ -1,10 +1,12 @@
-package pl.myc22ka.mathapp.model.functions;
+package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
-import pl.myc22ka.mathapp.model.FunctionTypes;
+import pl.myc22ka.mathapp.exceptions.FunctionException;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import pl.myc22ka.mathapp.utils.annotations.NotTested;
 
@@ -21,7 +23,7 @@ public class Constant extends Function {
         super(FunctionTypes.CONSTANT);
 
         if (value == null) {
-            throw new IllegalArgumentException(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED.getMessage());
+            throw new FunctionException(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED);
         }
 
         this.value = value;
@@ -41,7 +43,7 @@ public class Constant extends Function {
     protected void updateExpression() {
 
         if (value == null) {
-            throw new IllegalStateException(FunctionErrorMessages.NULL_VALUE_UPDATE_ERROR.getMessage());
+            throw new FunctionException(FunctionErrorMessages.NULL_VALUE_UPDATE_ERROR);
         }
 
         setExpressions(value);
