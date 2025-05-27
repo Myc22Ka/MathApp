@@ -5,11 +5,13 @@ import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
+import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.functions.Constant;
+import pl.myc22ka.mathapp.model.function.functions.Linear;
 import pl.myc22ka.mathapp.utils.MathRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -179,18 +181,57 @@ class ConstantTest {
     @Test
     void testGetRealRootsForConstantNoSolutions() {
         Constant c1 = new Constant(F.ZZ(5));
+        ISymbol symbol = F.Dummy("a");
 
-        Exception exception = assertThrows(FunctionException.class, c1::getRealRoots);
+        var exception1 = assertThrows(FunctionException.class, c1::getRealRoots);
 
-        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception.getMessage());
+        var exception2 = assertThrows(FunctionException.class, () ->
+                c1.getRealConditionRoots(symbol)
+        );
+
+        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception1.getMessage());
+        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception2.getMessage());
     }
 
     @Test
     void testGetRealRootsForConstantAllSolutions() {
         Constant c1 = new Constant(F.ZZ(0));
+        ISymbol symbol = F.Dummy("a");
 
-        Exception exception = assertThrows(FunctionException.class, c1::getRealRoots);
+        var exception1 = assertThrows(FunctionException.class, c1::getRealRoots);
 
-        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception.getMessage());
+        FunctionException exception2 = assertThrows(FunctionException.class, () ->
+                c1.getRealConditionRoots(symbol)
+        );
+
+        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception1.getMessage());
+        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception2.getMessage());
     }
+
+    @Test
+    void testGetDerivativeForConstant(){
+        Constant c1 = new Constant(F.ZZ(10));
+
+        Function result = new Function(c1.getDerivative());
+
+        assertEquals("0", result.toString(), "Derivative from constant function should be 0");
+    }
+
+    @Test
+    void testGetRangeForConstant(){
+        Constant c1 = new Constant(F.ZZ(10));
+
+        IExpr range = c1.getRange();
+
+        assertEquals("y∈ℝ", range.toString(), "Derivative from constant function should be 0");
+    }
+
+//    @Test
+//    void testGetIntegralForConstant(){
+//        var c1 = new Linear(F.ZZ(10), F.ZZ(2));
+//
+//        Function integral = new Function(c1.getIntegral());
+//
+//        assertEquals("10*x+C", integral.toString(), "Derivative from constant function should be 0");
+//    }
 }

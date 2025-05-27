@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
 public class MathUtils {
     private static final ExprEvaluator evaluator = new ExprEvaluator();
 
-    public static List<Double> createInfiniteRange() {
-        return List.of(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-    }
-
     public static IExpr getVariableBelongsToReals(ISymbol variable) {
         ISymbol symbol = variable != null ? variable : F.x;
         return F.Element(symbol, F.Dummy("ℝ"));
@@ -98,6 +94,16 @@ public class MathUtils {
 
     public static List<ConditionRoots> getConditionsRootsFromExpr(IExpr expr) {
         List<ConditionRoots> result = new ArrayList<>();
+
+        // No solution check
+        if (expr.isList() && expr.size() == 1) {
+            throw new FunctionException(FunctionErrorMessages.NO_SOLUTIONS);
+        }
+
+        // All solution check
+        if(expr.isList() && expr.size() == 2){
+            throw new FunctionException(FunctionErrorMessages.ALL_SOLUTIONS);
+        }
 
         if (expr.isList()) {
             for (int i = 0; i < expr.size(); i++) {

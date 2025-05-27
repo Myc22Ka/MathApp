@@ -7,6 +7,7 @@ import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import pl.myc22ka.mathapp.utils.annotations.NotTested;
 
@@ -42,10 +43,16 @@ public class Constant extends Function {
 
     protected void updateExpression() {
 
+
         if (value == null) {
             throw new FunctionException(FunctionErrorMessages.NULL_VALUE_UPDATE_ERROR);
         }
 
         setExpressions(value);
+    }
+
+    @Override
+    public IExpr getRange() {
+        return MathUtils.getVariableBelongsToReals(F.Dummy("y"));
     }
 }

@@ -11,6 +11,7 @@ import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.model.function.functions.Constant;
 import pl.myc22ka.mathapp.utils.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
+import pl.myc22ka.mathapp.utils.annotations.NotTested;
 import pl.myc22ka.mathapp.utils.functions.ConditionRoots;
 import pl.myc22ka.mathapp.utils.functions.Point;
 
@@ -78,6 +79,7 @@ public class Function implements FunctionInterface {
                 .toList();
     }
 
+    @NotTested
     @NotFullyImplemented
     @Override
     public List<IExpr> getRealRoots(double min, double max) {
@@ -96,6 +98,7 @@ public class Function implements FunctionInterface {
         return MathUtils.getRootsFromExpr(expr);
     }
 
+    @NotTested
     @Override
     public IExpr getVaraibles() {
         System.out.println(evaluator.eval(F.Variables(symjaExpression)));
