@@ -21,6 +21,13 @@ public class Rational extends Function {
         updateExpression();
     }
 
+    public Rational(Function numerator, Function denominator) {
+        super(FunctionTypes.RATIONAL);
+        this.numerator = numerator.getSymjaExpression();
+        this.denominator = denominator.getSymjaExpression();
+        updateExpression();
+    }
+
     @Override
     public void generateRandomFunction() {
         numerator = F.Plus(F.ZZ(2), F.Times(F.ZZ(3), variable));  // Random numerator

@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.model.functions;
+package pl.myc22ka.mathapp.model.function.functions;
 
 import org.junit.jupiter.api.Test;
 import org.matheclipse.core.eval.ExprEvaluator;

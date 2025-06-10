@@ -33,15 +33,15 @@ public class MathUtils {
     public static List<IExpr> getRootsFromExpr(IExpr expr) {
         List<IExpr> roots = new ArrayList<>();
 
-        // No solution check
-        if (expr.isList() && expr.size() == 1) {
-            throw new FunctionException(FunctionErrorMessages.NO_SOLUTIONS);
-        }
-
-        // All solution check
-        if(expr.isList() && expr.size() == 2){
-            throw new FunctionException(FunctionErrorMessages.ALL_SOLUTIONS);
-        }
+//        // No solution check
+//        if (expr.isList() && expr.size() == 1) {
+//            throw new FunctionException(FunctionErrorMessages.NO_SOLUTIONS);
+//        }
+//
+//        // All solution check
+//        if(expr.isList() && expr.size() == 2){
+//            throw new FunctionException(FunctionErrorMessages.ALL_SOLUTIONS);
+//        }
 
         if (expr.isList()) {
             for (int i = 0; i < expr.size(); i++) {
@@ -95,15 +95,15 @@ public class MathUtils {
     public static List<ConditionRoots> getConditionsRootsFromExpr(IExpr expr) {
         List<ConditionRoots> result = new ArrayList<>();
 
-        // No solution check
-        if (expr.isList() && expr.size() == 1) {
-            throw new FunctionException(FunctionErrorMessages.NO_SOLUTIONS);
-        }
-
-        // All solution check
-        if(expr.isList() && expr.size() == 2){
-            throw new FunctionException(FunctionErrorMessages.ALL_SOLUTIONS);
-        }
+//        // No solution check
+//        if (expr.isList() && expr.size() == 1) {
+//            throw new FunctionException(FunctionErrorMessages.NO_SOLUTIONS);
+//        }
+//
+//        // All solution check
+//        if(expr.isList() && expr.size() == 2){
+//            throw new FunctionException(FunctionErrorMessages.ALL_SOLUTIONS);
+//        }
 
         if (expr.isList()) {
             for (int i = 0; i < expr.size(); i++) {
