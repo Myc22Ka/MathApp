@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.utils;
+package pl.myc22ka.mathapp.utils.math;
 
 import java.util.Random;
 

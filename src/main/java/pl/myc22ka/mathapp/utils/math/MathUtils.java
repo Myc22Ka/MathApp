@@ -1,27 +1,17 @@
-package pl.myc22ka.mathapp.utils;
+package pl.myc22ka.mathapp.utils.math;
 
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.S;
-import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
-import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
-import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.utils.functions.ConditionRoots;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MathUtils {
     private static final ExprEvaluator evaluator = new ExprEvaluator();
-
-    public static IExpr getVariableBelongsToReals(ISymbol variable) {
-        ISymbol symbol = variable != null ? variable : F.x;
-        return F.Element(symbol, F.Dummy("ℝ"));
-    }
 
     /**
      * Extracts numerical roots from a Symja expression returned by the `Solve`

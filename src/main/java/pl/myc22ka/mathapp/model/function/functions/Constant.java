@@ -7,9 +7,13 @@ import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
-import pl.myc22ka.mathapp.utils.MathUtils;
+import pl.myc22ka.mathapp.utils.math.MathSymbols;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import pl.myc22ka.mathapp.utils.annotations.NotTested;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Constant extends Function {
     private IExpr value;
@@ -30,6 +34,10 @@ public class Constant extends Function {
         this.value = value;
 
         updateExpression();
+    }
+
+    public Constant(String rawExpression) {
+        super(FunctionTypes.CONSTANT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @NotFullyImplemented
@@ -53,6 +61,11 @@ public class Constant extends Function {
 
     @Override
     public IExpr getRange() {
-        return MathUtils.getVariableBelongsToReals(F.Dummy("y"));
+        return MathSymbols.belongs(F.y, MathSymbols.getReal());
+    }
+
+    @Override
+    public List<IExpr> getRealRoots() {
+        return rawExpression.equals("0") ? List.of(F.True) : List.of(F.False);
     }
 }

@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.functions.Point;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
@@ -73,6 +74,10 @@ public class Quadratic extends Function {
         this.constant = F.Plus(F.Times(coefficientA, vertex.getX(), vertex.getX()), vertex.getY());
 
         updateExpression();
+    }
+
+    public Quadratic(String rawExpression) {
+        super(FunctionTypes.QUADRATIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     protected void updateExpression() {

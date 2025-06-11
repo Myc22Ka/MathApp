@@ -4,4 +4,4 @@ spring:
 
 logging:
   level:
-    edu.jas: WARN
+    edu.jas: off

@@ -4,6 +4,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 
 public class Logarithmic extends Function {
     private IExpr base;
@@ -21,6 +22,10 @@ public class Logarithmic extends Function {
         this.coefficient = coefficient;
 
         updateExpression();
+    }
+
+    public Logarithmic(String rawExpression) {
+        super(FunctionTypes.LOGARITHMIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.model.function.functions.Constant;
-import pl.myc22ka.mathapp.utils.MathUtils;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import pl.myc22ka.mathapp.utils.annotations.NotTested;
 import pl.myc22ka.mathapp.utils.functions.ConditionRoots;

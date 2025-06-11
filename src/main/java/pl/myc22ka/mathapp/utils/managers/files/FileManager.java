@@ -24,6 +24,7 @@ public class FileManager<T> {
                 .withCSVParser(new CSVParserBuilder()
                         .withSeparator(';')
                         .build())
+                .withSkipLines(1)
                 .build()) {
 
             StreamSupport.stream(csvReader.spliterator(), false).forEach(record -> {

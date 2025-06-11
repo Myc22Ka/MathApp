@@ -2,25 +2,49 @@ package pl.myc22ka.mathapp.utils.managers.files.parsers;
 
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.model.function.FunctionFactory;
+import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.utils.managers.files.CsvRecordParser;
+import pl.myc22ka.mathapp.utils.managers.files.records.FunctionRecord;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
-public class FunctionParser implements CsvRecordParser<FunctionRootsRecord> {
+public class FunctionParser implements CsvRecordParser<FunctionRecord> {
     private static final ExprEvaluator evaluator = new ExprEvaluator();
 
     @Override
-    public FunctionRootsRecord parse(String[] record) {
-        String key = record.length > 0 ? record[0] : "";
-        List<IExpr> values = new ArrayList<>();
-        for (int i = 1; i < record.length; i++) {
-            try {
-                values.add(evaluator.parse(record[i]));
-            } catch (NumberFormatException e) {
-                // Możesz tu dodać logowanie lub obsługę błędów
-            }
+    public FunctionRecord parse(String[] record) {
+        if(record.length < FunctionRecord.class.getRecordComponents().length) {
+            throw new IllegalArgumentException("Invalid record: " + Arrays.toString(record));
         }
-        return new FunctionRootsRecord(key, values);
+
+        var function = FunctionFactory.create(record[0]);
+        var type = FunctionTypes.parse(record[1]);
+        var roots = parseList(record[2]);
+        var derivative = evaluator.parse(record[3]);
+        String range = record[4];
+        String domain = record[5];
+        var integral = evaluator.parse(record[6]);
+
+        return new FunctionRecord(function, type, roots, derivative, range, domain, integral);
+    }
+
+    private List<IExpr> parseList(String input) {
+        // Expect input like "[-1, 0, 1]"
+        input = input.replaceAll("[\\[\\]]", "").trim(); // Remove brackets
+        List<IExpr> result = new ArrayList<>();
+
+        if (input.isEmpty()) return result;
+
+        for (String s : input.split(",")) {
+            result.add(evaluator.parse(s.trim()));
+        }
+
+        result.sort(Comparator.comparingDouble(evaluator::evalf));
+
+        return result;
     }
 }

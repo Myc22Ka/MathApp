@@ -4,6 +4,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 public class Exponential extends Function {
@@ -24,6 +25,10 @@ public class Exponential extends Function {
         this.coefficient = coefficient;
 
         updateExpression();
+    }
+
+    public Exponential(String rawExpression) {
+        super(FunctionTypes.EXPONENTIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @NotFullyImplemented

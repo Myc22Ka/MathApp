@@ -10,9 +10,7 @@ import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
-import pl.myc22ka.mathapp.model.function.functions.Constant;
-import pl.myc22ka.mathapp.model.function.functions.Linear;
-import pl.myc22ka.mathapp.utils.MathRandom;
+import pl.myc22ka.mathapp.utils.math.MathRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,7 +92,7 @@ class ConstantTest {
     void constructorThrowsExceptionOnNull() {
         // GIVEN / WHEN / THEN
         Exception exception = assertThrows(FunctionException.class, () -> {
-            new Constant(null);
+            new Constant("null");
         });
 
         assertEquals(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED.toString(), exception.getMessage());

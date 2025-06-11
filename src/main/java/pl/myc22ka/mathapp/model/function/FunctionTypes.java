@@ -11,5 +11,15 @@ public enum FunctionTypes {
     RATIONAL,
     LOGARITHMIC,
     ABSOLUTE,
-    FUNCTION
+    FUNCTION;
+
+    public static FunctionTypes parse(String text) {
+        if (text == null) return FUNCTION;
+
+        try {
+            return valueOf(text.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return FUNCTION; // Default value
+        }
+    }
 }

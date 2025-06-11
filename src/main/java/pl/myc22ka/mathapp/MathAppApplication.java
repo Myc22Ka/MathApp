@@ -2,8 +2,6 @@ package pl.myc22ka.mathapp;
 
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,7 +9,9 @@ import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.model.function.functions.Exponential;
 import pl.myc22ka.mathapp.model.function.functions.Logarithmic;
 import pl.myc22ka.mathapp.model.function.functions.Rational;
-import pl.myc22ka.mathapp.utils.MathUtils;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SpringBootApplication
 public class MathAppApplication {
@@ -19,6 +19,11 @@ public class MathAppApplication {
 	private static final ExprEvaluator evaluator = new ExprEvaluator();
 
 	public static void main(String[] args) {
+
+		// Disable logging for JAS packages
+		Logger jasLogger = Logger.getLogger("edu.jas");
+		jasLogger.setLevel(Level.OFF);
+
 		SpringApplication.run(MathAppApplication.class, args);
 
 		// Function function1 = new Linear(F.x);

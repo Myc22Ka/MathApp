@@ -5,6 +5,7 @@ import org.matheclipse.core.interfaces.IExpr;
 
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.*;
@@ -24,6 +25,10 @@ public class Polynomial extends Function {
         this.coefficients = new ArrayList<>(coefficients.reversed());
 
         updateExpression();
+    }
+
+    public Polynomial(String rawExpression) {
+        super(FunctionTypes.POLYNOMIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     protected void updateExpression() {

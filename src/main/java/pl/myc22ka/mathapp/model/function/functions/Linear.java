@@ -6,6 +6,7 @@ import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.exceptions.FunctionException;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;
@@ -32,6 +33,10 @@ public class Linear extends Function {
         updateExpression();
     }
 
+    public Linear(String rawExpression) {
+        super(FunctionTypes.LINEAR, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+    }
+
     protected final void updateExpression() {
         setExpressions(F.Plus(F.Times(coefficient, variable), constant).toString());
     }
@@ -46,4 +51,6 @@ public class Linear extends Function {
         this.coefficient = F.ZZ(1); // need to be gathered trough generator...
         this.constant = coefficient.negate().multiply(answers.getFirst());
     }
+
+
 }

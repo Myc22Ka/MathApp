@@ -4,6 +4,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionTypes;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.utils.math.MathUtils;
 
 public class Rational extends Function {
     private IExpr numerator;
@@ -26,6 +27,10 @@ public class Rational extends Function {
         this.numerator = numerator.getSymjaExpression();
         this.denominator = denominator.getSymjaExpression();
         updateExpression();
+    }
+
+    public Rational(String rawExpression) {
+        super(FunctionTypes.RATIONAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @Override
