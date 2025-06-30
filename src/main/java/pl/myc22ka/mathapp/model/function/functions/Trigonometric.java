@@ -2,7 +2,7 @@ package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
@@ -16,7 +16,7 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.function.Function {
     private Function<IExpr, IExpr> trigFunction;
 
     public Trigonometric() {
-        super(FunctionTypes.TRIGONOMETRIC);
+        super(FunctionType.TRIGONOMETRIC);
 
         generateRandomFunction();
         updateExpression();
@@ -24,14 +24,14 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.function.Function {
 
     // Konstruktor z pełnymi danymi
     public Trigonometric(IExpr coefficient, IExpr angle, Function<IExpr, IExpr> trigFunction) {
-        super(FunctionTypes.TRIGONOMETRIC);
+        super(FunctionType.TRIGONOMETRIC);
         this.coefficient = coefficient;
         this.angle = angle;
         this.trigFunction = trigFunction;
     }
 
     public Trigonometric(String rawExpression) {
-        super(FunctionTypes.TRIGONOMETRIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.TRIGONOMETRIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
 
         updateExpression();
     }

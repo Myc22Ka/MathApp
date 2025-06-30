@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.model.function.functions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -14,21 +14,21 @@ public class Polynomial extends Function {
     private List<IExpr> coefficients;
 
     public Polynomial() {
-        super(FunctionTypes.POLYNOMIAL);
+        super(FunctionType.POLYNOMIAL);
 
         generateRandomFunction();
         updateExpression();
     }
 
     public Polynomial(List<IExpr> coefficients) {
-        super(FunctionTypes.POLYNOMIAL);
+        super(FunctionType.POLYNOMIAL);
         this.coefficients = new ArrayList<>(coefficients.reversed());
 
         updateExpression();
     }
 
     public Polynomial(String rawExpression) {
-        super(FunctionTypes.POLYNOMIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.POLYNOMIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     protected void updateExpression() {

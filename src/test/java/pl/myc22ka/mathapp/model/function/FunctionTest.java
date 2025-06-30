@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.model.function;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.utils.managers.files.CsvRecordParser;
 import pl.myc22ka.mathapp.utils.managers.files.FileManager;
 import pl.myc22ka.mathapp.utils.managers.files.parsers.FunctionParser;
@@ -17,7 +18,7 @@ class FunctionTest {
 
     @BeforeAll
     static void before() throws Exception {
-        File file = new File("src/main/resources/static/data.csv");
+        File file = new File("src/main/resources/static/test/data.csv");
         CsvRecordParser<FunctionRecord> parser = new FunctionParser();
         FileManager<FunctionRecord> manager = new FileManager<>(parser);
 
@@ -30,6 +31,11 @@ class FunctionTest {
         records.forEach(entry -> {
             var function = entry.function();
             var expectedRoots = entry.roots();
+
+//            ISet set = SetConverter.from(function.getRange());
+//            System.out.println(set.toString());
+
+            System.out.print(entry.function());
 
             var result = function.getRealRoots();
 

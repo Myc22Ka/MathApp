@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.model.function.functions;
 import lombok.Getter;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -15,13 +15,13 @@ public class SquareRoot extends Function {
 
     // Constructor for a random Root Function
     public SquareRoot() {
-        super(FunctionTypes.SQUAREROOT);
+        super(FunctionType.SQUAREROOT);
         generateRandomFunction();
     }
 
     // Constructor with given function and degree
     public SquareRoot(Function function, int degree) {
-        super(FunctionTypes.SQUAREROOT);
+        super(FunctionType.SQUAREROOT);
 
         this.function = function;
         this.degree = degree;
@@ -30,14 +30,14 @@ public class SquareRoot extends Function {
     }
 
     public SquareRoot(String rawExpression) {
-        super(FunctionTypes.SQUAREROOT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.SQUAREROOT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @Override
     @NotFullyImplemented
     public void generateRandomFunction() {
         this.degree = 2;
-        this.function = new Function(FunctionTypes.LINEAR);
+        this.function = new Function(FunctionType.LINEAR);
 
         updateExpression();
     }

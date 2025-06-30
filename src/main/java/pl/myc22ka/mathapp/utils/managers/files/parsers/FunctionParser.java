@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.utils.managers.files.parsers;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionFactory;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.utils.managers.files.CsvRecordParser;
 import pl.myc22ka.mathapp.utils.managers.files.records.FunctionRecord;
 
@@ -22,11 +22,13 @@ public class FunctionParser implements CsvRecordParser<FunctionRecord> {
         }
 
         var function = FunctionFactory.create(record[0]);
-        var type = FunctionTypes.parse(record[1]);
+        var type = FunctionType.parse(record[1]);
         var roots = parseList(record[2]);
         var derivative = evaluator.parse(record[3]);
-        String range = record[4];
-        String domain = record[5];
+
+        var range = record[4];
+        var domain = record[5];
+
         var integral = evaluator.parse(record[6]);
 
         return new FunctionRecord(function, type, roots, derivative, range, domain, integral);

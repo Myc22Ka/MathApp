@@ -1,14 +1,15 @@
 package pl.myc22ka.mathapp.utils.managers.files.records;
 
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
+import pl.myc22ka.mathapp.model.set.ISet;
 
 import java.util.List;
 
 public record FunctionRecord (
         Function function,
-        FunctionTypes type,
+        FunctionType type,
         List<IExpr> roots,
         IExpr derivative,
         String range,

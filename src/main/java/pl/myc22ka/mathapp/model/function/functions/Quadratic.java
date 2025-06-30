@@ -4,7 +4,7 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.functions.Point;
@@ -19,7 +19,7 @@ public class Quadratic extends Function {
 
     // Random Quadratic
     public Quadratic() {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         generateRandomFunction();
         updateExpression();
@@ -27,7 +27,7 @@ public class Quadratic extends Function {
 
     // Quadratic from a, b and c
     public Quadratic(IExpr coefficientA, IExpr coefficientB, IExpr constant) {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         this.coefficientA = coefficientA;
         this.coefficientB = coefficientB;
@@ -38,7 +38,7 @@ public class Quadratic extends Function {
 
     // Quadratic from derivative
     public Quadratic(Linear derivative) {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         this.coefficientA = F.Divide(derivative.getCoefficient(), 2);
         this.coefficientB = derivative.getConstant();
@@ -49,7 +49,7 @@ public class Quadratic extends Function {
 
     // Quadratic from answers
     public Quadratic(List<IExpr> answers) {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         generateFunctionFromAnswers(answers);
         updateExpression();
@@ -57,7 +57,7 @@ public class Quadratic extends Function {
 
     // Quadratic from vertex
     public Quadratic(Point vertex) {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         this.coefficientA = F.C1; // need to be gathered trough generator...
         this.coefficientB = F.Times(F.CN2, this.coefficientA, vertex.getX());
@@ -67,7 +67,7 @@ public class Quadratic extends Function {
     }
 
     public Quadratic(Point vertex, IExpr coefficientA, ISymbol variable) {
-        super(FunctionTypes.QUADRATIC);
+        super(FunctionType.QUADRATIC);
 
         this.coefficientA = coefficientA;
         this.coefficientB = F.Times(F.ZZ(-2), coefficientA, vertex.getX());
@@ -77,7 +77,7 @@ public class Quadratic extends Function {
     }
 
     public Quadratic(String rawExpression) {
-        super(FunctionTypes.QUADRATIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.QUADRATIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     protected void updateExpression() {

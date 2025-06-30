@@ -2,7 +2,7 @@ package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 
@@ -11,13 +11,13 @@ public class Logarithmic extends Function {
     private IExpr coefficient;
 
     public Logarithmic() {
-        super(FunctionTypes.LOGARITHMIC);
+        super(FunctionType.LOGARITHMIC);
 
         generateRandomFunction();
     }
 
     public Logarithmic(IExpr base, IExpr coefficient) {
-        super(FunctionTypes.LOGARITHMIC);
+        super(FunctionType.LOGARITHMIC);
         this.base = base;
         this.coefficient = coefficient;
 
@@ -25,7 +25,7 @@ public class Logarithmic extends Function {
     }
 
     public Logarithmic(String rawExpression) {
-        super(FunctionTypes.LOGARITHMIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.LOGARITHMIC, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @Override

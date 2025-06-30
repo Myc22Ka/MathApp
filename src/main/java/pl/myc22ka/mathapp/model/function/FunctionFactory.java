@@ -5,7 +5,7 @@ import pl.myc22ka.mathapp.utils.math.MathUtils;
 
 public class FunctionFactory {
 
-    public static Function create(FunctionTypes type, String rawExpression) {
+    public static Function create(FunctionType type, String rawExpression) {
         return switch (type) {
             case ABSOLUTE -> new Absolute(rawExpression);
             case CONSTANT -> new Constant(rawExpression);
@@ -22,7 +22,7 @@ public class FunctionFactory {
     }
 
     public static Function create(String rawExpression) {
-        FunctionTypes type = FunctionTypeDetector.detect(rawExpression);
+        FunctionType type = FunctionTypeDetector.detect(rawExpression);
         return create(type, rawExpression);
     }
 }

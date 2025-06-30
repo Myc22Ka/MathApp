@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp;
 
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IExpr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -9,6 +10,9 @@ import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.model.function.functions.Exponential;
 import pl.myc22ka.mathapp.model.function.functions.Logarithmic;
 import pl.myc22ka.mathapp.model.function.functions.Rational;
+import pl.myc22ka.mathapp.model.set.Set;
+import pl.myc22ka.mathapp.model.set.SetSymbols;
+import pl.myc22ka.mathapp.model.set.sets.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -178,5 +182,130 @@ public class MathAppApplication {
 		System.out.println("All Roots: " + rationalFunction.getAllRoots());
 		System.out.println("Range: " + rationalFunction.getRange());
 		System.out.println("Integral: " + rationalFunction.getIntegral());
+
+		System.out.println("----------------------------------------------------");
+
+//		Finite A = new Finite("Range[1, 5]");       // {1, 2, 3, 4, 5}
+//		Finite B = new Finite("{3, 4, 5, 6, 7}");    // {3, 4, 5, 6, 7}
+//
+//		System.out.println(A.union(B));             // {1, 2, 3, 4, 5, 6, 7}
+//		System.out.println(A.intersection(B));      // {3, 4, 5}
+//		System.out.println(A.difference(B));        // {1, 2}
+//		System.out.println(B.difference(A));        // {6, 7}
+//		System.out.println(A.symmetricDifference(B)); // {1, 2, 6, 7}
+
+//		Interval A = new Interval(F.ZZ(1), BoundType.OPEN, BoundType.CLOSED, F.ZZ(20));
+
+		Set A = Set.of("{3,4,5}");
+		Set C = Set.of("{0,-1,10,5,4,20}");
+
+		System.out.println("A: " + A);
+		System.out.println("C: " + C);
+		System.out.println("----------------------------------------------------");
+
+		System.out.println("A ∪ C = " + A.union(C));
+		System.out.println("A \\ C = " + A.difference(C));
+		System.out.println("A ∩ C = " + A.intersection(C));
+
+		Set B = Set.of("[0,1]∖ℕ");
+
+		System.out.println("----------------------------------------------------");
+		System.out.println("B: " + B);
+		System.out.println("C: " + C);
+		System.out.println("----------------------------------------------------");
+
+		System.out.println("B ∪ C = " + B.union(C));
+		System.out.println("B \\ C = " + B.difference(C));
+		System.out.println("B ∩ C = " + B.intersection(Set.of("{0,-1,10,5,4,20}")));
+		System.out.println("----------------------------------------------------");
+
+		// [sqrt(2), 5] ∖ [1, 4)
+
+		Set D = Set.of(" ");
+		Set E = Set.of("[3, sqrt(10))");
+
+		System.out.println("D: " + D);
+		System.out.println("E: " + E);
+
+//		// Definicja przedziałów (zbiorów nieskończonych)
+//		System.out.println("=== DEFINICJA PRZEDZIAŁÓW (OPEN/CLOSED) ===");
+//		IExpr A = evaluator.eval("IntervalData({-1, Less, LessEqual, 3})");  // (-1, 3]
+//		IExpr B = evaluator.eval("{1, 2, 3, 4, 5}");   // {1, 2, 3, 4, 5}
+//
+//		System.out.println("A = (-1, 3]");
+//		System.out.println("B = {1, 2, 3, 4, 5}");
+//		System.out.println();
+//
+//		System.out.println("=== SUMA ZBIORÓW (A ∪ B) ===");
+//		IExpr union = evaluator.eval("IntervalUnion[" + A + ", " + B + "]");
+//		System.out.println("A ∪ B = " + union);
+//		System.out.println();
+//
+//		// 2. PRZECIĘCIE ZBIORÓW (A ∩ B) - Intersection
+//		System.out.println("=== PRZECIĘCIE ZBIORÓW (A ∩ B) ===");
+//		IExpr intersection = evaluator.eval("IntervalIntersection[Interval[{-1, 0}], Interval[{0, 5}]]");
+//		System.out.println("A ∩ B = " + intersection);
+//		System.out.println("Wynik: {0} (tylko punkt wspólny)");
+//		System.out.println();
+//
+//		// 3. RÓŻNICA A \ B (A bez B)
+//		System.out.println("=== RÓŻNICA A \\ B (A bez B) ===");
+//		IExpr differenceAB = evaluator.eval("IntervalComplement[Interval[{0, 5}], Interval[{-1, 0}]]");
+//		System.out.println("A \\ B = " + differenceAB);
+//		// Alternatywny sposób - manual calculation
+//		IExpr manualAB = evaluator.eval("Interval[{-1, 0}]");
+//		System.out.println("A \\ B (ręcznie) = [-1, 0) (przedział [-1,0) bez punktu 0)");
+//		System.out.println();
+//
+//		// 4. RÓŻNICA B \ A (B bez A)
+//		System.out.println("=== RÓŻNICA B \\ A (B bez A) ===");
+//		IExpr differenceBA = evaluator.eval("IntervalComplement[Interval[{-1, 0}], Interval[{0, 5}]]");
+//		System.out.println("B \\ A = " + differenceBA);
+//		System.out.println("B \\ A (ręcznie) = (0, 5] (przedział (0,5] bez punktu 0)");
+//		System.out.println();
+//
+//		// DODATKOWE OPERACJE
+//		System.out.println("=== DODATKOWE OPERACJE ===");
+//
+//		// Sprawdzenie czy przedziały się przecinają
+//		IExpr overlaps = evaluator.eval("IntervalIntersection[Interval[{-1, 0}], Interval[{0, 5}]] != {}");
+//		System.out.println("Czy A i B się przecinają? " + overlaps);
+//
+//		// Długość przedziałów
+//		IExpr lengthA = evaluator.eval("IntervalMeasure[Interval[{-1, 0}]]");
+//		IExpr lengthB = evaluator.eval("IntervalMeasure[Interval[{0, 5}]]");
+//		System.out.println("Długość A: " + lengthA);
+//		System.out.println("Długość B: " + lengthB);
+//
+//		// Sprawdzenie czy punkt należy do przedziału
+//		IExpr inA = evaluator.eval("IntervalMemberQ[Interval[{-1, 0}], -0.5]");
+//		IExpr inB = evaluator.eval("IntervalMemberQ[Interval[{0, 5}], 2.5]");
+//		System.out.println("Czy -0.5 ∈ A? " + inA);
+//		System.out.println("Czy 2.5 ∈ B? " + inB);
+//		System.out.println();
+//
+//		// PRZYKŁAD Z PRZEDZIAŁAMI OTWARTYMI
+//		System.out.println("=== PRZYKŁAD Z PRZEDZIAŁAMI OTWARTYMI ===");
+//		IExpr C = evaluator.eval("Interval[{-1, 0}]");  // (-1, 0) - otwarty
+//		IExpr D = evaluator.eval("Interval[{0, 5}]");   // (0, 5) - otwarty
+//
+//		System.out.println("C = (-1, 0) (przedział otwarty)");
+//		System.out.println("D = (0, 5) (przedział otwarty)");
+//
+//		IExpr unionOpen = evaluator.eval("IntervalUnion[Interval[{-1, 0}], Interval[{0, 5}]]");
+//		IExpr intersectionOpen = evaluator.eval("IntervalIntersection[Interval[{-1, 0}], Interval[{0, 5}]]");
+//
+//		System.out.println("C ∪ D = " + unionOpen);
+//		System.out.println("C ∩ D = " + intersectionOpen + " (zbiór pusty - brak przecięcia)");
+//
+//		// WIZUALIZACJA WYNIKÓW
+//		System.out.println("\n=== PODSUMOWANIE WYNIKÓW ===");
+//		System.out.println("A = [-1, 0]");
+//		System.out.println("B = [0, 5]");
+//		System.out.println("─────────────────────────────");
+//		System.out.println("A ∪ B = [-1, 5]");
+//		System.out.println("A ∩ B = {0}");
+//		System.out.println("A \\ B = [-1, 0)");
+//		System.out.println("B \\ A = (0, 5]");
 	}
 }

@@ -2,7 +2,7 @@ package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -13,13 +13,13 @@ public class Exponential extends Function {
     private Function exponent;
 
     public Exponential() {
-        super(FunctionTypes.EXPONENTIAL);
+        super(FunctionType.EXPONENTIAL);
 
         generateRandomFunction();
     }
 
     public Exponential(Function base, IExpr coefficient, Function exponent) {
-        super(FunctionTypes.EXPONENTIAL);
+        super(FunctionType.EXPONENTIAL);
         this.base = base;
         this.exponent = exponent;
         this.coefficient = coefficient;
@@ -28,7 +28,7 @@ public class Exponential extends Function {
     }
 
     public Exponential(String rawExpression) {
-        super(FunctionTypes.EXPONENTIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.EXPONENTIAL, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @NotFullyImplemented

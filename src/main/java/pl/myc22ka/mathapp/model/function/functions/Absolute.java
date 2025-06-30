@@ -1,7 +1,7 @@
 package pl.myc22ka.mathapp.model.function.functions;
 
 import org.matheclipse.core.expression.F;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -10,20 +10,20 @@ public class Absolute extends Function {
     private Function base;
 
     public Absolute() {
-        super(FunctionTypes.ABSOLUTE);
+        super(FunctionType.ABSOLUTE);
 
         generateRandomFunction();
     }
 
     public Absolute(Function base) {
-        super(FunctionTypes.ABSOLUTE);
+        super(FunctionType.ABSOLUTE);
         this.base = base;
 
         updateExpression();
     }
 
     public Absolute(String rawExpression) {
-        super(FunctionTypes.ABSOLUTE, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.ABSOLUTE, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @NotFullyImplemented

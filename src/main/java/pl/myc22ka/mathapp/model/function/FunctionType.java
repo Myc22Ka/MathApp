@@ -1,6 +1,6 @@
 package pl.myc22ka.mathapp.model.function;
 
-public enum FunctionTypes {
+public enum FunctionType {
     CONSTANT,
     LINEAR,
     QUADRATIC,
@@ -13,7 +13,7 @@ public enum FunctionTypes {
     ABSOLUTE,
     FUNCTION;
 
-    public static FunctionTypes parse(String text) {
+    public static FunctionType parse(String text) {
         if (text == null) return FUNCTION;
 
         try {

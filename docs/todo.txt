@@ -1,0 +1,7 @@
+1. In order to create generator of sets I need to get:
+- Generator of numbers: not started
+- Sets logic: done
+- Generator of sets:
+    depth - how many operations are in set
+    difficulty - specifies how difficult numbers are
+    random or specified brackets

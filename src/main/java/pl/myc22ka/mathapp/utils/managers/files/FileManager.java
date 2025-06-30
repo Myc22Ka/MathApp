@@ -4,11 +4,11 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import lombok.RequiredArgsConstructor;
-import org.matheclipse.core.eval.ExprEvaluator;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -27,13 +27,15 @@ public class FileManager<T> {
                 .withSkipLines(1)
                 .build()) {
 
-            StreamSupport.stream(csvReader.spliterator(), false).forEach(record -> {
-                T parsed = parser.parse(record);
-                results.add(parsed);
-            });
+            StreamSupport.stream(csvReader.spliterator(), false)
+                    .filter(record -> record.length > 0 &&
+                            !record[0].trim().startsWith("#") &&
+                            Arrays.stream(record).anyMatch(s -> !s.trim().isEmpty()))
+                    .forEach(record -> {
+                        T parsed = parser.parse(record);
+                        results.add(parsed);
+                    });
         }
-
-        results.removeFirst();
 
         return results;
     }

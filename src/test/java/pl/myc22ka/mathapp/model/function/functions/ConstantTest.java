@@ -6,10 +6,10 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import org.matheclipse.core.interfaces.ISymbol;
-import pl.myc22ka.mathapp.exceptions.FunctionException;
-import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
+import pl.myc22ka.mathapp.exceptions.ServerError;
+import pl.myc22ka.mathapp.exceptions.ServerErrorMessages;
 import pl.myc22ka.mathapp.model.function.Function;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.utils.math.MathRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +30,7 @@ class ConstantTest {
         assertEquals(F.ZZ(7), constant.getSymjaExpression(), "Symja expression should match the provided value");
         assertEquals("7", constant.getRawExpression(),
                 "Raw expression should be the string representation of the value");
-        assertEquals(FunctionTypes.CONSTANT, constant.getType(), "Function type should be CONSTANT");
+        assertEquals(FunctionType.CONSTANT, constant.getType(), "Function type should be CONSTANT");
     }
 
     @Test
@@ -91,11 +91,11 @@ class ConstantTest {
     @Test
     void constructorThrowsExceptionOnNull() {
         // GIVEN / WHEN / THEN
-        Exception exception = assertThrows(FunctionException.class, () -> {
+        Exception exception = assertThrows(ServerError.class, () -> {
             new Constant("null");
         });
 
-        assertEquals(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED.toString(), exception.getMessage());
+        assertEquals(ServerErrorMessages.NULL_VALUE_NOT_ALLOWED.toString(), exception.getMessage());
     }
 
     @Test
@@ -155,11 +155,11 @@ class ConstantTest {
         Constant c1 = new Constant(F.ZZ(5));
         Constant zero = new Constant(F.ZZ(0));
 
-        Exception exception = assertThrows(FunctionException.class, () -> {
+        Exception exception = assertThrows(ServerError.class, () -> {
             c1.divide(zero);
         });
 
-        assertEquals(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
+        assertEquals(ServerErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
     }
 
     @Test
@@ -169,11 +169,11 @@ class ConstantTest {
         Constant c2 = new Constant(org.matheclipse.core.expression.F.num(10));
 
         // WHEN & THEN
-        FunctionException exception = assertThrows(FunctionException.class, () -> {
+        ServerError exception = assertThrows(ServerError.class, () -> {
             c1.composition(c2);
         });
 
-        assertEquals(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
+        assertEquals(ServerErrorMessages.ILLOGICAL_MATH_OPERATION.toString(), exception.getMessage());
     }
 
     @Test
@@ -181,14 +181,14 @@ class ConstantTest {
         Constant c1 = new Constant(F.ZZ(5));
         ISymbol symbol = F.Dummy("a");
 
-        var exception1 = assertThrows(FunctionException.class, c1::getRealRoots);
+        var exception1 = assertThrows(ServerError.class, c1::getRealRoots);
 
-        var exception2 = assertThrows(FunctionException.class, () ->
+        var exception2 = assertThrows(ServerError.class, () ->
                 c1.getRealConditionRoots(symbol)
         );
 
-        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception1.getMessage());
-        assertEquals(FunctionErrorMessages.NO_SOLUTIONS.toString(), exception2.getMessage());
+        assertEquals(ServerErrorMessages.NO_SOLUTIONS.toString(), exception1.getMessage());
+        assertEquals(ServerErrorMessages.NO_SOLUTIONS.toString(), exception2.getMessage());
     }
 
     @Test
@@ -196,14 +196,14 @@ class ConstantTest {
         Constant c1 = new Constant(F.ZZ(0));
         ISymbol symbol = F.Dummy("a");
 
-        var exception1 = assertThrows(FunctionException.class, c1::getRealRoots);
+        var exception1 = assertThrows(ServerError.class, c1::getRealRoots);
 
-        FunctionException exception2 = assertThrows(FunctionException.class, () ->
+        ServerError exception2 = assertThrows(ServerError.class, () ->
                 c1.getRealConditionRoots(symbol)
         );
 
-        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception1.getMessage());
-        assertEquals(FunctionErrorMessages.ALL_SOLUTIONS.toString(), exception2.getMessage());
+        assertEquals(ServerErrorMessages.ALL_SOLUTIONS.toString(), exception1.getMessage());
+        assertEquals(ServerErrorMessages.ALL_SOLUTIONS.toString(), exception2.getMessage());
     }
 
     @Test
@@ -219,7 +219,7 @@ class ConstantTest {
     void testGetRangeForConstant(){
         Constant c1 = new Constant(F.ZZ(10));
 
-        IExpr range = c1.getRange();
+        var range = c1.getRange();
 
         assertEquals("y∈ℝ", range.toString(), "Derivative from constant function should be 0");
     }

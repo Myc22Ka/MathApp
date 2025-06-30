@@ -6,8 +6,8 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
 import org.matheclipse.core.interfaces.ISymbol;
-import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
-import pl.myc22ka.mathapp.exceptions.FunctionException;
+import pl.myc22ka.mathapp.exceptions.ServerErrorMessages;
+import pl.myc22ka.mathapp.exceptions.ServerError;
 import pl.myc22ka.mathapp.model.function.functions.Constant;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -20,34 +20,34 @@ import java.util.List;
 @Getter
 public class Function implements FunctionInterface {
     protected final ExprEvaluator evaluator = new ExprEvaluator();
-    private final FunctionTypes type;
+    private final FunctionType type;
     protected final ISymbol variable;
     protected String rawExpression;
     protected IExpr symjaExpression;
 
     public Function(String function) {
-        this(FunctionTypes.FUNCTION, MathUtils.detectFirstVariable(function), function);
+        this(FunctionType.FUNCTION, MathUtils.detectFirstVariable(function), function);
     }
 
     public Function(IExpr function) {
-        this(FunctionTypes.FUNCTION, MathUtils.detectFirstVariable(function), function);
+        this(FunctionType.FUNCTION, MathUtils.detectFirstVariable(function), function);
     }
 
-    public Function(FunctionTypes type) {
+    public Function(FunctionType type) {
         this(type, F.x);
     }
 
-    public Function(FunctionTypes type, ISymbol variable) {
+    public Function(FunctionType type, ISymbol variable) {
         this.type = type;
         this.variable = variable;
     }
 
-    public Function(FunctionTypes type, ISymbol variable, String rawExpression) {
+    public Function(FunctionType type, ISymbol variable, String rawExpression) {
         this(type, variable);
         setExpressions(rawExpression);
     }
 
-    public Function(FunctionTypes type, ISymbol variable, IExpr symjaExpression) {
+    public Function(FunctionType type, ISymbol variable, IExpr symjaExpression) {
         this(type, variable);
         setExpressions(symjaExpression);
     }
@@ -175,7 +175,7 @@ public class Function implements FunctionInterface {
     public final Function divide(Function other) {
         if (other instanceof Constant c) {
             if (c.getSymjaExpression().isZero()) {
-                throw new FunctionException(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION);
+                throw new ServerError(ServerErrorMessages.ILLOGICAL_MATH_OPERATION);
             }
         }
 
@@ -184,8 +184,8 @@ public class Function implements FunctionInterface {
 
     @Override
     public final Function composition(Function other) {
-        if (this.getType() == FunctionTypes.CONSTANT && other.getType() == FunctionTypes.CONSTANT) {
-            throw new FunctionException(FunctionErrorMessages.ILLOGICAL_MATH_OPERATION);
+        if (this.getType() == FunctionType.CONSTANT && other.getType() == FunctionType.CONSTANT) {
+            throw new ServerError(ServerErrorMessages.ILLOGICAL_MATH_OPERATION);
         }
 
         var rule = F.Rule(evaluator.eval(getVariable() + "_"), evaluator.eval("HoldForm[" + rawExpression + "]"));

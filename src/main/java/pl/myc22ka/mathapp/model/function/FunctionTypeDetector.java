@@ -4,14 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FunctionTypeDetector {
-    public static FunctionTypes detect(String expression) {
+    public static FunctionType detect(String expression) {
         String expr = expression.toLowerCase().trim();
 
         // Remove whitespace for easier pattern matching
         String cleanExpr = expr.replaceAll("\\s+", "");
 
         // Collect all detected function types
-        Set<FunctionTypes> detectedTypes = new HashSet<>();
+        Set<FunctionType> detectedTypes = new HashSet<>();
 
         // Check for each function type
         checkForConstant(cleanExpr, detectedTypes);
@@ -27,7 +27,7 @@ public class FunctionTypeDetector {
 
         // If multiple types detected, return FUNCTION
         if (detectedTypes.size() > 1) {
-            return FunctionTypes.FUNCTION;
+            return FunctionType.FUNCTION;
         }
 
         // If exactly one type detected, return it
@@ -36,17 +36,17 @@ public class FunctionTypeDetector {
         }
 
         // Default fallback
-        return FunctionTypes.FUNCTION;
+        return FunctionType.FUNCTION;
     }
 
-    private static void checkForConstant(String expr, Set<FunctionTypes> types) {
+    private static void checkForConstant(String expr, Set<FunctionType> types) {
         // Constant if no variable present
         if (!containsVariable(expr)) {
-            types.add(FunctionTypes.CONSTANT);
+            types.add(FunctionType.CONSTANT);
         }
     }
 
-    private static void checkForLinear(String expr, Set<FunctionTypes> types) {
+    private static void checkForLinear(String expr, Set<FunctionType> types) {
         // Linear: contains x but no higher powers, roots, trig, log, exp functions
         if (containsVariable(expr) &&
                 !containsHigherPowers(expr) &&
@@ -56,11 +56,11 @@ public class FunctionTypeDetector {
                 !containsExponential(expr) &&
                 !containsAbsolute(expr) &&
                 !containsRational(expr)) {
-            types.add(FunctionTypes.LINEAR);
+            types.add(FunctionType.LINEAR);
         }
     }
 
-    private static void checkForQuadratic(String expr, Set<FunctionTypes> types) {
+    private static void checkForQuadratic(String expr, Set<FunctionType> types) {
         // Quadratic: contains x^2 or x*x but no higher powers
         if ((expr.contains("x^2") || expr.contains("x*x") || expr.matches(".*x\\s*\\*\\s*x.*")) &&
                 !containsCubicOrHigher(expr) &&
@@ -70,11 +70,11 @@ public class FunctionTypeDetector {
                 !containsExponential(expr) &&
                 !containsAbsolute(expr) &&
                 !containsRational(expr)) {
-            types.add(FunctionTypes.QUADRATIC);
+            types.add(FunctionType.QUADRATIC);
         }
     }
 
-    private static void checkForPolynomial(String expr, Set<FunctionTypes> types) {
+    private static void checkForPolynomial(String expr, Set<FunctionType> types) {
         // Polynomial: contains x^n where n > 2
         if (containsCubicOrHigher(expr) &&
                 !containsTrigonometric(expr) &&
@@ -83,43 +83,43 @@ public class FunctionTypeDetector {
                 !containsExponential(expr) &&
                 !containsAbsolute(expr) &&
                 !containsRational(expr)) {
-            types.add(FunctionTypes.POLYNOMIAL);
+            types.add(FunctionType.POLYNOMIAL);
         }
     }
 
-    private static void checkForTrigonometric(String expr, Set<FunctionTypes> types) {
+    private static void checkForTrigonometric(String expr, Set<FunctionType> types) {
         if (containsTrigonometric(expr)) {
-            types.add(FunctionTypes.TRIGONOMETRIC);
+            types.add(FunctionType.TRIGONOMETRIC);
         }
     }
 
-    private static void checkForLogarithmic(String expr, Set<FunctionTypes> types) {
+    private static void checkForLogarithmic(String expr, Set<FunctionType> types) {
         if (containsLogarithmic(expr)) {
-            types.add(FunctionTypes.LOGARITHMIC);
+            types.add(FunctionType.LOGARITHMIC);
         }
     }
 
-    private static void checkForSquareRoot(String expr, Set<FunctionTypes> types) {
+    private static void checkForSquareRoot(String expr, Set<FunctionType> types) {
         if (containsSquareRoot(expr)) {
-            types.add(FunctionTypes.SQUAREROOT);
+            types.add(FunctionType.SQUAREROOT);
         }
     }
 
-    private static void checkForExponential(String expr, Set<FunctionTypes> types) {
+    private static void checkForExponential(String expr, Set<FunctionType> types) {
         if (containsExponential(expr)) {
-            types.add(FunctionTypes.EXPONENTIAL);
+            types.add(FunctionType.EXPONENTIAL);
         }
     }
 
-    private static void checkForAbsolute(String expr, Set<FunctionTypes> types) {
+    private static void checkForAbsolute(String expr, Set<FunctionType> types) {
         if (containsAbsolute(expr)) {
-            types.add(FunctionTypes.ABSOLUTE);
+            types.add(FunctionType.ABSOLUTE);
         }
     }
 
-    private static void checkForRational(String expr, Set<FunctionTypes> types) {
+    private static void checkForRational(String expr, Set<FunctionType> types) {
         if (containsRational(expr)) {
-            types.add(FunctionTypes.RATIONAL);
+            types.add(FunctionType.RATIONAL);
         }
     }
 

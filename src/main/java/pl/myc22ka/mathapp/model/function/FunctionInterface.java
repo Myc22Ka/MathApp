@@ -1,6 +1,5 @@
 package pl.myc22ka.mathapp.model.function;
 
-import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import pl.myc22ka.mathapp.utils.functions.ConditionRoots;

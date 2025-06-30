@@ -3,32 +3,30 @@ package pl.myc22ka.mathapp.model.function.functions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-import pl.myc22ka.mathapp.exceptions.FunctionErrorMessages;
-import pl.myc22ka.mathapp.exceptions.FunctionException;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.exceptions.ServerErrorMessages;
+import pl.myc22ka.mathapp.exceptions.ServerError;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
-import pl.myc22ka.mathapp.utils.math.MathSymbols;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 import pl.myc22ka.mathapp.utils.annotations.NotTested;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Constant extends Function {
     private IExpr value;
 
     public Constant() {
-        super(FunctionTypes.CONSTANT);
+        super(FunctionType.CONSTANT);
 
         generateRandomFunction();
     }
 
     public Constant(IExpr value) {
-        super(FunctionTypes.CONSTANT);
+        super(FunctionType.CONSTANT);
 
         if (value == null) {
-            throw new FunctionException(FunctionErrorMessages.NULL_VALUE_NOT_ALLOWED);
+            throw new ServerError(ServerErrorMessages.NULL_VALUE_NOT_ALLOWED);
         }
 
         this.value = value;
@@ -37,7 +35,7 @@ public class Constant extends Function {
     }
 
     public Constant(String rawExpression) {
-        super(FunctionTypes.CONSTANT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.CONSTANT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     @NotFullyImplemented
@@ -53,7 +51,7 @@ public class Constant extends Function {
 
 
         if (value == null) {
-            throw new FunctionException(FunctionErrorMessages.NULL_VALUE_UPDATE_ERROR);
+            throw new ServerError(ServerErrorMessages.NULL_VALUE_UPDATE_ERROR);
         }
 
         setExpressions(value);
@@ -61,7 +59,7 @@ public class Constant extends Function {
 
     @Override
     public IExpr getRange() {
-        return MathSymbols.belongs(F.y, MathSymbols.getReal());
+        return F.Dummy("R");
     }
 
     @Override

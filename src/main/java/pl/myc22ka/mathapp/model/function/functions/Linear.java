@@ -3,8 +3,8 @@ package pl.myc22ka.mathapp.model.function.functions;
 import lombok.Getter;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.exceptions.FunctionException;
-import pl.myc22ka.mathapp.model.function.FunctionTypes;
+import pl.myc22ka.mathapp.exceptions.ServerError;
+import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
@@ -18,14 +18,14 @@ public class Linear extends Function {
 
     // Constructor to generate random Linear Function
     public Linear() {
-        super(FunctionTypes.LINEAR);
+        super(FunctionType.LINEAR);
 
         generateRandomFunction();
     }
 
     // Constructor to get Linear Function with correct coefficients
     public Linear(IExpr coefficient, IExpr constant) {
-        super(FunctionTypes.LINEAR);
+        super(FunctionType.LINEAR);
 
         this.coefficient = coefficient;
         this.constant = constant;
@@ -34,7 +34,7 @@ public class Linear extends Function {
     }
 
     public Linear(String rawExpression) {
-        super(FunctionTypes.LINEAR, MathUtils.detectFirstVariable(rawExpression), rawExpression);
+        super(FunctionType.LINEAR, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
     protected final void updateExpression() {
@@ -45,7 +45,7 @@ public class Linear extends Function {
     @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 1) {
-            throw new FunctionException("Linear function requires exactly one root.");
+            throw new ServerError("Linear function requires exactly one root.");
         }
 
         this.coefficient = F.ZZ(1); // need to be gathered trough generator...
