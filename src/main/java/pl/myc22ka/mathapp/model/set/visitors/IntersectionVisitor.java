@@ -17,13 +17,16 @@ import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
 import java.util.ArrayList;
 import java.util.List;
 
+import static pl.myc22ka.mathapp.model.set.ISetType.FINITE;
 import static pl.myc22ka.mathapp.model.set.ISetType.REDUCED_FUNDAMENTAL;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 
 /**
  * Visitor for computing the set intersection (A ∩ B).
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 2025-06-24
  */
 @RequiredArgsConstructor
@@ -35,54 +38,23 @@ public class IntersectionVisitor implements SetVisitor<ISet> {
     public ISet visitFinite(Finite right) {
         if (right.isEmpty() || left.isEmpty()) return new Fundamental(SetSymbols.EMPTY);
 
-        if (left instanceof Interval) {
-            return right.intersection(left);
-        }
-
-        if (left instanceof ReducedFundamental rLeft) {
-            var simplified = rLeft.simplify();
-
-            if(!(simplified instanceof ReducedFundamental))
-                return simplified.intersection(right);
-        }
-
-        if (left instanceof Fundamental || left instanceof ReducedFundamental) {
-            List<IExpr> result = new ArrayList<>();
-
-            for (var element : right.exprToList()) {
-                if (left.contains(element.toString())) {
-                    result.add(element);
-                }
-            }
-
-            if (result.isEmpty()) return new Fundamental(SetSymbols.EMPTY);
-
-            return new Finite(result);
-        }
+        // Delegate to Interval Case
+        if (left.getISetType() != FINITE) return visitInterval(right.toInterval());
 
         IExpr result = evaluator.eval(F.Intersection(left.getExpression(), right.getExpression()));
 
-        if (result.isList()) return new Finite(result);
-
-        return new Fundamental(SetSymbols.EMPTY);
+        return result.isList() ? new Finite(result) : new Fundamental(EMPTY);
     }
 
     @Override
     public ISet visitInterval(Interval right) {
         if (right.isEmpty() || left.isEmpty()) return new Fundamental(SetSymbols.EMPTY);
 
-        ISet normalizedLeft = (left instanceof Finite) ? left.toInterval() : left;
+        String intersection = evaluator.eval(F.IntervalIntersection(left.toInterval().getExpression(), right.getExpression())).toString();
 
-        if (normalizedLeft instanceof Fundamental fLeft) {
-            if (fLeft.getLeftSymbol().equals(SetSymbols.REAL)) {
-                return right;
-            }
+        Interval result = new Interval(intersection);
 
-            return new ReducedFundamental(fLeft, SetSymbols.INTERSECTION, right, false);
-        }
-
-        IExpr intersection = evaluator.eval(F.IntervalIntersection(normalizedLeft.getExpression(), right.getExpression()));
-        return new Interval(intersection.toString());
+        return SetSymbols.isReal(result.toString()) ? new Fundamental(REAL) : result;
     }
 
     @Override
@@ -94,55 +66,21 @@ public class IntersectionVisitor implements SetVisitor<ISet> {
         }
 
         if (left instanceof Fundamental fLeft) {
-            if (right.getLeftSymbol().isSubsetOf(fLeft.getLeftSymbol())) {
+            if (fLeft.getLeftSymbol().equals(REAL)) {
                 return right;
             }
-            if (fLeft.getLeftSymbol().isSubsetOf(right.getLeftSymbol())) {
+            if (right.getLeftSymbol().equals(REAL)) {
+                return fLeft;
+            }
+
+            if(right.getLeftSymbol().equals(fLeft.getLeftSymbol())) {
                 return fLeft;
             }
 
             return new Fundamental(SetSymbols.EMPTY);
         }
 
-        // left instanceof ReducedFundamental
-        ReducedFundamental rLeft = (ReducedFundamental) left;
-        Fundamental fLeft = (Fundamental) rLeft.getLeft();
-
-        // Jeśli right jest podzbiorem bazowego zbioru z left
-        if (right.getLeftSymbol().isSubsetOf(fLeft.getLeftSymbol())) {
-            if (rLeft.getOperation() == SetSymbols.DIFFERENCE) {
-                // right ∩ (base \ excluded) = right \ (right ∩ excluded)
-                ISet rightIntersectionExcluded = right.intersection(rLeft.getRight());
-                return right.difference(rightIntersectionExcluded);
-            }
-            if (rLeft.getOperation() == SetSymbols.UNION) {
-                // right ∩ (base ∪ other) = right (jeśli right ⊆ base)
-                return right;
-            }
-            if (rLeft.getOperation() == SetSymbols.INTERSECTION) {
-                // right ∩ (base ∩ other) = right ∩ other (jeśli right ⊆ base)
-                return right.intersection(rLeft.getRight());
-            }
-        }
-
-        // Jeśli bazowy zbiór z left jest podzbiorem right
-        if (fLeft.getLeftSymbol().isSubsetOf(right.getLeftSymbol())) {
-            if (rLeft.getOperation() == SetSymbols.DIFFERENCE) {
-                // (base \ excluded) ∩ right = base \ excluded (jeśli base ⊆ right)
-                return rLeft;
-            }
-            if (rLeft.getOperation() == SetSymbols.UNION) {
-                // (base ∪ other) ∩ right = base ∪ (other ∩ right)
-                return fLeft.union(rLeft.getRight().intersection(right));
-            }
-            if (rLeft.getOperation() == SetSymbols.INTERSECTION) {
-                // (base ∩ other) ∩ right = base ∩ other (jeśli base ⊆ right)
-                return rLeft;
-            }
-        }
-
-        // Różne zbiory
-        return new ReducedFundamental(fLeft, SetSymbols.INTERSECTION, right, false);
+       return null;
     }
 
     @Override

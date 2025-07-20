@@ -207,7 +207,7 @@ public class MathAppApplication {
 		System.out.println("A \\ C = " + A.difference(C));
 		System.out.println("A ∩ C = " + A.intersection(C));
 
-		Set B = Set.of("[0,1]∖ℕ");
+		Set B = Set.of("ℝ∖{1, 5}");
 
 		System.out.println("----------------------------------------------------");
 		System.out.println("B: " + B);
@@ -221,8 +221,8 @@ public class MathAppApplication {
 
 		// [sqrt(2), 5] ∖ [1, 4)
 
-		Set D = Set.of(" ");
-		Set E = Set.of("[3, sqrt(10))");
+		Set D = Set.of("(ℝ ∩ [1, 5]) ∪ [3, sqrt(100))");
+		Set E = Set.of("ℝ∖[1, 5]");
 
 		System.out.println("D: " + D);
 		System.out.println("E: " + E);

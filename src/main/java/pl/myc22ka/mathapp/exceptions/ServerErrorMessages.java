@@ -12,6 +12,7 @@ public enum ServerErrorMessages {
     NO_SOLUTIONS("No solutions found"),
     ALL_SOLUTIONS("All solutions found"),
     UNSUPPORTED_OPERATION("This operation is not supported by system"),
+    UNSUPPORTED_CONSTRUCTION_BUILD("Construction was build incorrectly"),
     CHAIN_ERROR("You cannot chain this operation");
 
     private final String message;

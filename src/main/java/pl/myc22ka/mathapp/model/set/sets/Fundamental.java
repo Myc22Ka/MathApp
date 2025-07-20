@@ -15,11 +15,14 @@ import pl.myc22ka.mathapp.model.set.visitors.DifferenceVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.IntersectionVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
 
+import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
+
 /**
- * Mathematical interval set ℂ, ℝ.
+ * Mathematical interval set ℝ.
  *
  * @author Myc22Ka
- * @version 1.0
+ * @version 1.0.1
  * @since 2025‑06‑19
  */
 public class Fundamental implements ISet {
@@ -31,10 +34,20 @@ public class Fundamental implements ISet {
 
     public Fundamental(@NotNull String symbol) {
         this.leftSymbol = SetSymbols.fromDisplay(symbol);
+
+        if (!leftSymbol.equals(REAL) && !leftSymbol.equals(EMPTY)) {
+            throw new ServerError(ServerErrorMessages.UNSUPPORTED_CONSTRUCTION_BUILD);
+        }
+
         this.expression = leftSymbol.parse();
     }
 
     public Fundamental(@NotNull SetSymbols symbol) {
+
+        if (symbol != REAL && symbol != EMPTY) {
+            throw new ServerError(ServerErrorMessages.UNSUPPORTED_CONSTRUCTION_BUILD);
+        }
+
         this.leftSymbol = symbol;
         this.expression = leftSymbol.parse();
     }
@@ -66,7 +79,7 @@ public class Fundamental implements ISet {
 
     @Override
     public Integer size() {
-        return leftSymbol == SetSymbols.EMPTY ? 0 : null;
+        return leftSymbol == EMPTY ? 0 : null;
     }
 
     @Override
@@ -86,7 +99,7 @@ public class Fundamental implements ISet {
 
     @Override
     public Interval toInterval() {
-        if(leftSymbol.equals(SetSymbols.REAL)){
+        if(leftSymbol.equals(REAL)){
             return new Interval(F.Infinity, BoundType.OPEN, BoundType.OPEN, F.CNInfinity);
         }
 

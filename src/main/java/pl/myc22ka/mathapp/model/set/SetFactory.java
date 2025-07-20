@@ -139,7 +139,9 @@ public class SetFactory {
                     : fromString(rightExpr, hadOuterParens);
 
             if (left.getISetType() == ISetType.FUNDAMENTAL || left.getISetType() == ISetType.INTERVAL) {
-                return new ReducedFundamental(left, symbol, right, isParenthesized || hadOuterParens);
+                var result = new ReducedFundamental(left, symbol, right, isParenthesized || hadOuterParens);
+
+                return result.simplify().toInterval();
             }
         }
         return new Fundamental(SetSymbols.EMPTY.toString());

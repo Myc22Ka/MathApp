@@ -3,8 +3,8 @@ package pl.myc22ka.mathapp.model.set.sets;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.exceptions.ServerError;
+import pl.myc22ka.mathapp.exceptions.ServerErrorMessages;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.ISetType;
 import pl.myc22ka.mathapp.model.set.Set;
@@ -14,14 +14,11 @@ import pl.myc22ka.mathapp.model.set.visitors.DifferenceVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.IntersectionVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Mathematical interval set ℂ\{1,2}, ℝ{1/2}.
+ * Mathematical interval set ℝ/{1/2}.
  *
  * @author Myc22Ka
- * @version 1.0
+ * @version 1.0.2
  * @since 2025‑06‑19
  */
 
@@ -35,6 +32,10 @@ public class ReducedFundamental implements ISet {
     private boolean parenthesis;
 
     public ReducedFundamental(@NotNull ISet leftSymbol, @NotNull SetSymbols operation, @NotNull ISet right, boolean parenthesis) {
+        if ((right.getISetType() != ISetType.INTERVAL && right.getISetType() != ISetType.FINITE) || right.isEmpty()) {
+            throw new ServerError(ServerErrorMessages.UNSUPPORTED_CONSTRUCTION_BUILD);
+        }
+
         this.leftSymbol = SetSymbols.fromDisplay(leftSymbol.toString());
         this.left = leftSymbol;
         this.operation = operation;
@@ -91,6 +92,7 @@ public class ReducedFundamental implements ISet {
         }
     }
 
+
     @Override
     public Integer size() {
         return null;
@@ -111,17 +113,16 @@ public class ReducedFundamental implements ISet {
         return other.accept(new IntersectionVisitor(this));
     }
 
-    public String toString() {
-        String leftStr = needsParentheses(left) ? "(" + left + ")" : left.toString();
-        String rightStr = needsParentheses(right) ? "(" + right + ")" : right.toString();
-
-        return leftStr + operation.toString() + rightStr;
+    @Override
+    public Interval toInterval() {
+        return new Interval(right.toInterval().complement(left).getExpression().toString());
     }
 
-    private boolean needsParentheses(ISet side) {
-        if (side instanceof ReducedFundamental rf) {
-            return rf.parenthesis;
+    public String toString() {
+        if(right.getISetType() == ISetType.INTERVAL) {
+            return this.toInterval().toString();
         }
-        return false;
+
+        return left + operation.toString() + right;
     }
 }

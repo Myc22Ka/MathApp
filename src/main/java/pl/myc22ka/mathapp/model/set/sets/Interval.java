@@ -16,6 +16,9 @@ import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static pl.myc22ka.mathapp.model.set.SetSymbols.DIFFERENCE;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
+
 /**
  * Mathematical interval set [0, 4].
  *

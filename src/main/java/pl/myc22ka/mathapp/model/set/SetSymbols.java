@@ -149,7 +149,7 @@ public enum SetSymbols {
                 .collect(Collectors.joining(""));
     }
 
-    public static boolean isReal(String element) {
+    public static boolean isReal(@NotNull String element) {
         return element.equals("(-∞,∞)") || element.equals("(-∞,+∞)") || element.equals(SetSymbols.REAL.toString());
     }
 
