@@ -17,8 +17,7 @@ import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
 import java.util.ArrayList;
 import java.util.List;
 
-import static pl.myc22ka.mathapp.model.set.ISetType.FINITE;
-import static pl.myc22ka.mathapp.model.set.ISetType.REDUCED_FUNDAMENTAL;
+import static pl.myc22ka.mathapp.model.set.ISetType.*;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 
@@ -26,7 +25,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  * Visitor for computing the set intersection (A ∩ B).
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025-06-24
  */
 @RequiredArgsConstructor
@@ -54,70 +53,35 @@ public class IntersectionVisitor implements SetVisitor<ISet> {
 
         Interval result = new Interval(intersection);
 
-        return SetSymbols.isReal(result.toString()) ? new Fundamental(REAL) : result;
+        return SetSymbols.isReal(result.toString()) ? new Fundamental(REAL) : result.shorten();
     }
 
     @Override
     public ISet visitFundamental(Fundamental right) {
         if (right.isEmpty() || left.isEmpty()) return new Fundamental(SetSymbols.EMPTY);
 
-        if (left instanceof Finite || left instanceof Interval) {
-            return right.intersection(left);
+        if (left.getISetType() != FUNDAMENTAL) return right.intersection(left);
+
+        var fLeft = (Fundamental) left;
+
+        if (fLeft.getLeftSymbol().equals(REAL)) {
+            return right;
+        }
+        if (right.getLeftSymbol().equals(REAL)) {
+            return fLeft;
         }
 
-        if (left instanceof Fundamental fLeft) {
-            if (fLeft.getLeftSymbol().equals(REAL)) {
-                return right;
-            }
-            if (right.getLeftSymbol().equals(REAL)) {
-                return fLeft;
-            }
-
-            if(right.getLeftSymbol().equals(fLeft.getLeftSymbol())) {
-                return fLeft;
-            }
-
-            return new Fundamental(SetSymbols.EMPTY);
+        if(right.getLeftSymbol().equals(fLeft.getLeftSymbol())) {
+            return fLeft;
         }
 
-       return null;
+        return new Fundamental(SetSymbols.EMPTY);
     }
 
     @Override
     public ISet visitReducedFundamental(ReducedFundamental right) {
-        if (left.getISetType() != REDUCED_FUNDAMENTAL) {
-            // A ∩ (B ∖ C) = (A ∩ B) ∖ C
-            if (left instanceof Fundamental || left instanceof Interval) {
-                ISet baseIntersection = left.intersection(right.getLeft());
+        if (left.isEmpty() || right.isEmpty()) return new Fundamental(EMPTY);
 
-                if (baseIntersection.isEmpty()) return new Fundamental(SetSymbols.EMPTY);
-
-                return baseIntersection.difference(right.getRight());
-            }
-
-            return right.intersection(left); // fallback
-        }
-
-        ReducedFundamental rLeft = (ReducedFundamental) left;
-
-        // Simplify any funky pranks from user like Rn{1} from both sides
-        if (right.getOperation() != SetSymbols.DIFFERENCE) {
-            return right.simplify().intersection(left);
-        }
-
-        if (rLeft.getOperation() != SetSymbols.DIFFERENCE) {
-            return rLeft.simplify().intersection(right);
-        }
-
-        // (A ∖ B) ∩ (C ∖ D) = (A ∩ C) ∖ (B ∪ D)
-        ISet baseIntersection = rLeft.getLeft().intersection(right.getLeft());
-
-        if (baseIntersection.isEmpty()) {
-            return new Fundamental(SetSymbols.EMPTY);
-        }
-
-        ISet sum = rLeft.getRight().union(right.getRight());
-
-        return baseIntersection.difference(sum);
+        return visitInterval(right.toInterval());
     }
 }

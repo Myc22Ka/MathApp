@@ -8,22 +8,19 @@ import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.ISetType;
 import pl.myc22ka.mathapp.model.set.Set;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
-import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.DifferenceVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.IntersectionVisitor;
+import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static pl.myc22ka.mathapp.model.set.SetSymbols.DIFFERENCE;
-import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
-
 /**
  * Mathematical interval set [0, 4].
  *
  * @author Myc22Ka
- * @version 1.0
+ * @version 1.0.1
  * @since 2025‑06‑19
  */
 public class Interval implements ISet {
@@ -40,6 +37,28 @@ public class Interval implements ISet {
         } catch (Exception e) {
             this.expression = fromStringToInterval(expression);
         }
+    }
+
+    /**
+     * Finds the position of a comma at the top level (not inside parentheses)
+     * This handles mathematical functions like sqrt(10) properly
+     */
+    private static int findTopLevelComma(@NotNull String content) {
+        int parenDepth = 0;
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+
+            if (c == '(') {
+                parenDepth++;
+            } else if (c == ')') {
+                parenDepth--;
+            } else if (c == ',' && parenDepth == 0) {
+                return i;
+            }
+        }
+
+        return -1; // No top-level comma found
     }
 
     private @NotNull IExpr fromStringToInterval(@NotNull String expression) {
@@ -78,28 +97,6 @@ public class Interval implements ISet {
         }
     }
 
-    /**
-     * Finds the position of a comma at the top level (not inside parentheses)
-     * This handles mathematical functions like sqrt(10) properly
-     */
-    private static int findTopLevelComma(@NotNull String content) {
-        int parenDepth = 0;
-
-        for (int i = 0; i < content.length(); i++) {
-            char c = content.charAt(i);
-
-            if (c == '(') {
-                parenDepth++;
-            } else if (c == ')') {
-                parenDepth--;
-            } else if (c == ',' && parenDepth == 0) {
-                return i;
-            }
-        }
-
-        return -1; // No top-level comma found
-    }
-
     @Override
     public <T> T accept(@NotNull SetVisitor<T> visitor) {
         return visitor.visitInterval(this);
@@ -108,6 +105,22 @@ public class Interval implements ISet {
     @Override
     public Interval toInterval() {
         return this;
+    }
+
+    public ISet shorten() {
+        var rFundamental = this.toReducedFundamental();
+
+        if (this.toString().length() > rFundamental.toString().length() && Set.of(rFundamental.getRight().toString()).getISetType() == ISetType.FINITE) {
+            return rFundamental;
+        }
+
+        return this;
+    }
+
+    public ReducedFundamental toReducedFundamental() {
+        var universe = new Fundamental(SetSymbols.REAL);
+
+        return new ReducedFundamental(universe, SetSymbols.DIFFERENCE, this.complement(universe));
     }
 
     @Override
@@ -166,11 +179,11 @@ public class Interval implements ISet {
                 String rightSym = element.getAt(3).toString();
                 String end = element.getAt(4).toString();
 
-                if(start.equals(F.CNInfinity.toString())){
+                if (start.equals(F.CNInfinity.toString())) {
                     start = SetSymbols.NEGATIVE_INFINITY.toString();
                 }
 
-                if(end.equals(F.Infinity.toString())){
+                if (end.equals(F.Infinity.toString())) {
                     end = SetSymbols.INFINITY.toString();
                 }
 

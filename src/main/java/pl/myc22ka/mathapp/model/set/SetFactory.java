@@ -14,7 +14,7 @@ import java.util.List;
  * Supports finite sets, intervals, and fundamental sets.
  *
  * @author Myc22Ka
- * @version 1.0
+ * @version 1.0.1
  * @since 2025‑06‑19
  */
 
@@ -28,10 +28,6 @@ public class SetFactory {
      * @throws IllegalArgumentException if the expression is unsupported
      */
     public static @NotNull ISet fromString(@NotNull String setExpression) {
-        return fromString(setExpression, false);
-    }
-
-    private static @NotNull ISet fromString(@NotNull String setExpression, boolean isParenthesized) {
         var binaryOperations = SetSymbols.getBinaryOperations();
 
         String trimmed = setExpression.replaceAll("\\s+", "");
@@ -57,18 +53,17 @@ public class SetFactory {
         String stripped = stripOuterParentheses(trimmed, containsBinaryOps);
         if (!stripped.equals(trimmed)) {
             // Jeśli usunęliśmy nawiasy, ustaw flagę
-            return fromString(stripped, true);
+            return fromString(stripped);
         }
 
-        return parseSimpleExpression(trimmed, binaryOperations, isParenthesized);
+        return parseSimpleExpression(trimmed, binaryOperations);
     }
 
     /**
      * Parses simple expressions without binary operations
      */
     private static @NotNull ISet parseSimpleExpression(@NotNull String trimmed,
-                                                       @NotNull List<SetSymbols> binaryOperations,
-                                                       boolean isParenthesized) {
+                                                       @NotNull List<SetSymbols> binaryOperations) {
         // 1. Check for finite set (e.g. {1,2,3})
         if (isFinite(trimmed, binaryOperations)) return new Finite(trimmed);
 
@@ -84,40 +79,7 @@ public class SetFactory {
             return SetExpressionParser.parseAndEvaluate(trimmed);
         }
 
-        // 5. NEW CASE: Check for expressions like (ℝ∖ℤ)∖[1,6] where we have a parenthesized
-        //    complex expression followed by an operator and another operand
-        if (trimmed.startsWith("(") && !isInterval(trimmed)) {
-            int closingParen = findMatchingClosingParen(trimmed);
-            if (closingParen > 0 && closingParen < trimmed.length() - 1) {
-                // There's something after the closing parenthesis
-                String afterParen = trimmed.substring(closingParen + 1);
-
-                // Check if what follows is a binary operator
-                for (SetSymbols symbol : binaryOperations) {
-                    String op = symbol.toString();
-                    if (afterParen.startsWith(op)) {
-                        String leftExpr = trimmed.substring(1, closingParen); // Remove outer parentheses
-                        String rightExpr = afterParen.substring(op.length());
-
-                        // Parse left side using expression parser (it contains operators)
-                        ISet left = SetExpressionParser.parseAndEvaluate(leftExpr);
-
-                        // Parse right side normally
-                        ISet right = fromString(rightExpr);
-
-                        // Apply the operation
-                        return switch (symbol) {
-                            case UNION -> left.union(right);
-                            case INTERSECTION -> left.intersection(right);
-                            case DIFFERENCE -> left.difference(right);
-                            default -> throw new IllegalArgumentException("Unsupported operator: " + symbol);
-                        };
-                    }
-                }
-            }
-        }
-
-        // 6. Reduced fundamental ℝ\{1,2} ... (single operator case)
+        // 5. Reduced fundamental ℝ\{1,2} ... (single operator case)
         for (SetSymbols symbol : SetSymbols.getBinaryOperations()) {
             String rep = symbol.toString();
             int pos = findOperatorPosition(trimmed, rep);
@@ -127,21 +89,15 @@ public class SetFactory {
             String rightExpr = trimmed.substring(pos + rep.length());
 
             // Usuwamy nawiasy i ustawiamy flagę, ale przekazujemy ją dalej
-            boolean hadOuterParens = false;
             String strippedRightExpr = stripOuterParentheses(rightExpr, false);
-            if (!strippedRightExpr.equals(rightExpr)) {
-                hadOuterParens = true;
-                rightExpr = strippedRightExpr;
-            }
+            if (!strippedRightExpr.equals(rightExpr)) rightExpr = strippedRightExpr;
 
             ISet right = containsMultipleOperators(rightExpr, binaryOperations)
                     ? SetExpressionParser.parseAndEvaluate(rightExpr)
-                    : fromString(rightExpr, hadOuterParens);
+                    : fromString(rightExpr);
 
             if (left.getISetType() == ISetType.FUNDAMENTAL || left.getISetType() == ISetType.INTERVAL) {
-                var result = new ReducedFundamental(left, symbol, right, isParenthesized || hadOuterParens);
-
-                return result.simplify().toInterval();
+                return new ReducedFundamental(left, symbol, right);
             }
         }
         return new Fundamental(SetSymbols.EMPTY.toString());

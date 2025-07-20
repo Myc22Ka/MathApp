@@ -18,7 +18,7 @@ import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
  * Mathematical interval set ℝ/{1/2}.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025‑06‑19
  */
 
@@ -29,9 +29,8 @@ public class ReducedFundamental implements ISet {
     private ISet right;
     private ISet left;
     private SetSymbols leftSymbol;
-    private boolean parenthesis;
 
-    public ReducedFundamental(@NotNull ISet leftSymbol, @NotNull SetSymbols operation, @NotNull ISet right, boolean parenthesis) {
+    public ReducedFundamental(@NotNull ISet leftSymbol, @NotNull SetSymbols operation, @NotNull ISet right) {
         if ((right.getISetType() != ISetType.INTERVAL && right.getISetType() != ISetType.FINITE) || right.isEmpty()) {
             throw new ServerError(ServerErrorMessages.UNSUPPORTED_CONSTRUCTION_BUILD);
         }
@@ -40,7 +39,6 @@ public class ReducedFundamental implements ISet {
         this.left = leftSymbol;
         this.operation = operation;
         this.right = right;
-        this.parenthesis = parenthesis;
     }
 
     public ISet simplify(){
@@ -115,14 +113,13 @@ public class ReducedFundamental implements ISet {
 
     @Override
     public Interval toInterval() {
-        return new Interval(right.toInterval().complement(left).getExpression().toString());
+        var simplified = this.simplify();
+        var f = new Fundamental(SetSymbols.REAL);
+
+        return f.difference(simplified.complement(f)).toInterval();
     }
 
     public String toString() {
-        if(right.getISetType() == ISetType.INTERVAL) {
-            return this.toInterval().toString();
-        }
-
         return left + operation.toString() + right;
     }
 }

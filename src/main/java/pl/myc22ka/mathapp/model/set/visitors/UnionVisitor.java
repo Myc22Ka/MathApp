@@ -20,7 +20,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  * Visitor for computing the set union (A ∪ B).
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025-06-29
  */
 @RequiredArgsConstructor
@@ -53,7 +53,7 @@ public class UnionVisitor implements SetVisitor<ISet> {
 
         Interval result = new Interval(union);
 
-        return SetSymbols.isReal(result.toString()) ? new Fundamental(REAL) : result;
+        return SetSymbols.isReal(result.toString()) ? new Fundamental(REAL) : result.shorten();
     }
 
     @Override
@@ -75,6 +75,6 @@ public class UnionVisitor implements SetVisitor<ISet> {
         if (left.isEmpty()) return right;
         if (right.isEmpty()) return left;
 
-        return visitInterval(right.toInterval());
+        return visitInterval(right.simplify().toInterval());
     }
 }

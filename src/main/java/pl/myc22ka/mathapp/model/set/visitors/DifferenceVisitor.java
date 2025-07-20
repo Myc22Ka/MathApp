@@ -10,14 +10,16 @@ import pl.myc22ka.mathapp.model.set.sets.Fundamental;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
 
-import static pl.myc22ka.mathapp.model.set.ISetType.*;
+import static pl.myc22ka.mathapp.model.set.ISetType.FINITE;
+import static pl.myc22ka.mathapp.model.set.ISetType.FUNDAMENTAL;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.DIFFERENCE;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
 
 /**
  * Visitor for computing the set difference (A ∖ B).
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025-06-19
  */
 public class DifferenceVisitor implements SetVisitor<ISet> {
@@ -31,6 +33,22 @@ public class DifferenceVisitor implements SetVisitor<ISet> {
     @Override
     public ISet visitFinite(Finite right) {
         if (left.isEmpty() || right.isEmpty()) return left;
+
+        if (left.getISetType() == FUNDAMENTAL) {
+            return new ReducedFundamental(left, DIFFERENCE, right);
+        }
+
+        if (left instanceof ReducedFundamental rLeft) {
+
+            var union = rLeft.getRight().union(right);
+
+            if (union.getISetType() == FINITE && rLeft.getOperation() == DIFFERENCE)
+                return new ReducedFundamental(rLeft.getLeft(), DIFFERENCE, rLeft.getRight().union(right));
+
+            var simplified = rLeft.simplify();
+
+            return simplified.difference(right);
+        }
 
         // Delegate if not finite
         if (left.getISetType() != FINITE) {
@@ -47,13 +65,13 @@ public class DifferenceVisitor implements SetVisitor<ISet> {
     public ISet visitInterval(Interval right) {
         if (left.isEmpty() || right.isEmpty()) return left;
 
-        ISet normalizedLeft =  left.toInterval();
+        ISet normalizedLeft = left.toInterval();
 
-        IExpr expr = evaluator.eval(
+        String difference = evaluator.eval(
                 F.IntervalComplement(normalizedLeft.getExpression(), right.getExpression())
-        );
+        ).toString();
 
-        return new Interval(expr.toString());
+        return new Interval(difference);
     }
 
     @Override
@@ -62,7 +80,7 @@ public class DifferenceVisitor implements SetVisitor<ISet> {
 
         if (left.toString().equals(right.toString())) return new Fundamental(SetSymbols.EMPTY);
 
-        return visitInterval(left.toInterval());
+        return visitInterval(right.toInterval());
     }
 
     @Override
@@ -71,7 +89,15 @@ public class DifferenceVisitor implements SetVisitor<ISet> {
 
         if (left.toString().equals(right.getLeftSymbol().toString())) return right.getRight();
 
-        return visitInterval(left.toInterval());
+        if (left.getISetType() == FUNDAMENTAL) {
+            return right.getRight();
+        }
+
+        if (right.getOperation() != DIFFERENCE) {
+            return left.difference(right.simplify()).toInterval().shorten();
+        }
+
+        return right.getRight().intersection(left);
     }
 }
 
