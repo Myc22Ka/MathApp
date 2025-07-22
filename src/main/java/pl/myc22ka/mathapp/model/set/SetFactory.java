@@ -22,8 +22,9 @@ public class SetFactory {
             new SetParser(),
             new FiniteParser(),
             new IntervalParser(),
-            new FundamentalSetParser(),
-            new ReducedFundamentalParser()
+            new FundamentalParser(),
+            new ReducedFundamentalParser(),
+            new SymjaSetParser()
     );
 
     /**

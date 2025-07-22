@@ -12,7 +12,7 @@ import static pl.myc22ka.mathapp.model.set.ISetType.INTERVAL;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 
-public class FundamentalSetParser implements ISetParser {
+public class FundamentalParser implements ISetParser {
 
     private boolean containsSingleBinaryOperator(String expr) {
         var binaryOps = SetSymbols.getBinaryOperations();
