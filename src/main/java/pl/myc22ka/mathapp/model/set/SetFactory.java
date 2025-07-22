@@ -1,13 +1,15 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.model.set.parsers.SetExpressionParser;
-import pl.myc22ka.mathapp.model.set.sets.Finite;
-import pl.myc22ka.mathapp.model.set.sets.Fundamental;
-import pl.myc22ka.mathapp.model.set.sets.Interval;
-import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
+import pl.myc22ka.mathapp.model.set.parsers.SetParser;
+import pl.myc22ka.mathapp.model.set.sets.*;
 
 import java.util.List;
+
+import static pl.myc22ka.mathapp.model.set.ISetType.FUNDAMENTAL;
+import static pl.myc22ka.mathapp.model.set.ISetType.INTERVAL;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 
 /**
  * Factory class for creating {@link ISet} instances from string expressions.
@@ -17,7 +19,6 @@ import java.util.List;
  * @version 1.0.1
  * @since 2025‑06‑19
  */
-
 public class SetFactory {
 
     /**
@@ -28,255 +29,227 @@ public class SetFactory {
      * @throws IllegalArgumentException if the expression is unsupported
      */
     public static @NotNull ISet fromString(@NotNull String setExpression) {
-        var binaryOperations = SetSymbols.getBinaryOperations();
-
         String trimmed = setExpression.replaceAll("\\s+", "");
 
-        if (trimmed.isEmpty()) {
-            return new Fundamental(SetSymbols.EMPTY.toString());
-        }
+        if (SetSymbols.isReal(trimmed)) return new Fundamental(REAL);
 
-        if(trimmed.equals("(-∞,∞)") || trimmed.equals("(-∞,+∞)")) {
-            return new Fundamental(SetSymbols.REAL);
-        }
+        var binaryOperations = SetSymbols.getBinaryOperations();
 
         boolean containsFundamental = SetSymbols.getSymbols().stream()
-                .anyMatch(op -> trimmed.contains(op.toString()));
+                .anyMatch(symbol -> trimmed.contains(symbol.toString()));
 
         boolean containsBinaryOps = binaryOperations.stream()
                 .anyMatch(op -> trimmed.contains(op.toString()));
 
         if (containsBinaryOps && !containsFundamental) {
-            return SetExpressionParser.parseAndEvaluate(trimmed);
-        }
-
-        String stripped = stripOuterParentheses(trimmed, containsBinaryOps);
-        if (!stripped.equals(trimmed)) {
-            // Jeśli usunęliśmy nawiasy, ustaw flagę
-            return fromString(stripped);
+            return SetParser.parse(trimmed);
         }
 
         return parseSimpleExpression(trimmed, binaryOperations);
     }
 
     /**
-     * Parses simple expressions without binary operations
+     * Parses simple expressions without binary operations.
      */
     private static @NotNull ISet parseSimpleExpression(@NotNull String trimmed,
                                                        @NotNull List<SetSymbols> binaryOperations) {
         // 1. Check for finite set (e.g. {1,2,3})
-        if (isFinite(trimmed, binaryOperations)) return new Finite(trimmed);
+        if (isFiniteSet(trimmed, binaryOperations)) {
+            return new Finite(trimmed);
+        }
 
-        // 2. Check for closed or open intervals (e.g. [1,5], (2,10], [sqrt(10), 10), etc.)
-        if (isInterval(trimmed)) return new Interval(trimmed);
+        // 2. Check for intervals (e.g. [1,5], (2,10], [sqrt(10), 10))
+        if (isInterval(trimmed)) {
+            String symjaExpr = convertToIntervalExpression(trimmed);
 
-        // 3. Stand-alone fundamental symbol ℝ, ℕ, ∅ ...
-        if (SetSymbols.equals(trimmed)) return new Fundamental(trimmed);
+            return new Interval(symjaExpr);
+        }
 
-        // 4. Check if this is a complex expression with multiple operators
+        // 3. Stand-alone fundamental symbol ℝ, ℕ, ∅
+        if (SetSymbols.equals(trimmed)) {
+            return new Fundamental(trimmed);
+        }
+
+        // 4. Check for complex expressions with multiple operators
         if (containsMultipleOperators(trimmed, binaryOperations)) {
-            // Use the expression parser for complex expressions
-            return SetExpressionParser.parseAndEvaluate(trimmed);
+            return SetParser.parse(trimmed);
         }
 
-        // 5. Reduced fundamental ℝ\{1,2} ... (single operator case)
-        for (SetSymbols symbol : SetSymbols.getBinaryOperations()) {
-            String rep = symbol.toString();
-            int pos = findOperatorPosition(trimmed, rep);
-            if (pos <= 0) continue;
-
-            ISet left = fromString(trimmed.substring(0, pos));
-            String rightExpr = trimmed.substring(pos + rep.length());
-
-            // Usuwamy nawiasy i ustawiamy flagę, ale przekazujemy ją dalej
-            String strippedRightExpr = stripOuterParentheses(rightExpr, false);
-            if (!strippedRightExpr.equals(rightExpr)) rightExpr = strippedRightExpr;
-
-            ISet right = containsMultipleOperators(rightExpr, binaryOperations)
-                    ? SetExpressionParser.parseAndEvaluate(rightExpr)
-                    : fromString(rightExpr);
-
-            if (left.getISetType() == ISetType.FUNDAMENTAL || left.getISetType() == ISetType.INTERVAL) {
-                return new ReducedFundamental(left, symbol, right);
-            }
-        }
-        return new Fundamental(SetSymbols.EMPTY.toString());
+        // 5. Reduced fundamental expressions like ℝ\{1,2} (single operator case)
+        return parseReducedFundamental(trimmed, binaryOperations);
     }
 
     /**
-     * Helper method to find the matching closing parenthesis for a given opening parenthesis
+     * Parses reduced fundamental expressions (e.g., ℝ\{1,2}).
      */
-    private static int findMatchingClosingParen(String expr) {
-        if (expr.isEmpty() || expr.charAt(0) != '(') {
-            return -1;
-        }
+    private static @NotNull ISet parseReducedFundamental(@NotNull String trimmed,
+                                                         @NotNull List<SetSymbols> binaryOperations) {
+        for (SetSymbols symbol : binaryOperations) {
+            String operator = symbol.toString();
+            int position = findOperatorPosition(trimmed, operator);
 
-        int depth = 1;
-        for (int i = 1; i < expr.length(); i++) {
-            char c = expr.charAt(i);
-            if (c == '(') {
-                depth++;
-            } else if (c == ')') {
-                depth--;
-                if (depth == 0) {
-                    return i;
-                }
+            if (position <= 0) continue;
+
+            ISet left = fromString(trimmed.substring(0, position));
+            String rightExpr = trimmed.substring(position + operator.length());
+
+            rightExpr = stripOuterParentheses(rightExpr);
+
+            ISet right = containsMultipleOperators(rightExpr, binaryOperations)
+                    ? SetParser.parse(rightExpr)
+                    : fromString(rightExpr);
+
+            if (left.getISetType() == FUNDAMENTAL || left.getISetType() == INTERVAL) {
+                return new ReducedFundamental(left, symbol, right);
             }
         }
-        return -1; // No matching closing parenthesis found
+
+        return new Fundamental(EMPTY);
     }
 
-    private static String stripOuterParentheses(String expr, boolean containsBinaryOps) {
-        if (expr.startsWith("(") && expr.endsWith(")") && containsBinaryOps) {
-            // Sprawdź, czy nawiasy zewnętrzne są parzysto zagnieżdżone
-            int depth = 0;
-            for (int i = 0; i < expr.length(); i++) {
-                char c = expr.charAt(i);
-                if (c == '(') depth++;
-                else if (c == ')') depth--;
-                // Jeśli przedostatni znak zamyka pierwszego nawiasu to znaczy, że zewnętrzne nawiasy ok
-                if (depth == 0 && i < expr.length() - 1) {
-                    return expr; // Nawiasy nie obejmują całego wyrażenia
-                }
-            }
-            // Jeśli doszliśmy do końca i depth == 0, to możemy usunąć nawiasy
+    /**
+     * Removes outer parentheses if they encompass the entire expression.
+     */
+    private static @NotNull String stripOuterParentheses(@NotNull String expr) {
+        if (!expr.startsWith("(") || !expr.endsWith(")")) {
+            return expr;
+        }
+
+        if (hasMatchingOuterParentheses(expr)) {
             return expr.substring(1, expr.length() - 1);
         }
+
         return expr;
     }
 
     /**
-     * Checks if the expression contains multiple binary operators at the top level
+     * Checks if outer parentheses match and encompass the entire expression.
+     */
+    private static boolean hasMatchingOuterParentheses(@NotNull String expr) {
+        int depth = 0;
+        for (int i = 0; i < expr.length(); i++) {
+            char c = expr.charAt(i);
+            if (c == '(') depth++;
+            else if (c == ')') depth--;
+
+            // If depth becomes 0 before the last character, outer parentheses don't encompass all
+            if (depth == 0 && i < expr.length() - 1) {
+                return false;
+            }
+        }
+        return depth == 0;
+    }
+
+    /**
+     * Checks if the expression contains multiple binary operators at the top level.
      */
     private static boolean containsMultipleOperators(@NotNull String expression,
                                                      @NotNull List<SetSymbols> binaryOperations) {
         int operatorCount = 0;
-        int i = 0;
-        int braceDepth = 0;
-        int parenDepth = 0;
-        int bracketDepth = 0;
+        DepthTracker depth = new DepthTracker();
 
-        while (i < expression.length()) {
+        for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
+            depth.updateDepth(c);
 
-            // Track nesting depth
-            if (c == '{') braceDepth++;
-            else if (c == '}') braceDepth--;
-            else if (c == '(') parenDepth++;
-            else if (c == ')') parenDepth--;
-            else if (c == '[') bracketDepth++;
-            else if (c == ']') bracketDepth--;
-
-            // Check for operators only at top level (depth 0)
-            if (braceDepth == 0 && parenDepth == 0 && bracketDepth == 0) {
+            if (depth.isAtTopLevel()) {
                 for (SetSymbols symbol : binaryOperations) {
-                    String op = symbol.toString();
-                    if (expression.startsWith(op, i)) {
+                    String operator = symbol.toString();
+                    if (expression.startsWith(operator, i)) {
                         operatorCount++;
                         if (operatorCount > 1) {
-                            return true; // Found multiple operators
+                            return true;
                         }
-                        i += op.length() - 1; // Skip the operator
+                        i += operator.length() - 1;
                         break;
                     }
                 }
             }
-            i++;
         }
+
         return false;
     }
 
     /**
-     * Finds the position of an operator, considering nesting levels
+     * Finds the position of an operator, considering nesting levels.
      */
     private static int findOperatorPosition(@NotNull String expression, @NotNull String operator) {
-        int i = 0;
-        int braceDepth = 0;
-        int parenDepth = 0;
-        int bracketDepth = 0;
+        DepthTracker depth = new DepthTracker();
 
-        while (i <= expression.length() - operator.length()) {
+        for (int i = 0; i <= expression.length() - operator.length(); i++) {
             char c = expression.charAt(i);
+            depth.updateDepth(c);
 
-            // Track nesting depth
-            if (c == '{') braceDepth++;
-            else if (c == '}') braceDepth--;
-            else if (c == '(') parenDepth++;
-            else if (c == ')') parenDepth--;
-            else if (c == '[') bracketDepth++;
-            else if (c == ']') bracketDepth--;
-
-            // Check for operator only at top level (depth 0)
-            if (braceDepth == 0 && parenDepth == 0 && bracketDepth == 0) {
-                if (expression.startsWith(operator, i)) {
-                    return i;
-                }
+            if (depth.isAtTopLevel() && expression.startsWith(operator, i)) {
+                return i;
             }
-            i++;
         }
+
         return -1; // Operator not found at top level
     }
 
-    private static boolean isFinite(@NotNull String expr, List<SetSymbols> ops) {
-        return expr.matches("\\{.*}") && ops.stream().noneMatch(op -> expr.contains(op.toString()));
-    }
-
     /**
-     * Enhanced method to check if expression is an interval, now supporting square roots
-     * and other mathematical functions.
-     * Examples of supported formats:
-     * - [1, 5]
-     * - (2, 10]
-     * - [sqrt(10), 10)
-     * - (sqrt(2), sqrt(8)]
-     * - [-sqrt(5), sqrt(5)]
-     * - [3, sqrt(10))
+     * Checks if the expression represents a finite set.
      */
-    private static boolean isInterval(@NotNull String expr) {
-        // Basic structure check: starts with [ or (, ends with ] or )
-        if (!expr.matches("[\\[(].*[])]")) {
+    private static boolean isFiniteSet(@NotNull String expr, @NotNull List<SetSymbols> operations) {
+        if (!expr.matches("\\{.*}")) {
             return false;
         }
 
-        // Extract the content between brackets/parentheses
-        String content = expr.substring(1, expr.length() - 1);
-
-        // Find the comma that separates the two interval bounds
-        int commaPos = findTopLevelComma(content);
-        if (commaPos == -1) {
-            return false; // No comma found at top level
-        }
-
-        String leftBound = content.substring(0, commaPos).trim();
-        String rightBound = content.substring(commaPos + 1).trim();
-
-        // Check if both bounds are valid mathematical expressions
-        boolean leftValid = isValidMathExpression(leftBound);
-        boolean rightValid = isValidMathExpression(rightBound);
-
-//        // Debug info (remove in production)
-//        if (!leftValid || !rightValid) {
-//            System.out.println("DEBUG: leftBound='" + leftBound + "' valid=" + leftValid +
-//                    ", rightBound='" + rightBound + "' valid=" + rightValid);
-//        }
-
-        return leftValid && rightValid;
+        return operations.stream().noneMatch(op -> expr.contains(op.toString()));
     }
 
     /**
-     * Finds the position of a comma at the top level (not inside parentheses)
+     * Checks if the expression represents an interval.
+     * Supports formats like [1, 5], (2, 10], [sqrt(10), 10), etc.
+     */
+    private static boolean isInterval(@NotNull String expr) {
+        return expr.matches("^\\s*[\\[(].*[])]\\s*$");
+    }
+
+    /**
+     * Converts interval notation to internal expression format.
+     */
+    private static @NotNull String convertToIntervalExpression(@NotNull String expression) {
+        String trimmed = expression.trim();
+
+        if (!isInterval(trimmed)) {
+            throw new IllegalArgumentException("Invalid interval format: " + expression);
+        }
+
+        char leftBracket = trimmed.charAt(0);
+        char rightBracket = trimmed.charAt(trimmed.length() - 1);
+
+        BoundType leftBound = (leftBracket == '[') ? BoundType.CLOSED : BoundType.OPEN;
+        BoundType rightBound = (rightBracket == ']') ? BoundType.CLOSED : BoundType.OPEN;
+
+        String content = trimmed.substring(1, trimmed.length() - 1).trim();
+        int commaPosition = findTopLevelComma(content);
+
+        if (commaPosition == -1) {
+            throw new IllegalArgumentException("Invalid interval format: " + expression);
+        }
+
+        String start = content.substring(0, commaPosition).trim();
+        String end = content.substring(commaPosition + 1).trim();
+
+        return String.format("IntervalData({%s, %s, %s, %s})", start, leftBound, rightBound, end);
+    }
+
+    /**
+     * Finds the position of a comma at the top level (not inside parentheses).
      */
     private static int findTopLevelComma(@NotNull String content) {
-        int parenDepth = 0;
+        int parenthesesDepth = 0;
 
         for (int i = 0; i < content.length(); i++) {
             char c = content.charAt(i);
 
             if (c == '(') {
-                parenDepth++;
+                parenthesesDepth++;
             } else if (c == ')') {
-                parenDepth--;
-            } else if (c == ',' && parenDepth == 0) {
+                parenthesesDepth--;
+            } else if (c == ',' && parenthesesDepth == 0) {
                 return i;
             }
         }
@@ -285,69 +258,26 @@ public class SetFactory {
     }
 
     /**
-     * Checks if a string represents a valid mathematical expression for interval bounds.
-     * Supports numbers, negative numbers, infinity symbols, and mathematical functions like sqrt().
+     * Helper class to track nesting depth in expressions.
      */
-    private static boolean isValidMathExpression(@NotNull String expr) {
-        if (expr == null || expr.trim().isEmpty()) {
-            return false;
-        }
+    private static class DepthTracker {
+        private int braceDepth = 0;
+        private int parenthesesDepth = 0;
+        private int bracketDepth = 0;
 
-        expr = expr.trim(); // Ensure no leading/trailing whitespace
-
-        // Handle infinity symbols
-        if (expr.equals("∞") || expr.equals("+∞") || expr.equals("-∞")) {
-            return true;
-        }
-
-        // Check for simple numbers (integers and decimals, positive and negative)
-        // This regex should match: 3, -3, 3.14, -3.14, 0, -0, etc.
-        if (expr.matches("-?\\d+(\\.\\d+)?")) {
-            return true;
-        }
-
-        // Check for mathematical functions
-        if (isValidMathFunction(expr)) {
-            return true;
-        }
-
-        // Check for expressions starting with minus sign followed by a function
-        if (expr.startsWith("-") && expr.length() > 1) {
-            return isValidMathFunction(expr.substring(1));
-        }
-
-        return false;
-    }
-
-    /**
-     * Validates mathematical functions like sqrt(x), cbrt(x), etc.
-     */
-    private static boolean isValidMathFunction(@NotNull String expr) {
-        // Pattern for mathematical functions: function_name(argument)
-        if (!expr.matches("\\w+\\(.+\\)")) {
-            return false;
-        }
-
-        int parenPos = expr.indexOf('(');
-        String functionName = expr.substring(0, parenPos);
-        String argument = expr.substring(parenPos + 1, expr.length() - 1);
-
-        // List of supported mathematical functions
-        String[] supportedFunctions = {"sqrt", "cbrt", "abs", "sin", "cos", "tan", "ln", "log", "exp"};
-
-        boolean isValidFunction = false;
-        for (String func : supportedFunctions) {
-            if (functionName.equals(func)) {
-                isValidFunction = true;
-                break;
+        void updateDepth(char c) {
+            switch (c) {
+                case '{' -> braceDepth++;
+                case '}' -> braceDepth--;
+                case '(' -> parenthesesDepth++;
+                case ')' -> parenthesesDepth--;
+                case '[' -> bracketDepth++;
+                case ']' -> bracketDepth--;
             }
         }
 
-        if (!isValidFunction) {
-            return false;
+        boolean isAtTopLevel() {
+            return braceDepth == 0 && parenthesesDepth == 0 && bracketDepth == 0;
         }
-
-        // Recursively validate the argument
-        return isValidMathExpression(argument);
     }
 }

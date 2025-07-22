@@ -20,7 +20,7 @@ import java.util.List;
  * Mathematical interval set [0, 4].
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025‑06‑19
  */
 public class Interval implements ISet {
@@ -32,69 +32,7 @@ public class Interval implements ISet {
     }
 
     public Interval(String expression) {
-        try {
-            this.expression = evaluator.eval(expression);
-        } catch (Exception e) {
-            this.expression = fromStringToInterval(expression);
-        }
-    }
-
-    /**
-     * Finds the position of a comma at the top level (not inside parentheses)
-     * This handles mathematical functions like sqrt(10) properly
-     */
-    private static int findTopLevelComma(@NotNull String content) {
-        int parenDepth = 0;
-
-        for (int i = 0; i < content.length(); i++) {
-            char c = content.charAt(i);
-
-            if (c == '(') {
-                parenDepth++;
-            } else if (c == ')') {
-                parenDepth--;
-            } else if (c == ',' && parenDepth == 0) {
-                return i;
-            }
-        }
-
-        return -1; // No top-level comma found
-    }
-
-    private @NotNull IExpr fromStringToInterval(@NotNull String expression) {
-        String trimmed = expression.trim();
-
-        // Basic structure validation
-        if (!trimmed.matches("^\\s*[\\[(].*[])]\\s*$")) {
-            throw new IllegalArgumentException("Invalid interval format: " + expression);
-        }
-
-        // Extract bracket types
-        char leftBracket = trimmed.charAt(trimmed.indexOf('[') != -1 ? trimmed.indexOf('[') : trimmed.indexOf('('));
-        char rightBracket = trimmed.charAt(trimmed.lastIndexOf(']') != -1 ? trimmed.lastIndexOf(']') : trimmed.lastIndexOf(')'));
-
-        BoundType leftBound = (leftBracket == '[') ? BoundType.CLOSED : BoundType.OPEN;
-        BoundType rightBound = (rightBracket == ']') ? BoundType.CLOSED : BoundType.OPEN;
-
-        // Extract content between brackets
-        String content = trimmed.substring(1, trimmed.length() - 1).trim();
-
-        // Find the comma that separates bounds (accounting for nested parentheses)
-        int commaPos = findTopLevelComma(content);
-        if (commaPos == -1) {
-            throw new IllegalArgumentException("Invalid interval format: " + expression);
-        }
-
-        String startStr = content.substring(0, commaPos).trim();
-        String endStr = content.substring(commaPos + 1).trim();
-
-        try {
-            IExpr start = evaluator.parse(startStr);
-            IExpr end = evaluator.parse(endStr);
-            return new Interval(start, leftBound, rightBound, end).getExpression();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid interval format: " + expression + " - " + e.getMessage());
-        }
+        this.expression = evaluator.eval(expression);
     }
 
     @Override
