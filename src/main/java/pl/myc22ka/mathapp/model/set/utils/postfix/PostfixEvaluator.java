@@ -1,7 +1,9 @@
-package pl.myc22ka.mathapp.model.set.parsers;
+package pl.myc22ka.mathapp.model.set.utils.postfix;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.*;
+import pl.myc22ka.mathapp.model.set.utils.token.Token;
+import pl.myc22ka.mathapp.model.set.utils.token.TokenType;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.model.set.parsers;
+package pl.myc22ka.mathapp.model.set.utils.scanner;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.SetSymbols;

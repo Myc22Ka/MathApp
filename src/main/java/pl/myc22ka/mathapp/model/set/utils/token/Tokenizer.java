@@ -1,7 +1,8 @@
-package pl.myc22ka.mathapp.model.set.parsers;
+package pl.myc22ka.mathapp.model.set.utils.token;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
+import pl.myc22ka.mathapp.model.set.utils.scanner.IntervalScanner;
 
 import java.util.*;
 
