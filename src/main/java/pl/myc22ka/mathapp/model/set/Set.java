@@ -9,7 +9,7 @@ import pl.myc22ka.mathapp.model.set.visitors.*;
  *
  * @author Myc22Ka
  * @version 1.0
- * @since 2025‑06‑19
+ * @since 2025.06.19
  */
 public class Set implements ISet {
     private final ISet delegate;

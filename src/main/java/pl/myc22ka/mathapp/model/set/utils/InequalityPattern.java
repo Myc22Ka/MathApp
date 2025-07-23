@@ -23,46 +23,70 @@ import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
  * It supports both left-sided (e.g., {@code x > 3}) and reversed right-sided forms (e.g., {@code 3 < x}),
  * including both ASCII and Unicode inequality symbols.
  *
- * @author Krzysztof Gach
+ * @author Myc22Ka
  * @version 1.0.0
- * @since 23.06.2025
+ * @since 23.07.2025
  */
 public enum InequalityPattern {
-    // Matches expressions like "x >= 3"
-    GREATER_EQUAL("x\\s*>=\\s*([+-]?\\d*\\.?\\d+)", true, CLOSED, OPEN),
+    /**
+     * Matches expressions like "x >= 3"
+     */
+    GREATER_EQUAL("[a-zA-Z]\\s*>=\\s*([+-]?\\d*\\.?\\d+)", true, CLOSED, OPEN),
 
-    // Matches expressions like "x > 3"
-    GREATER("x\\s*>\\s*([+-]?\\d*\\.?\\d+)", true, OPEN, OPEN),
+    /**
+     * Matches expressions like "x > 3"
+     */
+    GREATER("[a-zA-Z]\\s*>\\s*([+-]?\\d*\\.?\\d+)", true, OPEN, OPEN),
 
-    // Matches expressions like "x <= 3"
-    LESS_EQUAL("x\\s*<=\\s*([+-]?\\d*\\.?\\d+)", OPEN, CLOSED),
+    /**
+     * Matches expressions like "x <= 3"
+     */
+    LESS_EQUAL("[a-zA-Z]\\s*<=\\s*([+-]?\\d*\\.?\\d+)", OPEN, CLOSED),
 
-    // Matches expressions like "x < 3"
-    LESS("x\\s*<\\s*([+-]?\\d*\\.?\\d+)", OPEN, OPEN),
+    /**
+     * Matches expressions like "x < 3"
+     */
+    LESS("[a-zA-Z]\\s*<\\s*([+-]?\\d*\\.?\\d+)", OPEN, OPEN),
 
-    // Matches expressions like "x ≥ 3" (Unicode greater or equal)
-    GREATER_EQUAL_UNICODE("x\\s*≥\\s*([+-]?\\d*\\.?\\d+)", true, CLOSED, OPEN),
+    /**
+     * Matches expressions like "x ≥ 3" (Unicode greater or equal)
+     */
+    GREATER_EQUAL_UNICODE("[a-zA-Z]\\s*≥\\s*([+-]?\\d*\\.?\\d+)", true, CLOSED, OPEN),
 
-    // Matches expressions like "x ≤ 3" (Unicode less or equal)
-    LESS_EQUAL_UNICODE("x\\s*≤\\s*([+-]?\\d*\\.?\\d+)", OPEN, CLOSED),
+    /**
+     * Matches expressions like "x ≤ 3" (Unicode less or equal)
+     */
+    LESS_EQUAL_UNICODE("[a-zA-Z]\\s*≤\\s*([+-]?\\d*\\.?\\d+)", OPEN, CLOSED),
 
-    // Matches expressions like "-3 > x" (equivalent to x < -3)
-    REVERSED_GREATER("([+-]?\\d*\\.?\\d+)\\s*>\\s*x", OPEN, OPEN),
+    /**
+     * Matches expressions like "-3 > x" (equivalent to x < -3)
+     */
+    REVERSED_GREATER("([+-]?\\d*\\.?\\d+)\\s*>\\s*[a-zA-Z]", OPEN, OPEN),
 
-    // Matches expressions like "5 >= x" (equivalent to x <= 5)
-    REVERSED_GREATER_EQUAL("([+-]?\\d*\\.?\\d+)\\s*>=\\s*x", OPEN, CLOSED),
+    /**
+     * Matches expressions like "5 >= x" (equivalent to x <= 5)
+     */
+    REVERSED_GREATER_EQUAL("([+-]?\\d*\\.?\\d+)\\s*>=\\s*[a-zA-Z]", OPEN, CLOSED),
 
-    // Matches expressions like "-2 < x" (equivalent to x > -2)
-    REVERSED_LESS("([+-]?\\d*\\.?\\d+)\\s*<\\s*x", true, OPEN, OPEN),
+    /**
+     * Matches expressions like "-2 < x" (equivalent to x > -2)
+     */
+    REVERSED_LESS("([+-]?\\d*\\.?\\d+)\\s*<\\s*[a-zA-Z]", true, OPEN, OPEN),
 
-    // Matches expressions like "10 <= x" (equivalent to x >= 10)
-    REVERSED_LESS_EQUAL("([+-]?\\d*\\.?\\d+)\\s*<=\\s*x", true, CLOSED, OPEN),
+    /**
+     * Matches expressions like "10 <= x" (equivalent to x >= 10)
+     */
+    REVERSED_LESS_EQUAL("([+-]?\\d*\\.?\\d+)\\s*<=\\s*[a-zA-Z]", true, CLOSED, OPEN),
 
-    // Matches expressions like "5 ≥ x" (equivalent to x ≤ 5, Unicode)
-    REVERSED_GREATER_EQUAL_UNICODE("([+-]?\\d*\\.?\\d+)\\s*≥\\s*x", OPEN, CLOSED),
+    /**
+     * Matches expressions like "5 ≥ x" (equivalent to x ≤ 5, Unicode)
+     */
+    REVERSED_GREATER_EQUAL_UNICODE("([+-]?\\d*\\.?\\d+)\\s*≥\\s*[a-zA-Z]", OPEN, CLOSED),
 
-    // Matches expressions like "10 ≤ x" (equivalent to x ≥ 10, Unicode)
-    REVERSED_LESS_EQUAL_UNICODE("([+-]?\\d*\\.?\\d+)\\s*≤\\s*x", true, CLOSED, OPEN);
+    /**
+     * Matches expressions like "10 ≤ x" (equivalent to x ≥ 10, Unicode)
+     */
+    REVERSED_LESS_EQUAL_UNICODE("([+-]?\\d*\\.?\\d+)\\s*≤\\s*[a-zA-Z]", true, CLOSED, OPEN);
 
     private final Pattern pattern;
     private final boolean isLowerBound; // true: [value, ∞), false: (-∞, value]

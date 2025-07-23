@@ -1,5 +1,6 @@
 package pl.myc22ka.mathapp.model.set.visitors;
 
+import lombok.RequiredArgsConstructor;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -19,16 +20,13 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
  * Visitor for computing the set difference (A ∖ B).
  *
  * @author Myc22Ka
- * @version 1.0.2
- * @since 2025-06-19
+ * @version 1.0.3
+ * @since 2025 -06-19
  */
+@RequiredArgsConstructor
 public class DifferenceVisitor implements SetVisitor<ISet> {
     private final ISet left;
     private final ExprEvaluator evaluator = new ExprEvaluator();
-
-    public DifferenceVisitor(ISet left) {
-        this.left = left;
-    }
 
     @Override
     public ISet visitFinite(Finite right) {

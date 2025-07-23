@@ -1,8 +1,6 @@
 package pl.myc22ka.mathapp.model.set;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
@@ -18,24 +16,78 @@ import java.util.stream.Collectors;
  * Enum representing common set symbols with Symja and display forms.
  *
  * @author Myc22Ka
- * @version 1.0
- * @since 2025‑06‑19
+ * @version 1.0.4
+ * @since 2025.06.19
  */
 public enum SetSymbols {
+
+    /**
+     * Real set symbols.
+     */
     REAL("Reals", "ℝ"),
+    /**
+     * Complex set symbols.
+     */
     COMPLEX("Complexes", "ℂ"),
+    /**
+     * Integer set symbols.
+     */
     INTEGER("Integers", "ℤ"),
+    /**
+     * Natural set symbols.
+     */
     NATURAL("Naturals", "ℕ"),
+    /**
+     * Rational set symbols.
+     */
     RATIONAL("Rationals", "ℚ"),
+    /**
+     * Empty set symbols.
+     */
     EMPTY("EmptySet", "∅"),
+    /**
+     * Union set symbols.
+     */
     UNION("Union", "∪"),
+    /**
+     * Intersection set symbols.
+     */
     INTERSECTION("Intersection", "∩"),
+    /**
+     * Difference set symbols.
+     */
     DIFFERENCE("Complement", "∖"),
+    /**
+     * Element of set symbols.
+     */
     ELEMENT_OF("Element", "∈"),
+    /**
+     * Subset set symbols.
+     */
     SUBSET("Subset", "⊆"),
+    /**
+     * Proper subset set symbols.
+     */
     PROPER_SUBSET("ProperSubset", "⊂"),
+    /**
+     * Infinity set symbols.
+     */
     INFINITY("Infinity", "∞"),
+    /**
+     * Negative infinity set symbols.
+     */
     NEGATIVE_INFINITY("Infinity", "-∞"),
+    /**
+     * And set symbols.
+     */
+    AND("And", "∧"),
+    /**
+     * Or set symbols.
+     */
+    OR("Or", "∨"),
+    /**
+     * No operation set symbols.
+     */
     NO_OPERATION("NoOperation", "NO");
 
 
@@ -43,17 +95,13 @@ public enum SetSymbols {
     private final String displaySymbol;
     private final ExprEvaluator evaluator = new ExprEvaluator();
 
-    private static final Map<String, SetSymbols> SYMBOL_LOOKUP;
     private static final Map<String, SetSymbols> DISPLAY_LOOKUP;
 
     static {
-        Map<String, SetSymbols> symjaMap = new HashMap<>();
         Map<String, SetSymbols> displayMap = new HashMap<>();
         for (SetSymbols symbol : values()) {
-            symjaMap.put(symbol.symjaSymbol.toLowerCase(), symbol);
             displayMap.put(symbol.displaySymbol, symbol);
         }
-        SYMBOL_LOOKUP = Collections.unmodifiableMap(symjaMap);
         DISPLAY_LOOKUP = Collections.unmodifiableMap(displayMap);
     }
 
@@ -92,25 +140,6 @@ public enum SetSymbols {
     }
 
     /**
-     * Determines whether this set is a subset of the given set symbolically.
-     *
-     * @param other the other set symbol
-     * @return true if this is a subset of other
-     */
-    public boolean isSubsetOf(@NotNull SetSymbols other) {
-        if (this == other) return true;
-
-        return switch (this) {
-            case NATURAL -> other == INTEGER || other == RATIONAL || other == REAL || other == COMPLEX;
-            case INTEGER -> other == RATIONAL || other == REAL || other == COMPLEX;
-            case RATIONAL -> other == REAL || other == COMPLEX;
-            case REAL -> other == COMPLEX;
-            case COMPLEX -> false;
-            default -> false;
-        };
-    }
-
-    /**
      * Parses the Symja symbol into an expression.
      *
      * @return parsed Symja expression
@@ -119,6 +148,11 @@ public enum SetSymbols {
         return evaluator.getEvalEngine().parse(symjaSymbol);
     }
 
+    /**
+     * Get binary operations list.
+     *
+     * @return the list
+     */
     public static @NotNull @Unmodifiable List<SetSymbols> getBinaryOperations(){
         return List.of(
                 SetSymbols.DIFFERENCE,
@@ -127,6 +161,11 @@ public enum SetSymbols {
         );
     }
 
+    /**
+     * Gets symbols.
+     *
+     * @return the symbols
+     */
     public static @NotNull @Unmodifiable List<SetSymbols> getSymbols() {
         return List.of(
                 SetSymbols.REAL,
@@ -135,6 +174,18 @@ public enum SetSymbols {
                 SetSymbols.NATURAL,
                 SetSymbols.RATIONAL,
                 SetSymbols.EMPTY
+        );
+    }
+
+    /**
+     * Returns a list of logical set operation symbols.
+     *
+     * @return an unmodifiable list of logical set symbols
+     */
+    public static @NotNull @Unmodifiable List<SetSymbols> getSetLogicSymbols() {
+        return List.of(
+                SetSymbols.OR,
+                SetSymbols.AND
         );
     }
 
@@ -149,14 +200,32 @@ public enum SetSymbols {
                 .collect(Collectors.joining(""));
     }
 
+    /**
+     * Checks if the given element represents the real number set (R).
+     *
+     * @param element the string to check
+     * @return true if the element represents the real numbers, false otherwise
+     */
     public static boolean isReal(@NotNull String element) {
         return element.equals("(-∞,∞)") || element.equals("(-∞,+∞)") || element.equals(SetSymbols.REAL.toString());
     }
 
+    /**
+     * Converts a display string to the corresponding SetSymbols enum value.
+     *
+     * @param display the display string
+     * @return the corresponding SetSymbols value, or NO_OPERATION if not found
+     */
     public static SetSymbols fromDisplay(String display) {
         return isReal(display) ? REAL : DISPLAY_LOOKUP.getOrDefault(display, NO_OPERATION);
     }
 
+    /**
+     * Checks if the given element is contained in the display lookup map.
+     *
+     * @param element the element to check
+     * @return true if the element exists in the display lookup, false otherwise
+     */
     public static boolean equals(String element) {
         return DISPLAY_LOOKUP.containsKey(element);
     }

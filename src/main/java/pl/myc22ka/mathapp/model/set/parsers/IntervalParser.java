@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.model.set.parsers;
 
 import org.jetbrains.annotations.NotNull;
+import org.matheclipse.core.eval.ExprEvaluator;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 import pl.myc22ka.mathapp.model.set.sets.BoundType;
@@ -12,7 +13,15 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 import static pl.myc22ka.mathapp.model.set.sets.BoundType.CLOSED;
 import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
 
-public class IntervalParser implements ISetParser{
+/**
+ * Parser for Fundamental set expressions, such as "(0,1), [0, ∞)".
+ * It produces a {@link Interval} set representation.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 22.07.2025
+ */
+public final class IntervalParser implements ISetParser{
 
     @Override
     public boolean canHandle(@NotNull String expr) {
@@ -24,19 +33,19 @@ public class IntervalParser implements ISetParser{
 
         if(SetSymbols.isReal(expr)) return new Fundamental(REAL);
 
-        String trimmed = expr.trim();
-        char left = trimmed.charAt(0);
-        char right = trimmed.charAt(trimmed.length() - 1);
+        char left = expr.charAt(0);
+        char right = expr.charAt(expr.length() - 1);
         BoundType leftBound = (left == '[') ? CLOSED : OPEN;
         BoundType rightBound = (right == ']') ? CLOSED : OPEN;
 
-        String content = trimmed.substring(1, trimmed.length() - 1);
+        String content = expr.substring(1, expr.length() - 1);
         int comma = ExpressionUtils.findTopLevelComma(content);
 
         String start = content.substring(0, comma).trim();
         String end = content.substring(comma + 1).trim();
 
-        String symjaExpr = String.format("IntervalData({%s, %s, %s, %s})", start, leftBound, rightBound, end);
-        return new Interval(symjaExpr);
+        ExprEvaluator evaluator = new ExprEvaluator();
+
+        return new Interval(evaluator.eval(start), leftBound, rightBound, evaluator.eval(end));
     }
 }

@@ -21,16 +21,29 @@ import java.util.List;
  *
  * @author Myc22Ka
  * @version 1.0.2
- * @since 2025‑06‑19
+ * @since 2025.06.19
  */
 public class Interval implements ISet {
     private final ExprEvaluator evaluator = new ExprEvaluator();
     private IExpr expression;
 
+    /**
+     * Creates an Interval with the given start and end points and specified bound types.
+     *
+     * @param start the lower bound of the interval
+     * @param left  the bound type for the left side (OPEN or CLOSED)
+     * @param right the bound type for the right side (OPEN or CLOSED)
+     * @param end   the upper bound of the interval
+     */
     public Interval(IExpr start, @NotNull BoundType left, @NotNull BoundType right, IExpr end) {
         this.expression = evaluator.eval("IntervalData({" + start + "," + left.getInclusive() + "," + right.getInclusive() + "," + end + "})");
     }
 
+    /**
+     * Creates an interval by evaluating a Symja expression string.
+     *
+     * @param expression the Symja expression that evaluates to an IntervalData object
+     */
     public Interval(String expression) {
         this.expression = evaluator.eval(expression);
     }
@@ -45,6 +58,15 @@ public class Interval implements ISet {
         return this;
     }
 
+    /**
+     * Attempts to simplify the current set representation.
+     *
+     * <p>If the {@link ReducedFundamental} form of this set is shorter as a string
+     * and represents a {@link Finite} set, it returns that reduced form.
+     * Otherwise, it returns this set unchanged.</p>
+     *
+     * @return a simplified version of this set if possible; otherwise, the original set
+     */
     public ISet shorten() {
         var rFundamental = this.toReducedFundamental();
 
@@ -55,6 +77,12 @@ public class Interval implements ISet {
         return this;
     }
 
+    /**
+     * Converts this set into a {@link ReducedFundamental} form by expressing it
+     * as the difference between the universal set {@link SetSymbols#REAL} and its complement.
+     *
+     * @return a {@link ReducedFundamental} representing this set in simplified form
+     */
     public ReducedFundamental toReducedFundamental() {
         var universe = new Fundamental(SetSymbols.REAL);
 

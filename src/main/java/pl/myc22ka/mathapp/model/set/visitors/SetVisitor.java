@@ -12,7 +12,7 @@ import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
  * @param <T> the return type of the visitor methods
  * @author Myc22Ka
  * @version 1.0
- * @since 2025‑06‑19
+ * @since 2025 ‑06‑19
  */
 public interface SetVisitor<T> {
 
@@ -40,5 +40,11 @@ public interface SetVisitor<T> {
      */
     T visitFundamental(Fundamental fundamental);
 
+    /**
+     * Visit reduced fundamental t.
+     *
+     * @param reducedFundamental the reduced fundamental
+     * @return the t
+     */
     T visitReducedFundamental(ReducedFundamental reducedFundamental);
 }

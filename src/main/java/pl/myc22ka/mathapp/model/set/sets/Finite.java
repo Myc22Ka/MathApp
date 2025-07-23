@@ -20,13 +20,21 @@ import java.util.List;
  * Mathematical finite set {1,2,3,4}.
  *
  * @author Myc22Ka
- * @version 1.0
- * @since 2025‑06‑19
+ * @version 1.0.1
+ * @since 2025.06.19
  */
 public class Finite implements ISet {
     private final ExprEvaluator evaluator = new ExprEvaluator();
     private IExpr expression;
 
+    /**
+     * Creates a new Finite set representing a range of values from start to end with a given step.
+     *
+     * @param start the starting expression of the range
+     * @param end   the ending expression of the range
+     * @param step  the step expression between values in the range
+     * @throws IllegalArgumentException if the evaluated range is not a finite list
+     */
     public Finite(IExpr start, IExpr end, IExpr step) {
         expression = evaluator.eval(F.Range(start, end, step));
 
@@ -35,27 +43,30 @@ public class Finite implements ISet {
         }
     }
 
-    public Finite(@NotNull IExpr expr) {
-        this.expression = expr;
+    /**
+     * Creates a Finite set directly from a given Symja expression.
+     *
+     * @param expression the Symja expression representing a Finite set
+     */
+    public Finite(@NotNull IExpr expression) {
+        this.expression = expression;
     }
 
-    public Finite(String exprString) {
-        this.expression = evaluator.eval(exprString);
-
-        if (!expression.isList()) {
-            throw new IllegalArgumentException("Provided string does not evaluate to a finite list: " + exprString);
-        }
-    }
-
-    public Finite(List<IExpr> elements) {
-        if (elements == null || elements.isEmpty()) {
-            throw new IllegalArgumentException("Element list cannot be null or empty.");
-        }
-
+    /**
+     * Creates a Finite set from a list of elements.
+     *
+     * @param elements the list of expressions representing elements of the Finite set
+     */
+    public Finite(@NotNull List<IExpr> elements) {
         this.expression = F.List(elements.toArray(new IExpr[0]));
     }
 
-    public @NotNull List<IExpr> exprToList() {
+    /**
+     * Converts the Finite expression representing into a list of individual elements.
+     *
+     * @return a list of expressions representing the elements of Finite set
+     */
+    private @NotNull List<IExpr> exprToList() {
         IAST ast = (IAST) expression;
         List<IExpr> elements = new ArrayList<>();
 

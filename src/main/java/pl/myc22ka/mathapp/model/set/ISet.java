@@ -10,15 +10,15 @@ import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
  *
  * @author Myc22Ka
  * @version 1.0
- * @since 2025-06-19
+ * @since 2025 -06-19
  */
 public interface ISet {
 
     /**
      * Accepts a visitor to perform an operation on this set.
      *
-     * @param visitor the set visitor
      * @param <T>     return type of the visitor
+     * @param visitor the set visitor
      * @return result from the visitor
      */
     <T> T accept(@NotNull SetVisitor<T> visitor);
@@ -85,11 +85,22 @@ public interface ISet {
      */
     @NotNull ISet intersection(@NotNull ISet other);
 
+    /**
+     * Is empty boolean.
+     *
+     * @return the boolean
+     */
     default boolean isEmpty(){
         return this.toString().equals(SetSymbols.EMPTY.toString());
     }
 
-    // A' = U \ A
+    /**
+     * Complement set.
+     *
+     * @param universe the universe
+     * @return the set
+     */
+// A' = U \ A
     default @NotNull ISet complement(@NotNull ISet universe) {
         if (universe.toString().equals(SetSymbols.REAL.toString())){
             return universe.toInterval().difference(this);
@@ -98,6 +109,12 @@ public interface ISet {
         return universe.difference(this);
     }
 
+    /**
+     * Symmetric difference set.
+     *
+     * @param other the other
+     * @return the set
+     */
     default ISet symmetricDifference(@NotNull ISet other){
         return this.difference(other).union(other.difference(this));
     }

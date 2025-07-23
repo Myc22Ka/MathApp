@@ -1,30 +1,34 @@
 package pl.myc22ka.mathapp.model.set.utils.scanner;
 
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 
+/**
+ * Utility class for identifying and working with intervals in set expressions.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 23.07.2025
+ */
+@UtilityClass
 public class IntervalScanner {
-    private static class IntervalInfo {
-        boolean isInterval;
-        int start;
-        int end;
 
-        IntervalInfo(boolean isInterval, int start, int end) {
-            this.isInterval = isInterval;
-            this.start = start;
-            this.end = end;
-        }
-    }
-
-    public static boolean[] markIntervalCharacters(@NotNull String expression) {
+    /**
+     * Marks which characters in the input string belong to a valid interval (e.g. [1, 2)).
+     *
+     * @param expression the full set expression
+     * @return a boolean array where true indicates the character is part of an interval
+     */
+    public boolean[] markIntervalCharacters(@NotNull String expression) {
         boolean[] isInterval = new boolean[expression.length()];
 
         for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
             if (c == '[' || c == '(') {
                 IntervalInfo info = analyzeInterval(expression, i);
-                if (info.isInterval) {
-                    for (int j = info.start; j < info.end; j++) {
+                if (info.isInterval()) {
+                    for (int j = info.start(); j < info.end(); j++) {
                         isInterval[j] = true;
                     }
                 }
@@ -34,19 +38,42 @@ public class IntervalScanner {
         return isInterval;
     }
 
-    public static int findIntervalStart(@NotNull String expression, int pos, boolean[] isInterval) {
+    /**
+     * Finds the beginning index of an interval starting at or before the given position.
+     *
+     * @param pos the position to search backwards from
+     * @param isInterval the boolean array marking interval characters
+     * @return the index of the interval start
+     */
+    public int findIntervalStart(int pos, boolean[] isInterval) {
         int i = pos;
         while (i >= 0 && isInterval[i]) i--;
         return i + 1;
     }
 
-    public static int findIntervalEnd(@NotNull String expression, int start, boolean[] isInterval) {
+    /**
+     * Finds the ending index of an interval starting at a given position.
+     *
+     * @param expression the full expression
+     * @param start the starting index of the interval
+     * @param isInterval the boolean array marking interval characters
+     * @return the index just after the interval ends
+     */
+    public int findIntervalEnd(@NotNull String expression, int start, boolean[] isInterval) {
         int i = start;
         while (i < expression.length() && isInterval[i]) i++;
         return i;
     }
 
-    public static int findOperandEnd(@NotNull String expression, int start, boolean[] isInterval) {
+    /**
+     * Finds the ending index of a complete operand (finite set, interval, or fundamental symbol).
+     *
+     * @param expression the full expression
+     * @param start the starting index of the operand
+     * @param isInterval the boolean array marking interval characters
+     * @return the index just after the operand ends
+     */
+    public int findOperandEnd(@NotNull String expression, int start, boolean[] isInterval) {
         int i = start;
         char startChar = expression.charAt(start);
 
@@ -72,7 +99,7 @@ public class IntervalScanner {
         }
     }
 
-    private static IntervalInfo analyzeInterval(@NotNull String expression, int pos) {
+    private @NotNull IntervalInfo analyzeInterval(@NotNull String expression, int pos) {
         char startChar = expression.charAt(pos);
         if (startChar != '[' && startChar != '(') return new IntervalInfo(false, pos, pos);
 
@@ -80,7 +107,6 @@ public class IntervalScanner {
         int depth = 1;
         int commaCount = 0;
         boolean hasSetOps = false;
-        char expectedClose = (startChar == '[') ? ']' : ')';
 
         while (i < expression.length() && depth > 0) {
             char c = expression.charAt(i);

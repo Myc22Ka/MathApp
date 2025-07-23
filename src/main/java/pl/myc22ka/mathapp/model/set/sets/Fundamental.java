@@ -22,8 +22,8 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  * Mathematical interval set ℝ.
  *
  * @author Myc22Ka
- * @version 1.0.1
- * @since 2025‑06‑19
+ * @version 1.0.2
+ * @since 2025.06.19
  */
 public class Fundamental implements ISet {
     private final IExpr expression;
@@ -32,16 +32,15 @@ public class Fundamental implements ISet {
     @Setter
     private SetSymbols leftSymbol;
 
-    public Fundamental(@NotNull String symbol) {
-        this.leftSymbol = SetSymbols.fromDisplay(symbol);
-
-        if (!leftSymbol.equals(REAL) && !leftSymbol.equals(EMPTY)) {
-            throw new ServerError(ServerErrorMessages.UNSUPPORTED_CONSTRUCTION_BUILD);
-        }
-
-        this.expression = leftSymbol.parse();
-    }
-
+    /**
+     * Creates a new Fundamental set based on a predefined symbol.
+     *
+     * <p>Currently supports only the symbols {@link SetSymbols#REAL} and {@link SetSymbols#EMPTY}.
+     * Attempting to use other symbols will result in an error.</p>
+     *
+     * @param symbol the predefined symbol representing the fundamental set
+     * @throws ServerError if the provided symbol is not supported for construction
+     */
     public Fundamental(@NotNull SetSymbols symbol) {
 
         if (symbol != REAL && symbol != EMPTY) {

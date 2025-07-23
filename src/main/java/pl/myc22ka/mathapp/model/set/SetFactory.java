@@ -14,7 +14,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
  *
  * @author Myc22Ka
  * @version 1.0.1
- * @since 2025‑06‑19
+ * @since 2025.06.19
  */
 public class SetFactory {
 
@@ -22,7 +22,6 @@ public class SetFactory {
             new SetParser(),
             new FiniteParser(),
             new IntervalParser(),
-            new FundamentalParser(),
             new ReducedFundamentalParser(),
             new SymjaSetParser()
     );

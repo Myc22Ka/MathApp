@@ -7,12 +7,18 @@ import org.jetbrains.annotations.NotNull;
  * Enum representing bound types for intervals: open or closed.
  *
  * @author Myc22Ka
- * @version 1.0
- * @since 2025‑06‑19
+ * @version 1.0.1
+ * @since 2025.06.19
  */
 @Getter
 public enum BoundType {
+    /**
+     * Open bound type.
+     */
     OPEN("Less"),        // (
+    /**
+     * Closed bound type.
+     */
     CLOSED("LessEqual"); // [
 
     private final String inclusive;

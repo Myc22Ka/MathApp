@@ -26,7 +26,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  *
  * @author Myc22Ka
  * @version 1.0.2
- * @since 2025-06-24
+ * @since 2025 -06-24
  */
 @RequiredArgsConstructor
 public class IntersectionVisitor implements SetVisitor<ISet> {

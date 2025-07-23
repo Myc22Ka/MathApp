@@ -21,7 +21,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  *
  * @author Myc22Ka
  * @version 1.0.3
- * @since 2025-06-29
+ * @since 2025 -06-29
  */
 @RequiredArgsConstructor
 public class UnionVisitor implements SetVisitor<ISet> {

@@ -1,13 +1,32 @@
 package pl.myc22ka.mathapp.model.set.utils.token;
 
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 import pl.myc22ka.mathapp.model.set.utils.scanner.IntervalScanner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Utility class for converting a raw set expression string into a list of {@link Token} objects.
+ * Handles operands (e.g., sets, intervals), operators (∪, ∩, \), and parentheses.
+ *
+ * @author Myc22Ka
+ * @version 1.0.1
+ * @since 23.07.2025
+ */
+@UtilityClass
 public class Tokenizer {
-    public static @NotNull List<Token> tokenize(@NotNull String expression) {
+
+    /**
+     * Converts a string set expression into a {@link Token} list.
+     *
+     * @param expression the string representation of a set expression
+     * @return the list of parsed tokens
+     * @throws IllegalArgumentException if an unexpected or invalid character is found
+     */
+    public @NotNull List<Token> tokenize(@NotNull String expression) {
         List<Token> tokens = new ArrayList<>();
         boolean[] isIntervalChar = IntervalScanner.markIntervalCharacters(expression);
 
@@ -16,7 +35,7 @@ public class Tokenizer {
             char c = expression.charAt(i);
 
             if (isIntervalChar[i] && (c == '(' || c == ')')) {
-                int start = IntervalScanner.findIntervalStart(expression, i, isIntervalChar);
+                int start = IntervalScanner.findIntervalStart(i, isIntervalChar);
                 int end = IntervalScanner.findIntervalEnd(expression, start, isIntervalChar);
                 if (start < i) {
                     i = end;
