@@ -1,0 +1,10 @@
+FROM ollama/ollama
+
+# Uruchom serwer w tle i pobierz model
+RUN ollama serve & \
+    sleep 10 && \
+    ollama pull deepseek-coder && \
+    pkill ollama
+
+# Domyślna komenda
+CMD ["ollama", "serve"]
