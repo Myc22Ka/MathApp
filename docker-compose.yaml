@@ -26,64 +26,13 @@ services:
     container_name: dbeaver
     restart: always
     ports:
-      - "8978:8978"
+      - "${DBEAVER_PORT}:8978"
     volumes:
       - dbeaver_data:/opt/cloudbeaver/workspace
-    environment:
-      - CB_ADMIN_LOGIN=admin
-      - CB_ADMIN_PASSWORD=admin
-# services:
-#     postgresql_database:
-#         image: postgres:latest
-#         container_name: postgres_database
-#         env_file:
-#             - .env
-#         ports:
-#             - '${POSTGRES_PORT}:5432'
-#         restart: always
-#         volumes:
-#             - database-data:/var/lib/postgresql/data/
-
-#     pgadmin:
-#         image: dpage/pgadmin4
-#         container_name: pgadmin
-#         env_file:
-#             - .env
-#         ports:
-#             - '${PGADMIN_PORT}:80'
-#         restart: always
-#         volumes:
-#             - pgadmin:/root/.pgadmin
-
-#     backend:
-#         build:
-#             context: .
-#             dockerfile: ./docker/backend/Dockerfile
-#         container_name: backend_app
-#         depends_on:
-#             - postgresql_database
-#         env_file:
-#             - .env
-#         environment:
-#             - SPRING_PROFILES_ACTIVE=docker
-#         ports:
-#             - '${BACKEND_PORT}:8080'
-#         restart: always
-
-#     frontend:
-#         build:
-#             context: .
-#             dockerfile: ./docker/frontend/Dockerfile
-#         container_name: frontend_app
-#         ports:
-#             - '${FRONTEND_PORT}:80'
-#         depends_on:
-#             - backend
-#         restart: always
-
+    env_file:
+      - .env
 volumes:
   database-data:
   node_modules:
   build:
   dbeaver_data:
-  # pgadmin:
