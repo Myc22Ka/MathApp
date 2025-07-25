@@ -23,7 +23,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     ports:
-      - '${BACKEND_PORT}:8080'
+      - "${BACKEND_PORT}:8080"
     restart: always
   postgresql_database:
     image: postgres:latest
@@ -45,6 +45,23 @@ services:
       - dbeaver_data:/opt/cloudbeaver/workspace
     env_file:
       - .env
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "${BUCKET_PORT}:4566"
+    environment:
+      - SERVICES=${SERVICES}
+      - DEBUG=${DEBUG}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - DATA_DIR=${DATA_DIR}
+      - START_WEB=${START_WEB}
+      - HOST_TMP_FOLDER=${HOST_TMP_FOLDER}
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 volumes:
   database-data:
   node_modules:

@@ -1,8 +1,18 @@
- spring:
+spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: TAB project
+  cloud:
+    aws:
+      s3:
+        bucket: ${BUCKET_NAME:mathapp-bucket}
+        endpoint: http://${PLATFORM_URL:localhost}:${LOCALSTACK_PORT:4566}
+        region: ${BUCKET_REGION:eu-central-1}
+        path-style-access-enabled: true
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:test}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:test}
 #  jpa:
 #    hibernate:
 #      ddl-auto: update

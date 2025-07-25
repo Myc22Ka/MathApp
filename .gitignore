@@ -35,3 +35,5 @@ build/
 
 .env
 .env.*
+
+localstack-data/*
