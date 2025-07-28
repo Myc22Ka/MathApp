@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:23-jdk AS build
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -30,7 +30,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:23-jre
 
 WORKDIR /app
 

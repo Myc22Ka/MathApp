@@ -1,10 +1,6 @@
 FROM ollama/ollama
 
-# Uruchom serwer w tle i pobierz model
-RUN ollama serve & \
-    sleep 10 && \
-    ollama pull deepseek-coder && \
-    pkill ollama
+COPY ./scripts/ollama-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Domyślna komenda
-CMD ["ollama", "serve"]
+ENTRYPOINT ["/entrypoint.sh"]

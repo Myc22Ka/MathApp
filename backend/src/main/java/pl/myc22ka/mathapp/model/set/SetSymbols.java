@@ -1,7 +1,6 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
@@ -153,7 +152,7 @@ public enum SetSymbols {
      *
      * @return the list
      */
-    public static @NotNull @Unmodifiable List<SetSymbols> getBinaryOperations(){
+    public static @NotNull List<SetSymbols> getBinaryOperations(){
         return List.of(
                 SetSymbols.DIFFERENCE,
                 SetSymbols.UNION,
@@ -166,7 +165,7 @@ public enum SetSymbols {
      *
      * @return the symbols
      */
-    public static @NotNull @Unmodifiable List<SetSymbols> getSymbols() {
+    public static @NotNull List<SetSymbols> getSymbols() {
         return List.of(
                 SetSymbols.REAL,
                 SetSymbols.INTEGER,
@@ -182,7 +181,7 @@ public enum SetSymbols {
      *
      * @return an unmodifiable list of logical set symbols
      */
-    public static @NotNull @Unmodifiable List<SetSymbols> getSetLogicSymbols() {
+    public static @NotNull List<SetSymbols> getSetLogicSymbols() {
         return List.of(
                 SetSymbols.OR,
                 SetSymbols.AND

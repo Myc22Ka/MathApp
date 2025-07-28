@@ -2,7 +2,15 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
-    name: TAB project
+    name: MathApp
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  cors:
+    allowed:
+      origin: ${PLATFORM_URL}:${FRONTEND_PORT}
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}
@@ -11,6 +19,8 @@ spring:
   ollama:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
     model: deepseek-coder
-logging:
-  level:
-    org.springframework.boot.autoconfigure.condition.ConditionEvaluationReportLogger: off
+
+#logging:
+#  level:
+#    root: INFO
+#    org.springframework.boot.autoconfigure: INFO

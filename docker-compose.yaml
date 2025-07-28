@@ -21,7 +21,7 @@ services:
     env_file:
       - .env
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=prod
     ports:
       - "${BACKEND_PORT}:8080"
     restart: always
