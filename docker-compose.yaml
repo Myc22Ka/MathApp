@@ -1,0 +1,79 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_app
+    env_file:
+      - .env
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
+    restart: always
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_app
+    depends_on:
+      - postgresql_database
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "${BACKEND_PORT}:8080"
+    restart: always
+  postgresql_database:
+    image: postgres:latest
+    container_name: postgres_database
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    restart: always
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: dbeaver
+    restart: always
+    ports:
+      - "${DBEAVER_PORT}:8978"
+    volumes:
+      - dbeaver_data:/opt/cloudbeaver/workspace
+    env_file:
+      - .env
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "${BUCKET_PORT}:4566"
+    environment:
+      - SERVICES=${SERVICES}
+      - DEBUG=${DEBUG}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - DATA_DIR=${DATA_DIR}
+      - START_WEB=${START_WEB}
+      - HOST_TMP_FOLDER=${HOST_TMP_FOLDER}
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: ollama
+    ports:
+      - "${OLLAMA_PORT}:11434"
+    volumes:
+      - .ollama:/root/.ollama
+    restart: unless-stopped
+volumes:
+  database-data:
+  node_modules:
+  build:
+  dbeaver_data:

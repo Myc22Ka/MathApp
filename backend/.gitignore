@@ -32,14 +32,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-.env
-.env.*
-
-localstack-data/*
-.localstack/*
-localstack
-.localstack-*
-
-.ollama/*
-.ollama
