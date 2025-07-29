@@ -1,13 +1,29 @@
-package pl.myc22ka.mathapp.ai.service;
+package pl.myc22ka.mathapp.ai.ollama.service;
 
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
+import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
+import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
+import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
+import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
+import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
+import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OllamaService {
 
     @Value("${spring.ollama.base-url}")
@@ -17,6 +33,7 @@ public class OllamaService {
     private String model;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final PromptService promptService;
 
     public String chat(String prompt) {
         String url = baseUrl + "/api/generate";
@@ -39,5 +56,16 @@ public class OllamaService {
         } else {
             throw new RuntimeException("Failed to get response from Ollama");
         }
+    }
+
+    public String generateMathString(PromptRequest request) {
+        Prompt prompt = promptService.createPrompt(request);
+
+        String response = chat(prompt.getFinalPromptText());
+
+        prompt.setResponseText(response);
+        promptService.save(prompt);
+
+        return response;
     }
 }

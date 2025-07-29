@@ -18,7 +18,7 @@ spring:
       region: ${BUCKET_REGION:eu-central-1}
   ollama:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
-    model: deepseek-coder
+    model: qwen2-math
 
 #logging:
 #  level:

@@ -1,0 +1,32 @@
+[
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Use only simple examples with basic intervals.",
+    "difficultyLevel": 1,
+    "topicId": 1
+  },
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Include finite sets in addition to intervals.",
+    "difficultyLevel": 2,
+    "topicId": 1
+  },
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Use intervals, finite sets, and symbols like ℝ and ∅.",
+    "difficultyLevel": 3,
+    "topicId": 1
+  },
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Include real number logic with intervals, finite sets, and math symbols.",
+    "difficultyLevel": 4,
+    "topicId": 1
+  },
+  {
+    "modifierType": "REQUIREMENT",
+    "modifierText": "Use only interval notation like [a, b] or (a, b).",
+    "requirement": "INTERVALS",
+    "topicId": 1
+  }
+]

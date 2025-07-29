@@ -7,7 +7,7 @@ ollama serve &
 sleep 10
 
 # Pull model
-ollama pull deepseek-coder
+ollama pull qwen2-math
 
 # Kill initial server
 pkill ollama
