@@ -1,26 +1,38 @@
 [
   {
     "modifierType": "DIFFICULTY",
-    "modifierText": "Use only simple examples with basic intervals.",
+    "modifierText": "Use only simple examples with basic intervals like (1, 5) or [2, 6).",
     "difficultyLevel": 1,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
-    "modifierText": "Include finite sets in addition to intervals.",
+    "modifierText": "Include finite sets like {1, 2, 3} in addition to intervals.",
     "difficultyLevel": 2,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
-    "modifierText": "Use intervals, finite sets, and symbols like ℝ and ∅.",
+    "modifierText": "Use intervals, finite sets, and also include fundamental sets like ℝ and ∅.",
     "difficultyLevel": 3,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
-    "modifierText": "Include real number logic with intervals, finite sets, and math symbols.",
+    "modifierText": "Include intervals, finite sets, ℝ, ∅ and introduce elements like fractions (e.g. 1/2) or radicals (e.g. √2).",
     "difficultyLevel": 4,
+    "topicId": 1
+  },
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Include more advanced expressions with set operations like ∪ (union), ∩ (intersection), and \\ (difference).",
+    "difficultyLevel": 5,
+    "topicId": 1
+  },
+  {
+    "modifierType": "DIFFICULTY",
+    "modifierText": "Combine all previous elements and add complex nested structures using different brackets like (), [], {} with operations and symbolic elements.",
+    "difficultyLevel": 6,
     "topicId": 1
   },
   {

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.service.ModifierService;
-import pl.myc22ka.mathapp.ai.prompt.validator.checkers.SetChecker;
+import pl.myc22ka.mathapp.model.set.utils.checker.SetChecker;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.Set;
@@ -42,6 +42,11 @@ public class DifficultyValidator {
 
         return switch (modifier.getDifficultyLevel()) {
             case 1 -> setChecker.checkDifficultyLevel1(set);
+            case 2 -> setChecker.checkDifficultyLevel2(set);
+            case 3 -> setChecker.checkDifficultyLevel3(set);
+            case 4 -> setChecker.checkDifficultyLevel4(set);
+            case 5 -> setChecker.checkDifficultyLevel5(set);
+            case 6 -> setChecker.checkDifficultyLevel6(set);
             default -> false;
         };
     }
