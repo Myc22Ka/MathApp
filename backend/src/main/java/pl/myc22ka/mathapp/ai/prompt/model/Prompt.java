@@ -35,6 +35,9 @@ public class Prompt {
     @Column(name = "response_text", columnDefinition = "TEXT")
     private String responseText;
 
+    @Column(name = "verified", nullable = false)
+    private boolean verified;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

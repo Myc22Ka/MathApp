@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
+import pl.myc22ka.mathapp.ai.prompt.handler.ModifierExecutor;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
@@ -26,6 +27,7 @@ public class PromptService {
     private final TopicRepository topicRepository;
     private final ModifierRepository modifierRepository;
     private final PromptRepository promptRepository;
+    private final ModifierExecutor modifierExecutor;
 
     public void save(Prompt prompt) {
         promptRepository.save(prompt);
@@ -41,6 +43,17 @@ public class PromptService {
                 .build();
 
         prompt.buildFinalPromptText();
+
+        boolean allVerified = true;
+
+        for (Modifier modifier : prompt.getModifiers()) {
+            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType());
+            if (!verified) {
+                allVerified = false;
+            }
+        }
+
+        prompt.setVerified(allVerified);
 
         return prompt;
     }

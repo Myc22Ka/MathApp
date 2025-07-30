@@ -14,8 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface ModifierRepository extends JpaRepository<Modifier, Long> {
-    Optional<DifficultyModifier> findByModifierTextAndDifficultyLevel(String modifierText, Integer difficultyLevel);
-    Optional<RequirementModifier> findByModifierTextAndRequirement(String modifierText, Requirement requirement);
 
     @Query("SELECT m FROM DifficultyModifier m WHERE m.topic = :topic AND m.difficultyLevel = :difficultyLevel")
     Optional<DifficultyModifier> findByTopicAndDifficultyLevel(
@@ -28,4 +26,7 @@ public interface ModifierRepository extends JpaRepository<Modifier, Long> {
             @Param("topic") Topic topic,
             @Param("requirement") Requirement requirement
     );
+
+    @Query("SELECT MAX(d.difficultyLevel) FROM DifficultyModifier d WHERE d.topic = :topic")
+    Optional<Integer> findMaxDifficultyLevelByTopic(@Param("topic") Topic topic);
 }

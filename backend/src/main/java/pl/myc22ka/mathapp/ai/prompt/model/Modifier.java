@@ -2,8 +2,6 @@ package pl.myc22ka.mathapp.ai.prompt.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 
 @Entity
 @Table(name = "modifiers")
@@ -24,6 +22,4 @@ public abstract class Modifier {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
-
-    public abstract Modifier findOrCreate(@NotNull ModifierRepository repository);
 }
