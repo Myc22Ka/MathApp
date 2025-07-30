@@ -13,16 +13,16 @@ public class ModifierExecutor {
 
     private final List<ModifierHandler<? extends Modifier>> handlers;
 
-    public boolean applyModifier(Modifier modifier, PromptType promptType) {
+    public boolean applyModifier(Modifier modifier, PromptType promptType, String response) {
         return handlers.stream()
                 .filter(h -> h.supports(modifier))
                 .findFirst()
-                .map(h -> applyWithCast(h, modifier, promptType))
+                .map(h -> applyWithCast(h, modifier, promptType, response))
                 .orElse(false);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Modifier> boolean applyWithCast(ModifierHandler<?> handler, Modifier modifier, PromptType promptType) {
-        return ((ModifierHandler<T>) handler).apply((T) modifier, promptType);
+    private <T extends Modifier> boolean applyWithCast(ModifierHandler<?> handler, Modifier modifier, PromptType promptType, String response) {
+        return ((ModifierHandler<T>) handler).apply((T) modifier, promptType, response);
     }
 }

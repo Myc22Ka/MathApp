@@ -5,5 +5,5 @@ import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 
 public interface ModifierHandler<T extends Modifier> {
     boolean supports(Modifier modifier);
-    boolean apply(T modifier, PromptType promptType);
+    boolean apply(T modifier, PromptType promptType, String response);
 }

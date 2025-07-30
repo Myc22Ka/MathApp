@@ -1,26 +1,17 @@
 package pl.myc22ka.mathapp.ai.ollama.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
-import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
-import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
+import pl.myc22ka.mathapp.model.set.ISet;
+import pl.myc22ka.mathapp.model.set.Set;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +54,15 @@ public class OllamaService {
 
         String response = chat(prompt.getFinalPromptText());
 
-        prompt.setResponseText(response);
+        // TODO: I need to implement Parent Parser for
+        //  parsing all responses to respectively Math Models implemented by me. For now I'll leave it as only support for sets.
+
+        ISet set = Set.of(response.replace("\n", ""));
+
+        prompt.setResponseText(set.toString());
+
+        promptService.verifyPromptResponse(prompt);
+
         promptService.save(prompt);
 
         return response;

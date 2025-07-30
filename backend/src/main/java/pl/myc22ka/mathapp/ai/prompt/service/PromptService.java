@@ -33,6 +33,19 @@ public class PromptService {
         promptRepository.save(prompt);
     }
 
+    public void verifyPromptResponse(@NotNull Prompt prompt){
+        boolean allVerified = true;
+
+        for (Modifier modifier : prompt.getModifiers()) {
+            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType(), prompt.getResponseText());
+            if (!verified) {
+                allVerified = false;
+            }
+        }
+
+        prompt.setVerified(allVerified);
+    }
+
     public Prompt createPrompt(@NotNull PromptRequest request) {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
@@ -43,17 +56,6 @@ public class PromptService {
                 .build();
 
         prompt.buildFinalPromptText();
-
-        boolean allVerified = true;
-
-        for (Modifier modifier : prompt.getModifiers()) {
-            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType());
-            if (!verified) {
-                allVerified = false;
-            }
-        }
-
-        prompt.setVerified(allVerified);
 
         return prompt;
     }

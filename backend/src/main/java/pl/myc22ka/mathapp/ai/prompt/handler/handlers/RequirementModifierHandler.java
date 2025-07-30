@@ -16,7 +16,7 @@ public class RequirementModifierHandler implements ModifierHandler<RequirementMo
     }
 
     @Override
-    public boolean apply(RequirementModifier modifier, PromptType promptType) {
+    public boolean apply(RequirementModifier modifier, PromptType promptType, String resposne) {
         Requirement req = modifier.getRequirement();
         switch (req) {
             case INTERVALS -> System.out.println("Użyj tylko notacji przedziałowej");
