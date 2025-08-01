@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
 import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
 
@@ -9,10 +10,10 @@ import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
  * Represents a mathematical set with common set operations.
  *
  * @author Myc22Ka
- * @version 1.0
- * @since 2025 -06-19
+ * @version 1.0.1
+ * @since 2025.06.19
  */
-public interface ISet {
+public interface ISet extends MathExpression {
 
     /**
      * Accepts a visitor to perform an operation on this set.

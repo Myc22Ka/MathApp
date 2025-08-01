@@ -12,11 +12,13 @@ import java.util.*;
  * Utility class for evaluating set expressions written in postfix (Reverse Polish Notation).
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 23.07.2025
  */
 @UtilityClass
 public class PostfixEvaluator {
+
+    private final SetFactory setFactory = new SetFactory();
 
     /**
      * Evaluates a postfix expression representing a set operation.
@@ -33,7 +35,7 @@ public class PostfixEvaluator {
 
         for (Token token : postfix) {
             if (token.type() == TokenType.OPERAND) {
-                stack.push(SetFactory.fromString(token.value()));
+                stack.push(setFactory.parse(token.value()));
             } else if (token.type() == TokenType.OPERATOR) {
                 if (stack.size() < 2) throw new IllegalArgumentException("Invalid expression: insufficient operands for " + token.value());
                 ISet right = stack.pop();

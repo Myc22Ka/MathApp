@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.Set;
 
@@ -24,6 +25,7 @@ public class OllamaService {
     private String model;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ExpressionFactory expressionFactory = new ExpressionFactory();
     private final PromptService promptService;
 
     public String chat(String prompt) {
@@ -52,14 +54,11 @@ public class OllamaService {
     public String generateMathString(PromptRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
-        String response = chat(prompt.getFinalPromptText());
+        String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\\\+", "");
 
-        // TODO: I need to implement Parent Parser for
-        //  parsing all responses to respectively Math Models implemented by me. For now I'll leave it as only support for sets.
+        var result = expressionFactory.parse(response);
 
-        ISet set = Set.of(response.replace("\n", ""));
-
-        prompt.setResponseText(set.toString());
+        prompt.setResponseText(result.toString());
 
         promptService.verifyPromptResponse(prompt);
 

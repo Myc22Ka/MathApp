@@ -1,5 +1,7 @@
 package pl.myc22ka.mathapp.model.set;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.set.visitors.*;
@@ -8,15 +10,13 @@ import pl.myc22ka.mathapp.model.set.visitors.*;
  * A wrapper implementation of {@link ISet}. Acts as a unified entry point for all set types.
  *
  * @author Myc22Ka
- * @version 1.0
+ * @version 1.0.1
  * @since 2025.06.19
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Set implements ISet {
     private final ISet delegate;
-
-    private Set(ISet delegate) {
-        this.delegate = delegate;
-    }
+    private static final SetFactory setFactory = new SetFactory();
 
     /**
      * Creates a {@link Set} instance from a string expression.
@@ -25,7 +25,7 @@ public class Set implements ISet {
      * @return a new {@link Set} instance
      */
     public static @NotNull Set of(String expr) {
-        ISet set = SetFactory.fromString(expr);
+        ISet set = setFactory.parse(expr);
         return new Set(set);
     }
 
@@ -72,11 +72,6 @@ public class Set implements ISet {
     @Override
     public @NotNull ISet intersection(@NotNull ISet other) {
         return other.accept(new IntersectionVisitor(delegate));
-    }
-
-    @Override
-    public String toString() {
-        return delegate.toString();
     }
 }
 

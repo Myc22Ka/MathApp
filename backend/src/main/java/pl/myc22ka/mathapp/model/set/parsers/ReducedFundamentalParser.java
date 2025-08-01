@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.model.set.parsers;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.set.ISet;
+import pl.myc22ka.mathapp.model.set.SetFactory;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 import pl.myc22ka.mathapp.model.set.sets.Fundamental;
 import pl.myc22ka.mathapp.model.set.sets.ReducedFundamental;
@@ -11,7 +12,6 @@ import java.util.List;
 
 import static pl.myc22ka.mathapp.model.set.ISetType.FUNDAMENTAL;
 import static pl.myc22ka.mathapp.model.set.ISetType.INTERVAL;
-import static pl.myc22ka.mathapp.model.set.SetFactory.fromString;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
 import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
 
@@ -20,10 +20,12 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
  * It produces a {@link ReducedFundamental} set representation.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 22.07.2025
  */
 public final class ReducedFundamentalParser implements ISetParser {
+
+    private final SetFactory setFactory = new SetFactory();
 
     @Override
     public boolean canHandle(@NotNull String expr) {
@@ -50,14 +52,14 @@ public final class ReducedFundamentalParser implements ISetParser {
 
             if (position <= 0) continue;
 
-            ISet left = fromString(expr.substring(0, position));
+            ISet left = setFactory.parse(expr.substring(0, position));
             String rightExpr = expr.substring(position + operator.length());
 
             rightExpr = ExpressionUtils.stripOuterParentheses(rightExpr);
 
             ISet right = ExpressionUtils.containsMultipleOperators(rightExpr)
                     ? new SetParser().parse(rightExpr)
-                    : fromString(rightExpr);
+                    : setFactory.parse(rightExpr);
 
             if (left.getISetType() == FUNDAMENTAL || left.getISetType() == INTERVAL) {
                 return new ReducedFundamental(left, symbol, right);
