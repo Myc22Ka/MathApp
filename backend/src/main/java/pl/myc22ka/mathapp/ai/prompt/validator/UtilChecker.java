@@ -1,7 +1,8 @@
-package pl.myc22ka.mathapp.ai.prompt.validator.checkers;
+package pl.myc22ka.mathapp.ai.prompt.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.model.set.SetSymbols;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +62,11 @@ public class UtilChecker {
     }
 
     public boolean containsSetOperations(String str) {
-        return str.contains("∪") || str.contains("∩") || str.contains("\\");
+        String operations = SetSymbols.getBinaryOperationsString();
+        for (char c : str.toCharArray()) {
+            if (operations.indexOf(c) != -1) return true;
+        }
+        return false;
     }
 
     public boolean hasMixedComplexity(String str) {
