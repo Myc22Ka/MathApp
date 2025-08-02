@@ -29,7 +29,7 @@ public class Prompt {
     @JoinTable(name = "prompt_modifiers")
     private List<Modifier> modifiers = new ArrayList<>();
 
-    @Column(name = "final_prompt_text", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "final_prompt_text", columnDefinition = "TEXT")
     private String finalPromptText;
 
     @Column(name = "response_text", columnDefinition = "TEXT")

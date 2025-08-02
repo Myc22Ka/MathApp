@@ -2,8 +2,9 @@ package pl.myc22ka.mathapp.ai.ollama.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 
 @RestController
 @RequestMapping("/ollama")
@@ -18,7 +19,12 @@ public class OllamaController {
     }
 
     @PostMapping("/generate-math-string")
-    public String generateMathString(@RequestBody PromptRequest request) {
+    public String generateMathString(@RequestBody MathExpressionChatRequest request) {
         return ollamaService.generateMathString(request);
+    }
+
+    @PostMapping("/use-math-string")
+    public String useMathString(@RequestBody MathExpressionRequest request) {
+        return ollamaService.useMathString(request);
     }
 }

@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
-import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
 import pl.myc22ka.mathapp.ai.prompt.handler.ModifierExecutor;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
@@ -47,7 +48,7 @@ public class PromptService {
         prompt.setVerified(allVerified);
     }
 
-    public Prompt createPrompt(@NotNull PromptRequest request) {
+    public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
@@ -57,6 +58,20 @@ public class PromptService {
                 .build();
 
         prompt.buildFinalPromptText();
+
+        return prompt;
+    }
+
+    public Prompt createPrompt(@NotNull MathExpressionRequest request) {
+        Topic topic = findTopicByType(request.topicType());
+        List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
+
+        Prompt prompt = Prompt.builder()
+                .topic(topic)
+                .modifiers(modifiers)
+                .build();
+
+        prompt.setFinalPromptText(null);
 
         return prompt;
     }
