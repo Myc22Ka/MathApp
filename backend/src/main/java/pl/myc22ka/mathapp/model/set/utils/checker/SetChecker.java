@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.validator.UtilChecker;
 import pl.myc22ka.mathapp.model.set.ISet;
+import pl.myc22ka.mathapp.model.set.SetSymbols;
 
 import static pl.myc22ka.mathapp.model.set.ISetType.*;
 
@@ -42,5 +43,9 @@ public class SetChecker {
         String str = set.toString();
         return checkDifficultyLevel5(set) &&
                 utilChecker.hasMixedComplexity(str);
+    }
+
+    public boolean checkDisjoint(@NotNull ISet set) {
+        return set.toString().contains(SetSymbols.UNION.toString());
     }
 }

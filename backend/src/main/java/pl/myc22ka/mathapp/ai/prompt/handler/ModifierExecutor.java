@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class ModifierExecutor {
 
     private final List<ModifierHandler<? extends Modifier>> handlers;
 
-    public boolean applyModifier(Modifier modifier, PromptType promptType, String response) {
+    public boolean applyModifier(Modifier modifier, PromptType promptType, MathExpression response) {
         return handlers.stream()
                 .filter(h -> h.supports(modifier))
                 .findFirst()
@@ -22,7 +23,7 @@ public class ModifierExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Modifier> boolean applyWithCast(ModifierHandler<?> handler, Modifier modifier, PromptType promptType, String response) {
+    private <T extends Modifier> boolean applyWithCast(ModifierHandler<?> handler, Modifier modifier, PromptType promptType, MathExpression response) {
         return ((ModifierHandler<T>) handler).apply((T) modifier, promptType, response);
     }
 }

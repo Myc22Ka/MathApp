@@ -1,10 +1,16 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
+import org.matheclipse.core.builtin.BooleanFunctions;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.set.sets.BoundType;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
+
+import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
+import static pl.myc22ka.mathapp.model.set.utils.InequalityPattern.LESS;
 
 /**
  * Represents a mathematical set with common set operations.
@@ -96,12 +102,11 @@ public interface ISet extends MathExpression {
     }
 
     /**
-     * Complement set.
+     * Complement set. A' = U \ A
      *
      * @param universe the universe
      * @return the set
      */
-// A' = U \ A
     default @NotNull ISet complement(@NotNull ISet universe) {
         if (universe.toString().equals(SetSymbols.REAL.toString())){
             return universe.toInterval().difference(this);
@@ -118,6 +123,13 @@ public interface ISet extends MathExpression {
      */
     default ISet symmetricDifference(@NotNull ISet other){
         return this.difference(other).union(other.difference(this));
+    }
+
+    @Override
+    default boolean onlyPositiveElements() {
+        var intersection = this.intersection(new Interval(F.ZZ(0), OPEN, OPEN, SetSymbols.INFINITY.parse()));
+
+        return intersection.toString().equals(this.toString());
     }
 
     /**

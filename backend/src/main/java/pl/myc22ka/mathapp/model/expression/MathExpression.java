@@ -9,5 +9,7 @@ public interface MathExpression {
         throw new UnsupportedOperationException("size() not supported for this expression");
     }
 
-
+    default boolean onlyPositiveElements() {
+        throw new UnsupportedOperationException("onlyPositiveElements() not supported for this expression");
+    }
 }

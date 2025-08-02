@@ -38,7 +38,25 @@
   {
     "modifierType": "REQUIREMENT",
     "modifierText": "Use only interval notation like [a, b] or (a, b).",
-    "requirement": "INTERVALS",
+    "requirement": "INTERVALS_ONLY",
+    "topicId": 1
+  },
+  {
+    "modifierType": "REQUIREMENT",
+    "modifierText": "Use only finite sets. Do not use infinite sets or intervals.",
+    "requirement": "FINITE_SETS_ONLY",
+    "topicId": 1
+  },
+  {
+    "modifierType": "REQUIREMENT",
+    "modifierText": "Include only positive numbers in the sets. Exclude zero and negative numbers.",
+    "requirement": "POSITIVE_ONLY",
+    "topicId": 1
+  },
+  {
+    "modifierType": "REQUIREMENT",
+    "modifierText": "Ensure that all sets are disjoint. No element should appear in more than one set.",
+    "requirement": "DISJOINT_SETS",
     "topicId": 1
   }
 ]

@@ -1,6 +1,5 @@
 package pl.myc22ka.mathapp.ai.prompt.handler.handlers;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -10,8 +9,8 @@ import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.service.ModifierService;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
-import pl.myc22ka.mathapp.model.set.Set;
 import pl.myc22ka.mathapp.model.set.utils.checker.SetChecker;
 
 @Component
@@ -27,19 +26,16 @@ public class DifficultyModifierHandler implements ModifierHandler<DifficultyModi
     }
 
     @Override
-    public boolean apply(DifficultyModifier modifier, PromptType promptType, String response) {
-        if (promptType == PromptType.SET) {
-            return validateSets(modifier, response);
+    public boolean apply(DifficultyModifier modifier, PromptType promptType, MathExpression response) {
+        if (promptType == PromptType.SET && response instanceof ISet set) {
+            return validateSets(modifier, set);
         }
 
         throw new PromptValidatorException("Unsupported PromptType: " + promptType);
     }
 
-    private boolean validateSets(@NotNull DifficultyModifier modifier, String response) {
+    private boolean validateSets(@NotNull DifficultyModifier modifier, ISet set) {
         int maxLevel = modifierService.getMaxDifficultyLevel(modifier.getTopic());
-
-        // TODO: When I do Parent Parser I need to remove this line
-        ISet set = Set.of(response);
 
         if (modifier.getDifficultyLevel() > maxLevel) {
             throw new PromptValidatorException("Difficulty level for this topic is too high");

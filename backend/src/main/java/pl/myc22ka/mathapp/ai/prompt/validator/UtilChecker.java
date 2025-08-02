@@ -1,7 +1,9 @@
 package pl.myc22ka.mathapp.ai.prompt.validator;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 
 import java.util.regex.Matcher;
@@ -61,7 +63,7 @@ public class UtilChecker {
         return ROOT_PATTERN.matcher(text).find();
     }
 
-    public boolean containsSetOperations(String str) {
+    public boolean containsSetOperations(@NotNull String str) {
         String operations = SetSymbols.getBinaryOperationsString();
         for (char c : str.toCharArray()) {
             if (operations.indexOf(c) != -1) return true;
@@ -69,8 +71,12 @@ public class UtilChecker {
         return false;
     }
 
-    public boolean hasMixedComplexity(String str) {
+    public boolean hasMixedComplexity(@NotNull String str) {
         return str.matches(".*[()\\[\\]{}].*") &&
                 (containsSetOperations(str) || containsFraction(str) || containsRoot(str));
+    }
+
+    public boolean onlyPositiveElements(@NotNull MathExpression expression) {
+        return expression.onlyPositiveElements();
     }
 }

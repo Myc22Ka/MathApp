@@ -15,6 +15,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.List;
 
@@ -33,11 +34,11 @@ public class PromptService {
         promptRepository.save(prompt);
     }
 
-    public void verifyPromptResponse(@NotNull Prompt prompt){
+    public void verifyPromptResponse(@NotNull Prompt prompt, MathExpression response){
         boolean allVerified = true;
 
         for (Modifier modifier : prompt.getModifiers()) {
-            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType(), prompt.getResponseText());
+            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType(), response);
             if (!verified) {
                 allVerified = false;
             }

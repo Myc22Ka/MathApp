@@ -54,13 +54,15 @@ public class OllamaService {
     public String generateMathString(PromptRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
-        String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\\\+", "");
+        String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
+
+        System.out.println(response);
 
         var result = expressionFactory.parse(response);
 
         prompt.setResponseText(result.toString());
 
-        promptService.verifyPromptResponse(prompt);
+        promptService.verifyPromptResponse(prompt, result);
 
         promptService.save(prompt);
 
