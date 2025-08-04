@@ -6,10 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Requirement;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.*;
 
 import java.util.Optional;
 
@@ -28,11 +25,12 @@ public interface ModifierRepository extends JpaRepository<Modifier, Long> {
             @Param("requirement") Requirement requirement
     );
 
-    @Query("SELECT t FROM TemplateModifier t WHERE t.topic = :topic AND t.requirement = :requirement")
-    Optional<TemplateModifier> findTemplateByTopicAndRequirement(
+    @Query("SELECT t FROM TemplateModifier t WHERE t.topic = :topic AND t.template = :template")
+    Optional<TemplateModifier> findByTopicAndTemplate(
             @Param("topic") Topic topic,
-            @Param("requirement") Requirement requirement
+            @Param("template") Template template
     );
+
 
     @Query("SELECT MAX(d.difficultyLevel) FROM DifficultyModifier d WHERE d.topic = :topic")
     Optional<Integer> findMaxDifficultyLevelByTopic(@Param("topic") Topic topic);

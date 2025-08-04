@@ -1,23 +1,22 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
-import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
-import pl.myc22ka.mathapp.model.set.sets.BoundType;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
 
+import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.SET;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.*;
 import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
-import static pl.myc22ka.mathapp.model.set.utils.InequalityPattern.LESS;
 
 /**
  * Represents a mathematical set with common set operations.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025.06.19
  */
 public interface ISet extends MathExpression {
@@ -99,7 +98,7 @@ public interface ISet extends MathExpression {
      * @return the boolean
      */
     default boolean isEmpty(){
-        return this.toString().equals(SetSymbols.EMPTY.toString());
+        return this.toString().equals(EMPTY.toString());
     }
 
     /**
@@ -109,7 +108,7 @@ public interface ISet extends MathExpression {
      * @return the set
      */
     default @NotNull ISet complement(@NotNull ISet universe) {
-        if (universe.toString().equals(SetSymbols.REAL.toString())){
+        if (universe.toString().equals(REAL.toString())){
             return universe.toInterval().difference(this);
         }
 
@@ -126,16 +125,20 @@ public interface ISet extends MathExpression {
         return this.difference(other).union(other.difference(this));
     }
 
+    default boolean areDisjoint(@NotNull ISet other) {
+        return this.intersection(other).isEmpty();
+    }
+
     @Override
     default boolean onlyPositiveElements() {
-        var intersection = this.intersection(new Interval(F.ZZ(0), OPEN, OPEN, SetSymbols.INFINITY.parse()));
+        var intersection = this.intersection(new Interval(F.ZZ(0), OPEN, OPEN, INFINITY.parse()));
 
         return intersection.toString().equals(this.toString());
     }
 
     @Override
     default TemplatePrefix getTemplatePrefix() {
-        return TemplatePrefix.SET;
+        return SET;
     }
 
     /**

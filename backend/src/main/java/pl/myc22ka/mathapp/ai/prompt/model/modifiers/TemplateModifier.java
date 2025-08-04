@@ -16,14 +16,14 @@ import pl.myc22ka.mathapp.model.expression.MathExpression;
 public class TemplateModifier extends Modifier {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "requirement")
-    private Requirement requirement;
+    @Column(name = "template")
+    private Template template;
 
     @Transient
     private MathExpression information;
 
-    public TemplateModifier(Topic topic, String modifierText, Requirement requirement) {
+    public TemplateModifier(Topic topic, String modifierText, Template template) {
         super(null, modifierText, topic);
-        this.requirement = requirement;
+        this.template = template;
     }
 }
