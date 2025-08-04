@@ -9,16 +9,21 @@ import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.handler.ModifierExecutor;
+import pl.myc22ka.mathapp.ai.prompt.handler.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -30,6 +35,7 @@ public class PromptService {
     private final ModifierRepository modifierRepository;
     private final PromptRepository promptRepository;
     private final ModifierExecutor modifierExecutor;
+    private final TemplateResolver templateResolver;
 
     public void save(Prompt prompt) {
         promptRepository.save(prompt);
@@ -52,6 +58,30 @@ public class PromptService {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
+        if (!request.templateInformation().isEmpty()) {
+            MathExpression parsed = new ExpressionFactory().parse(request.templateInformation());
+
+            for (var modifier : modifiers) {
+                if (modifier instanceof TemplateModifier t) {
+                    t.setInformation(parsed); // zachowaj surowe info
+
+                    // załaduj oryginalny tekst
+                    String original = t.getModifierText();
+
+                    // przygotuj kontekst dla resolvera (np. s → set/funkcja)
+                    Map<String, Object> context = Map.of(
+                            TemplatePrefix.SET.getKey(), parsed
+                    );
+
+                    // podmień ${s:} → parsed.toString()
+                    String resolvedText = templateResolver.resolve(original, context);
+
+                    // ustaw podmieniony tekst jako ostateczny modifierText
+                    t.setModifierText(resolvedText);
+                }
+            }
+        }
+
         Prompt prompt = Prompt.builder()
                 .topic(topic)
                 .modifiers(modifiers)
@@ -65,6 +95,16 @@ public class PromptService {
     public Prompt createPrompt(@NotNull MathExpressionRequest request) {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
+
+        if(!request.templateInformation().isEmpty()) {
+            for (var modifier : modifiers) {
+                if(modifier instanceof TemplateModifier t){
+                    var parsed = new ExpressionFactory().parse(request.templateInformation());
+
+                    t.setInformation(parsed);
+                }
+            }
+        }
 
         Prompt prompt = Prompt.builder()
                 .topic(topic)

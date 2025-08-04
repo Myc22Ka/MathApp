@@ -5,6 +5,7 @@ import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.model.set.sets.BoundType;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
@@ -16,7 +17,7 @@ import static pl.myc22ka.mathapp.model.set.utils.InequalityPattern.LESS;
  * Represents a mathematical set with common set operations.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025.06.19
  */
 public interface ISet extends MathExpression {
@@ -130,6 +131,11 @@ public interface ISet extends MathExpression {
         var intersection = this.intersection(new Interval(F.ZZ(0), OPEN, OPEN, SetSymbols.INFINITY.parse()));
 
         return intersection.toString().equals(this.toString());
+    }
+
+    @Override
+    default TemplatePrefix getTemplatePrefix() {
+        return TemplatePrefix.SET;
     }
 
     /**

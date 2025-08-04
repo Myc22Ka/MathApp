@@ -58,5 +58,11 @@
     "modifierText": "Ensure that all sets are disjoint. No element should appear in more than one set.",
     "requirement": "DISJOINT_SETS",
     "topicId": 1
+  },
+  {
+    "modifierType": "TEMPLATE",
+    "modifierText": "You MUST generate a set that is completely disjoint from the following set: ${s:}.\n- Do NOT include any number that lies within this interval.\n- Avoid any overlap, including endpoints (unless the interval is open).\n- Your entire output must not intersect with ${s:}.",
+    "requirement": "DISJOINT_SETS",
+    "topicId": 1
   }
 ]

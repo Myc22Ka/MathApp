@@ -7,5 +7,6 @@ import java.util.List;
 public record MathExpressionRequest(
         PromptType topicType,
         List<ModifierRequest> modifiers,
-        String response
+        String response,
+        String templateInformation
 ) {}

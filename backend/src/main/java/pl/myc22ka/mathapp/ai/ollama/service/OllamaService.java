@@ -53,6 +53,8 @@ public class OllamaService {
     public String generateMathString(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
+
+
         String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
 
         var result = expressionFactory.parse(response);

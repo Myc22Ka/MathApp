@@ -3,9 +3,7 @@ package pl.myc22ka.mathapp.ai.prompt.dto;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Requirement;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 
 public record ModifierRequest(
@@ -22,6 +20,9 @@ public record ModifierRequest(
             case "REQUIREMENT" -> repository
                     .findByTopicAndRequirement(topic, requirement)
                     .orElseThrow(() -> new IllegalStateException("No RequirementModifier found for topic=" + topic.getId() + " and requirement=" + requirement));
+            case "TEMPLATE" -> repository
+                    .findTemplateByTopicAndRequirement(topic, requirement)
+                    .orElseThrow(() -> new IllegalStateException("No TemplateModifier found for topic=" + topic.getId() + " and requirement=" + requirement));
             default -> throw new IllegalArgumentException("Unknown modifier type: " + type);
         };
     }

@@ -16,7 +16,7 @@ public abstract class Modifier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "modifier_text", nullable = false)
+    @Column(name = "modifier_text", nullable = false, columnDefinition = "TEXT")
     private String modifierText;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

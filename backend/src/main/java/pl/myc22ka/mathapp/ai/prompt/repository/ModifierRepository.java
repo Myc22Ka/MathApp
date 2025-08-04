@@ -9,6 +9,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Requirement;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 
 import java.util.Optional;
 
@@ -23,6 +24,12 @@ public interface ModifierRepository extends JpaRepository<Modifier, Long> {
 
     @Query("SELECT m FROM RequirementModifier m WHERE m.topic = :topic AND m.requirement = :requirement")
     Optional<RequirementModifier> findByTopicAndRequirement(
+            @Param("topic") Topic topic,
+            @Param("requirement") Requirement requirement
+    );
+
+    @Query("SELECT t FROM TemplateModifier t WHERE t.topic = :topic AND t.requirement = :requirement")
+    Optional<TemplateModifier> findTemplateByTopicAndRequirement(
             @Param("topic") Topic topic,
             @Param("requirement") Requirement requirement
     );

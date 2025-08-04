@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.ai.prompt.initializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierSeed;
@@ -10,6 +11,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 
@@ -46,14 +48,21 @@ public class PromptInitializer {
             Topic topic = topicRepository.findById(seed.topicId())
                     .orElseThrow(() -> new IllegalStateException("Topic not found with id: " + seed.topicId()));
 
-            Modifier modifier;
-            switch (seed.modifierType().toUpperCase()) {
-                case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel());
-                case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement());
-                default -> throw new IllegalArgumentException("Unknown modifier type: " + seed.modifierType());
-            }
+            Modifier modifier = getModifier(seed, topic);
 
             modifierRepository.save(modifier);
         }
+    }
+
+    @NotNull
+    private Modifier getModifier(@NotNull ModifierSeed seed, Topic topic) {
+        Modifier modifier;
+        switch (seed.modifierType().toUpperCase()) {
+            case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel());
+            case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement());
+            case "TEMPLATE" -> modifier = new TemplateModifier(topic, seed.modifierText(), seed.requirement());
+            default -> throw new IllegalArgumentException("Unknown modifier type: " + seed.modifierType());
+        }
+        return modifier;
     }
 }
