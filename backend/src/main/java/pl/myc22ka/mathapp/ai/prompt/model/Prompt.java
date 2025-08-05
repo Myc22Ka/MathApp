@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class Prompt {
 
     @Column(name = "response_text", columnDefinition = "TEXT")
     private String responseText;
+
+//    @Transient
+//    private MathExpression mathExpression;
 
     @Column(name = "verified", nullable = false)
     private boolean verified;

@@ -1,9 +1,11 @@
 package pl.myc22ka.mathapp.model.expression;
 
+import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.model.set.SetFactory;
 
 import java.util.List;
 
+@Component
 public class ExpressionFactory {
 
     private final List<IExpressionParser<? extends MathExpression>> parsers = List.of(

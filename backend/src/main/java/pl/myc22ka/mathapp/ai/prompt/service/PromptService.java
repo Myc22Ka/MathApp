@@ -36,6 +36,7 @@ public class PromptService {
     private final PromptRepository promptRepository;
     private final ModifierExecutor modifierExecutor;
     private final TemplateResolver templateResolver;
+    private final ExpressionFactory expressionFactory;
 
     public void save(Prompt prompt) {
         promptRepository.save(prompt);
@@ -52,6 +53,33 @@ public class PromptService {
         }
 
         prompt.setVerified(allVerified);
+    }
+
+    public boolean verifyUserMathExpressionRequest(MathExpressionRequest request){
+        boolean allVerified = true;
+        var result = expressionFactory.parse(request.response());
+
+        Topic topic = findTopicByType(request.topicType());
+        List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
+
+        if(!request.templateInformation().isEmpty()) {
+            for (var modifier : modifiers) {
+                if(modifier instanceof TemplateModifier t){
+                    var parsed = new ExpressionFactory().parse(request.templateInformation());
+
+                    t.setInformation(parsed);
+                }
+            }
+        }
+
+        for (Modifier modifier : modifiers) {
+            boolean verified = modifierExecutor.applyModifier(modifier, request.topicType(), result);
+            if (!verified) {
+                allVerified = false;
+            }
+        }
+
+        return allVerified;
     }
 
     public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
@@ -88,30 +116,6 @@ public class PromptService {
                 .build();
 
         prompt.buildFinalPromptText();
-
-        return prompt;
-    }
-
-    public Prompt createPrompt(@NotNull MathExpressionRequest request) {
-        Topic topic = findTopicByType(request.topicType());
-        List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
-
-        if(!request.templateInformation().isEmpty()) {
-            for (var modifier : modifiers) {
-                if(modifier instanceof TemplateModifier t){
-                    var parsed = new ExpressionFactory().parse(request.templateInformation());
-
-                    t.setInformation(parsed);
-                }
-            }
-        }
-
-        Prompt prompt = Prompt.builder()
-                .topic(topic)
-                .modifiers(modifiers)
-                .build();
-
-        prompt.setFinalPromptText(null);
 
         return prompt;
     }

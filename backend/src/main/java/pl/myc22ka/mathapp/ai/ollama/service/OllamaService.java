@@ -68,17 +68,7 @@ public class OllamaService {
         return response;
     }
 
-    public String useMathString(MathExpressionRequest request) {
-        Prompt prompt = promptService.createPrompt(request);
-
-        var result = expressionFactory.parse(request.response());
-
-        prompt.setResponseText(result.toString());
-
-        promptService.verifyPromptResponse(prompt, result);
-
-        promptService.save(prompt);
-
-        return prompt.getResponseText();
+    public boolean useMathString(MathExpressionRequest request) {
+        return promptService.verifyUserMathExpressionRequest(request);
     }
 }
