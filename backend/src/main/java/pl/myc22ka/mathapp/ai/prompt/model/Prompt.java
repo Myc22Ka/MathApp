@@ -1,10 +1,12 @@
 package pl.myc22ka.mathapp.ai.prompt.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class Prompt {
     @JoinTable(name = "prompt_modifiers")
     private List<Modifier> modifiers = new ArrayList<>();
 
-    @Column(name = "final_prompt_text", columnDefinition = "TEXT")
+    @Column(name = "final_prompt_text", nullable = false, columnDefinition = "TEXT")
     private String finalPromptText;
 
     @Column(name = "response_text", columnDefinition = "TEXT")

@@ -50,10 +50,8 @@ public class OllamaService {
         }
     }
 
-    public String generateMathString(MathExpressionChatRequest request) {
+    public String generateMathExpression(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
-
-
 
         String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
 

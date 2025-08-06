@@ -62,16 +62,6 @@ public class PromptService {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
-        if(!request.templateInformation().isEmpty()) {
-            for (var modifier : modifiers) {
-                if(modifier instanceof TemplateModifier t){
-                    var parsed = new ExpressionFactory().parse(request.templateInformation());
-
-                    t.setInformation(parsed);
-                }
-            }
-        }
-
         for (Modifier modifier : modifiers) {
             boolean verified = modifierExecutor.applyModifier(modifier, request.topicType(), result);
             if (!verified) {
@@ -86,27 +76,13 @@ public class PromptService {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
-        if (!request.templateInformation().isEmpty()) {
-            MathExpression parsed = new ExpressionFactory().parse(request.templateInformation());
-
-            for (var modifier : modifiers) {
-                if (modifier instanceof TemplateModifier t) {
-                    t.setInformation(parsed); // zachowaj surowe info
-
-                    // załaduj oryginalny tekst
-                    String original = t.getModifierText();
-
-                    // przygotuj kontekst dla resolvera (np. s → set/funkcja)
-                    Map<String, Object> context = Map.of(
-                            TemplatePrefix.SET.getKey(), parsed
-                    );
-
-                    // podmień ${s:} → parsed.toString()
-                    String resolvedText = templateResolver.resolve(original, context);
-
-                    // ustaw podmieniony tekst jako ostateczny modifierText
-                    t.setModifierText(resolvedText);
-                }
+        for (Modifier modifier : modifiers) {
+            if (modifier instanceof TemplateModifier t && t.getInformation() != null) {
+                String original = t.getModifierText();
+                String resolved = templateResolver.resolve(original, Map.of(
+                        TemplatePrefix.SET.getKey(), t.getInformation()
+                ));
+                t.setModifierText(resolved);
             }
         }
 

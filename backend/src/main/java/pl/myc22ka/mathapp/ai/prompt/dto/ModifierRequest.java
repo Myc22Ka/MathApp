@@ -5,14 +5,19 @@ import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Requirement;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Template;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
 public record ModifierRequest(
         String type,
         Integer difficultyLevel,
         Requirement requirement,
-        Template template
+        Template template,
+        String templateInformation
 ) {
+
+    private static final ExpressionFactory expressionFactory = new ExpressionFactory();
 
     public Modifier toModifier(@NotNull Topic topic, @NotNull ModifierRepository repository) {
         return switch (type.toUpperCase()) {
@@ -22,9 +27,18 @@ public record ModifierRequest(
             case "REQUIREMENT" -> repository
                     .findByTopicAndRequirement(topic, requirement)
                     .orElseThrow(() -> new IllegalStateException("No RequirementModifier found for topic=" + topic.getId() + " and requirement=" + requirement));
-            case "TEMPLATE" -> repository
-                    .findByTopicAndTemplate(topic, template)
-                    .orElseThrow(() -> new IllegalStateException("No TemplateModifier found for topic=" + topic.getId() + " and template=" + template));
+            case "TEMPLATE" -> {
+                var modifier = repository
+                        .findByTopicAndTemplate(topic, template)
+                        .orElseThrow(() -> new IllegalStateException("No TemplateModifier found for topic=" + topic.getId() + " and template=" + template));
+
+
+                if (modifier instanceof TemplateModifier templateModifier && templateInformation != null) {
+                    templateModifier.setInformation(expressionFactory.parse(templateInformation));
+                }
+
+                yield modifier;
+            }
             default -> throw new IllegalArgumentException("Unknown modifier type: " + type);
         };
     }
