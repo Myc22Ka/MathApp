@@ -12,6 +12,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing prompts sent to the AI.
+ * <p>
+ * Collects prompt details including topic, modifiers, and responses.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Entity
 @Table(name = "prompts")
 @Data
@@ -38,9 +47,6 @@ public class Prompt {
     @Column(name = "response_text", columnDefinition = "TEXT")
     private String responseText;
 
-//    @Transient
-//    private MathExpression mathExpression;
-
     @Column(name = "verified", nullable = false)
     private boolean verified;
 
@@ -52,6 +58,9 @@ public class Prompt {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    /**
+     * Builds the final prompt text by concatenating topic text and modifier texts.
+     */
     public void buildFinalPromptText() {
         StringBuilder sb = new StringBuilder();
 

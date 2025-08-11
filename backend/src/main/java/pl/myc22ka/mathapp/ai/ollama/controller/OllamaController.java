@@ -2,12 +2,11 @@ package pl.myc22ka.mathapp.ai.ollama.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Controller responsible for communication with the Ollama AI service.
@@ -19,6 +18,7 @@ import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 @RestController
 @RequestMapping("/ollama")
 @RequiredArgsConstructor
+@Tag(name = "Ollama AI", description = "Endpoints for communication with Ollama AI service")
 public class OllamaController {
 
     private final OllamaService ollamaService;
@@ -29,10 +29,10 @@ public class OllamaController {
      * @param prompt The message or question to send to the AI.
      * @return AI-generated response as plain text.
      */
-    @Operation(summary = "Chat with Ollama AI", description = "Sends a plain text prompt to the AI and returns the response.")
+    @Operation(summary = "Chat with AI", description = "Send a plain text prompt and get AI response")
     @GetMapping("/chat")
     public String chat(
-            @Parameter(description = "Plain prompt text for the AI", required = true)
+            @Parameter(description = "Prompt text for the AI", required = true)
             @RequestParam String prompt
     ) {
         return ollamaService.chat(prompt);
@@ -44,16 +44,9 @@ public class OllamaController {
      * @param request Request containing type, level, and rules for math expression generation.
      * @return AI-generated mathematical set expression as plain text.
      */
-    @Operation(summary = "Generate a math expression", description = "Generates a mathematical set expression based on difficulty and constraints.")
+    @Operation(summary = "Generate math expression", description = "Generate mathematical set expression based on difficulty and constraints")
     @PostMapping("/generate-math-expression")
-    public String generateMathExpression(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Request body with details for math expression generation",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = MathExpressionChatRequest.class))
-            )
-            @RequestBody MathExpressionChatRequest request
-    ) {
+    public String generateMathExpression(@RequestBody MathExpressionChatRequest request) {
         return ollamaService.generateMathExpression(request);
     }
 }

@@ -9,10 +9,16 @@ import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
-import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
 import java.util.Map;
 
+/**
+ * Service for Ollama AI communication and math expression generation.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 06.08.2025
+ */
 @Service
 @RequiredArgsConstructor
 public class OllamaService {
@@ -24,9 +30,15 @@ public class OllamaService {
     private String model;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ExpressionFactory expressionFactory = new ExpressionFactory();
     private final PromptService promptService;
 
+    /**
+     * Sends prompt to Ollama AI and returns response.
+     *
+     * @param prompt text prompt for AI
+     * @return AI response as string
+     * @throws RuntimeException if request fails
+     */
     public String chat(String prompt) {
         String url = baseUrl + "/api/generate";
 
@@ -50,22 +62,32 @@ public class OllamaService {
         }
     }
 
+    /**
+     * Generates and verifies math expression using AI.
+     *
+     * @param request request with expression parameters
+     * @return generated math expression
+     */
     public String generateMathExpression(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
         String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
 
-        var result = expressionFactory.parse(response);
+        prompt.setResponseText(response);
 
-        prompt.setResponseText(result.toString());
-
-        promptService.verifyPromptResponse(prompt, result);
+        promptService.verifyPromptResponse(prompt);
 
         promptService.save(prompt);
 
         return response;
     }
 
+    /**
+     * Validates user's math expression request.
+     *
+     * @param request math expression to verify
+     * @return true if expression is valid
+     */
     public boolean useMathString(MathExpressionRequest request) {
         return promptService.verifyUserMathExpressionRequest(request);
     }

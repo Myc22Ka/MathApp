@@ -61,7 +61,7 @@
   },
   {
     "modifierType": "TEMPLATE",
-    "modifierText": "You MUST generate a set that is completely disjoint from the following set: ${s:}.\n- Do NOT include any number that lies within this interval.\n- Avoid any overlap, including endpoints (unless the interval is open).\n- Your entire output must not intersect with ${s:}.",
+    "modifierText": "Your generated set must be disjoint from the set ${s:}.\n- Do NOT include any number inside ${s:}.\n- Avoid any overlap, including endpoints unless intervals are open.\n- The output must NOT intersect with ${s:}.",
     "template": "DISJOINT_SETS",
     "topicId": 1
   }

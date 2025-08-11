@@ -1,8 +1,20 @@
 package pl.myc22ka.mathapp.ai.prompt.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * Base entity for all modifiers.
+ * <p>
+ * Uses single-table inheritance with a discriminator column
+ * to distinguish modifier types (e.g., Difficulty, Requirement, Template).
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Entity
 @Table(name = "modifiers")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

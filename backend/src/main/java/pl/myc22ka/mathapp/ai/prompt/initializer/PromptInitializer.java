@@ -18,6 +18,14 @@ import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Loads topics and modifiers from JSON files at application startup.
+ * Runs only if the database is empty.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Component
 @RequiredArgsConstructor
 public class PromptInitializer {
@@ -26,24 +34,25 @@ public class PromptInitializer {
     private final ModifierRepository modifierRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Initializes topics and modifiers from JSON files if the database is empty.
+     *
+     * @throws IOException if reading the JSON files fails
+     */
     @PostConstruct
     public void init() throws IOException {
         if (topicRepository.count() > 0 || modifierRepository.count() > 0) {
             return;
         }
 
-        // Wczytaj pliki JSON z classpath
         var topicsStream = new ClassPathResource("data/static/prompts/topics.json").getInputStream();
         var modifiersStream = new ClassPathResource("data/static/prompts/modifiers.json").getInputStream();
 
-        // Zmapuj dane
         List<Topic> topics = List.of(objectMapper.readValue(topicsStream, Topic[].class));
         List<ModifierSeed> modifierSeeds = List.of(objectMapper.readValue(modifiersStream, ModifierSeed[].class));
 
-        // Zapisz tematy
         topicRepository.saveAll(topics);
 
-        // Przypnij modyfikatory do tematów
         for (ModifierSeed seed : modifierSeeds) {
             Topic topic = topicRepository.findById(seed.topicId())
                     .orElseThrow(() -> new IllegalStateException("Topic not found with id: " + seed.topicId()));

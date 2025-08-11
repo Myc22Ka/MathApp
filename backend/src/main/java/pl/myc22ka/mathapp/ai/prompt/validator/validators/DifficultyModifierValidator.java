@@ -1,21 +1,30 @@
-package pl.myc22ka.mathapp.ai.prompt.handler.handlers;
+package pl.myc22ka.mathapp.ai.prompt.validator.validators;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.handler.ModifierHandler;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.service.ModifierService;
+import pl.myc22ka.mathapp.ai.prompt.validator.ModifierValidator;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.utils.checker.SetChecker;
 
+/**
+ * Validator for DifficultyModifier.
+ * <p>
+ * Validates difficulty level against max allowed and checks set difficulty rules.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Component
 @RequiredArgsConstructor
-public class DifficultyModifierHandler implements ModifierHandler<DifficultyModifier> {
+public class DifficultyModifierValidator implements ModifierValidator<DifficultyModifier> {
 
     private final ModifierService modifierService;
     private final SetChecker setChecker;
@@ -26,7 +35,7 @@ public class DifficultyModifierHandler implements ModifierHandler<DifficultyModi
     }
 
     @Override
-    public boolean apply(DifficultyModifier modifier, PromptType promptType, MathExpression response) {
+    public boolean validate(DifficultyModifier modifier, PromptType promptType, MathExpression response) {
         if (promptType == PromptType.SET && response instanceof ISet set) {
             return validateSets(modifier, set);
         }

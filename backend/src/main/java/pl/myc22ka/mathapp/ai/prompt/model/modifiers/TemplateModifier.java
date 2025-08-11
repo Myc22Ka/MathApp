@@ -8,6 +8,15 @@ import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 
+/**
+ * Template modifier entity.
+ * <p>
+ * Represents a modifier based on a user-provided additional information.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Entity
 @DiscriminatorValue("TEMPLATE")
 @Data
@@ -22,6 +31,13 @@ public class TemplateModifier extends Modifier {
     @Transient
     private MathExpression information;
 
+    /**
+     * Creates a TemplateModifier instance.
+     *
+     * @param topic        the associated topic
+     * @param modifierText text describing the modifier
+     * @param template     the template type
+     */
     public TemplateModifier(Topic topic, String modifierText, Template template) {
         super(null, modifierText, topic);
         this.template = template;

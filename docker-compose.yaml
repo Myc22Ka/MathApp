@@ -72,6 +72,12 @@ services:
     volumes:
       - .ollama:/root/.ollama
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
 volumes:
   database-data:
   node_modules:

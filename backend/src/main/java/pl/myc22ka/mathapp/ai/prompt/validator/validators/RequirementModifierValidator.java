@@ -1,13 +1,13 @@
-package pl.myc22ka.mathapp.ai.prompt.handler.handlers;
+package pl.myc22ka.mathapp.ai.prompt.validator.validators;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.handler.ModifierHandler;
+import pl.myc22ka.mathapp.ai.prompt.validator.ModifierValidator;
+import pl.myc22ka.mathapp.ai.prompt.validator.UtilChecker;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
-import pl.myc22ka.mathapp.ai.prompt.validator.UtilChecker;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
@@ -17,12 +17,20 @@ import static pl.myc22ka.mathapp.ai.prompt.model.PromptType.SET;
 import static pl.myc22ka.mathapp.model.set.ISetType.FINITE;
 import static pl.myc22ka.mathapp.model.set.ISetType.INTERVAL;
 
+/**
+ * Validator for RequirementModifier.
+ * <p>
+ * Checks set constraints based on requirement enum.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Component
 @RequiredArgsConstructor
-public class RequirementModifierHandler implements ModifierHandler<RequirementModifier> {
+public class RequirementModifierValidator implements ModifierValidator<RequirementModifier> {
 
     private final SetChecker setChecker;
-    private final UtilChecker utilChecker;
 
     @Override
     public boolean supports(Modifier modifier) {
@@ -30,7 +38,7 @@ public class RequirementModifierHandler implements ModifierHandler<RequirementMo
     }
 
     @Override
-    public boolean apply(RequirementModifier modifier, PromptType promptType, MathExpression response) {
+    public boolean validate(RequirementModifier modifier, PromptType promptType, MathExpression response) {
         if (promptType == SET && response instanceof ISet set) {
             return validateSets(modifier, set);
         }
@@ -45,8 +53,8 @@ public class RequirementModifierHandler implements ModifierHandler<RequirementMo
                     !set.toString().contains("}");
 
             case FINITE_SETS_ONLY -> set.getISetType() == FINITE;
-            case POSITIVE_ONLY -> utilChecker.onlyPositiveElements(set);
-            case DISJOINT_SETS -> setChecker.checkDisjoint(set);
+            case POSITIVE_ONLY -> set.onlyPositiveElements();
+            case DISJOINT_SETS -> set.isDisjoint();
         };
     }
 }

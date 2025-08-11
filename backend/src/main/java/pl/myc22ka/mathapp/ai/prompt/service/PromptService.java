@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
-import pl.myc22ka.mathapp.ai.prompt.handler.ModifierExecutor;
-import pl.myc22ka.mathapp.ai.prompt.handler.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.validator.ModifierExecutor;
+import pl.myc22ka.mathapp.ai.prompt.validator.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
@@ -19,12 +19,20 @@ import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service for managing Prompts and their verification.
+ * <p>
+ * Handles prompt creation, saving, and response validation.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Service
 @Transactional
 @Slf4j
@@ -38,40 +46,49 @@ public class PromptService {
     private final TemplateResolver templateResolver;
     private final ExpressionFactory expressionFactory;
 
+    /**
+     * Saves the given prompt.
+     *
+     * @param prompt prompt to save
+     */
     public void save(Prompt prompt) {
         promptRepository.save(prompt);
     }
 
-    public void verifyPromptResponse(@NotNull Prompt prompt, MathExpression response){
-        boolean allVerified = true;
-
-        for (Modifier modifier : prompt.getModifiers()) {
-            boolean verified = modifierExecutor.applyModifier(modifier, prompt.getTopic().getType(), response);
-            if (!verified) {
-                allVerified = false;
-            }
-        }
+    /**
+     * Verifies the response of the prompt and sets verified flag.
+     *
+     * @param prompt prompt to verify
+     */
+    public void verifyPromptResponse(@NotNull Prompt prompt) {
+        boolean allVerified = verify(
+                prompt.getResponseText(),
+                prompt.getTopic().getType(),
+                prompt.getModifiers()
+        );
 
         prompt.setVerified(allVerified);
     }
 
-    public boolean verifyUserMathExpressionRequest(MathExpressionRequest request){
-        boolean allVerified = true;
-        var result = expressionFactory.parse(request.response());
-
+    /**
+     * Verifies a user's math expression request.
+     *
+     * @param request math expression request
+     * @return true if valid, false otherwise
+     */
+    public boolean verifyUserMathExpressionRequest(@NotNull MathExpressionRequest request) {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
-        for (Modifier modifier : modifiers) {
-            boolean verified = modifierExecutor.applyModifier(modifier, request.topicType(), result);
-            if (!verified) {
-                allVerified = false;
-            }
-        }
-
-        return allVerified;
+        return verify(request.response(), request.topicType(), modifiers);
     }
 
+    /**
+     * Creates a prompt based on the chat request.
+     *
+     * @param request chat request data
+     * @return created prompt
+     */
     public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
@@ -94,6 +111,16 @@ public class PromptService {
         prompt.buildFinalPromptText();
 
         return prompt;
+    }
+
+    private boolean verify(String responseText, PromptType type, @NotNull List<Modifier> modifiers) {
+        var expression = expressionFactory.parse(responseText);
+        for (Modifier modifier : modifiers) {
+            if (!modifierExecutor.validate(modifier, type, expression)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Topic findTopicByType(PromptType topicType) {

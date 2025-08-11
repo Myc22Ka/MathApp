@@ -16,7 +16,7 @@ import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
  * Represents a mathematical set with common set operations.
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 2025.06.19
  */
 public interface ISet extends MathExpression {
@@ -125,8 +125,23 @@ public interface ISet extends MathExpression {
         return this.difference(other).union(other.difference(this));
     }
 
+    /**
+     * Checks if this set is disjoint with another set.
+     *
+     * @param other the other set to compare with
+     * @return true if the sets have no elements in common, false otherwise
+     */
     default boolean areDisjoint(@NotNull ISet other) {
         return this.intersection(other).isEmpty();
+    }
+
+    /**
+     * Checks if this set expression represents a disjoint union.
+     *
+     * @return true if the set contains a union operation, false otherwise
+     */
+    default boolean isDisjoint(){
+        return this.toString().contains(SetSymbols.UNION.toString());
     }
 
     @Override
