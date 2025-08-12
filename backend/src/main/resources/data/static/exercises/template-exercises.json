@@ -1,0 +1,12 @@
+[
+  {
+    "category": "Math",
+    "difficulty": "Easy",
+    "templateText": "Solve for x: 2x + 4 = 10",
+    "templateAnswer": "x = 3",
+    "steps": [
+      { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
+      { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }
+    ]
+  }
+]
