@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.ai.prompt.initializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierSeed;
@@ -10,12 +11,21 @@ import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Loads topics and modifiers from JSON files at application startup.
+ * Runs only if the database is empty.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Component
 @RequiredArgsConstructor
 public class PromptInitializer {
@@ -24,36 +34,44 @@ public class PromptInitializer {
     private final ModifierRepository modifierRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Initializes topics and modifiers from JSON files if the database is empty.
+     *
+     * @throws IOException if reading the JSON files fails
+     */
     @PostConstruct
     public void init() throws IOException {
         if (topicRepository.count() > 0 || modifierRepository.count() > 0) {
             return;
         }
 
-        // Wczytaj pliki JSON z classpath
         var topicsStream = new ClassPathResource("data/static/prompts/topics.json").getInputStream();
         var modifiersStream = new ClassPathResource("data/static/prompts/modifiers.json").getInputStream();
 
-        // Zmapuj dane
         List<Topic> topics = List.of(objectMapper.readValue(topicsStream, Topic[].class));
         List<ModifierSeed> modifierSeeds = List.of(objectMapper.readValue(modifiersStream, ModifierSeed[].class));
 
-        // Zapisz tematy
         topicRepository.saveAll(topics);
 
-        // Przypnij modyfikatory do tematów
         for (ModifierSeed seed : modifierSeeds) {
             Topic topic = topicRepository.findById(seed.topicId())
                     .orElseThrow(() -> new IllegalStateException("Topic not found with id: " + seed.topicId()));
 
-            Modifier modifier;
-            switch (seed.modifierType().toUpperCase()) {
-                case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel());
-                case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement());
-                default -> throw new IllegalArgumentException("Unknown modifier type: " + seed.modifierType());
-            }
+            Modifier modifier = getModifier(seed, topic);
 
             modifierRepository.save(modifier);
         }
+    }
+
+    @NotNull
+    private Modifier getModifier(@NotNull ModifierSeed seed, Topic topic) {
+        Modifier modifier;
+        switch (seed.modifierType().toUpperCase()) {
+            case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel());
+            case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement());
+            case "TEMPLATE" -> modifier = new TemplateModifier(topic, seed.modifierText(), seed.template());
+            default -> throw new IllegalArgumentException("Unknown modifier type: " + seed.modifierType());
+        }
+        return modifier;
     }
 }

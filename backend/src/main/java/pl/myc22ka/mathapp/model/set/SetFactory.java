@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.model.expression.IExpressionParser;
 import pl.myc22ka.mathapp.model.set.parsers.*;
 import pl.myc22ka.mathapp.model.set.sets.Fundamental;
 
@@ -13,10 +14,10 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
  * Supports finite sets, intervals, and fundamental sets.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025.06.19
  */
-public class SetFactory {
+public class SetFactory implements IExpressionParser<ISet> {
 
     private static final List<ISetParser> parsers = List.of(
             new SetParser(),
@@ -26,24 +27,19 @@ public class SetFactory {
             new SymjaSetParser()
     );
 
-    /**
-     * Parses a set expression and returns the corresponding {@link ISet} implementation.
-     *
-     * @param setExpression the string representation of the set
-     * @return the corresponding {@link ISet} instance
-     * @throws IllegalArgumentException if the expression is unsupported
-     */
-    public static @NotNull ISet fromString(@NotNull String setExpression) {
-        String trimmed = setExpression.replaceAll("\\s+", "");
+    @Override
+    public boolean canHandle(@NotNull String expression) {
+        return parsers.stream().anyMatch(p -> p.canHandle(expression));
+    }
 
-        if (trimmed.isEmpty()) return new Fundamental(EMPTY);
-
+    @Override
+    public @NotNull ISet parse(@NotNull String expression) {
         for (ISetParser parser : parsers) {
-            if (parser.canHandle(trimmed)) {
-                return parser.parse(trimmed);
+            if (parser.canHandle(expression)) {
+                return parser.parse(expression);
             }
         }
 
-        throw new IllegalArgumentException("Unsupported set expression: " + trimmed);
+        throw new IllegalArgumentException("Unsupported set expression: " + expression);
     }
 }

@@ -6,36 +6,40 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 /**
- * Requirement modifier entity.
+ * Template modifier entity.
  * <p>
- * Defines a specific requirement for a topic.
+ * Represents a modifier based on a user-provided additional information.
  *
  * @author Myc22Ka
  * @version 1.0.0
  * @since 11.08.2025
  */
 @Entity
-@DiscriminatorValue("REQUIREMENT")
+@DiscriminatorValue("TEMPLATE")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class RequirementModifier extends Modifier {
+public class TemplateModifier extends Modifier {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "requirement")
-    private Requirement requirement;
+    @Column(name = "template")
+    private Template template;
+
+    @Transient
+    private MathExpression information;
 
     /**
-     * Creates a RequirementModifier instance.
+     * Creates a TemplateModifier instance.
      *
      * @param topic        the associated topic
      * @param modifierText text describing the modifier
-     * @param requirement  requirement type
+     * @param template     the template type
      */
-    public RequirementModifier(Topic topic, String modifierText, Requirement requirement) {
+    public TemplateModifier(Topic topic, String modifierText, Template template) {
         super(null, modifierText, topic);
-        this.requirement = requirement;
+        this.template = template;
     }
 }

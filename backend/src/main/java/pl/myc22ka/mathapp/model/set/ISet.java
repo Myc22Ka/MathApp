@@ -1,18 +1,25 @@
 package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.model.set.visitors.SetVisitor;
+
+import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.SET;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.*;
+import static pl.myc22ka.mathapp.model.set.sets.BoundType.OPEN;
 
 /**
  * Represents a mathematical set with common set operations.
  *
  * @author Myc22Ka
- * @version 1.0
- * @since 2025 -06-19
+ * @version 1.0.4
+ * @since 2025.06.19
  */
-public interface ISet {
+public interface ISet extends MathExpression {
 
     /**
      * Accepts a visitor to perform an operation on this set.
@@ -91,18 +98,17 @@ public interface ISet {
      * @return the boolean
      */
     default boolean isEmpty(){
-        return this.toString().equals(SetSymbols.EMPTY.toString());
+        return this.toString().equals(EMPTY.toString());
     }
 
     /**
-     * Complement set.
+     * Complement set. A' = U \ A
      *
      * @param universe the universe
      * @return the set
      */
-// A' = U \ A
     default @NotNull ISet complement(@NotNull ISet universe) {
-        if (universe.toString().equals(SetSymbols.REAL.toString())){
+        if (universe.toString().equals(REAL.toString())){
             return universe.toInterval().difference(this);
         }
 
@@ -117,6 +123,37 @@ public interface ISet {
      */
     default ISet symmetricDifference(@NotNull ISet other){
         return this.difference(other).union(other.difference(this));
+    }
+
+    /**
+     * Checks if this set is disjoint with another set.
+     *
+     * @param other the other set to compare with
+     * @return true if the sets have no elements in common, false otherwise
+     */
+    default boolean areDisjoint(@NotNull ISet other) {
+        return this.intersection(other).isEmpty();
+    }
+
+    /**
+     * Checks if this set expression represents a disjoint union.
+     *
+     * @return true if the set contains a union operation, false otherwise
+     */
+    default boolean isDisjoint(){
+        return this.toString().contains(SetSymbols.UNION.toString());
+    }
+
+    @Override
+    default boolean onlyPositiveElements() {
+        var intersection = this.intersection(new Interval(F.ZZ(0), OPEN, OPEN, INFINITY.parse()));
+
+        return intersection.toString().equals(this.toString());
+    }
+
+    @Override
+    default TemplatePrefix getTemplatePrefix() {
+        return SET;
     }
 
     /**

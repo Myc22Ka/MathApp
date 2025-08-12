@@ -12,6 +12,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing a topic for prompts.
+ * <p>
+ * Holds prompt type and associated text, plus linked prompts.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 11.08.2025
+ */
 @Entity
 @Table(name = "topics")
 @Data

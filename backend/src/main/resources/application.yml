@@ -20,7 +20,7 @@ spring:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
     model: qwen2-math
 
-#logging:
-#  level:
-#    root: INFO
-#    org.springframework.boot.autoconfigure: INFO
+logging:
+  level:
+    root: INFO
+    org.springframework.boot.autoconfigure: INFO

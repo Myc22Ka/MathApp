@@ -1,27 +1,24 @@
 package pl.myc22ka.mathapp.ai.ollama.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import pl.myc22ka.mathapp.ai.prompt.dto.PromptRequest;
-import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
+import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
-import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+/**
+ * Service for Ollama AI communication and math expression generation.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 06.08.2025
+ */
 @Service
 @RequiredArgsConstructor
 public class OllamaService {
@@ -35,6 +32,13 @@ public class OllamaService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final PromptService promptService;
 
+    /**
+     * Sends prompt to Ollama AI and returns response.
+     *
+     * @param prompt text prompt for AI
+     * @return AI response as string
+     * @throws RuntimeException if request fails
+     */
     public String chat(String prompt) {
         String url = baseUrl + "/api/generate";
 
@@ -58,14 +62,33 @@ public class OllamaService {
         }
     }
 
-    public String generateMathString(PromptRequest request) {
+    /**
+     * Generates and verifies math expression using AI.
+     *
+     * @param request request with expression parameters
+     * @return generated math expression
+     */
+    public String generateMathExpression(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
-        String response = chat(prompt.getFinalPromptText());
+        String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
 
         prompt.setResponseText(response);
+
+        promptService.verifyPromptResponse(prompt);
+
         promptService.save(prompt);
 
         return response;
+    }
+
+    /**
+     * Validates user's math expression request.
+     *
+     * @param request math expression to verify
+     * @return true if expression is valid
+     */
+    public boolean useMathString(MathExpressionRequest request) {
+        return promptService.verifyUserMathExpressionRequest(request);
     }
 }
