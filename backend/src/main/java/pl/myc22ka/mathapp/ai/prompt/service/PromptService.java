@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.ai.prompt.validator.ModifierExecutor;
 import pl.myc22ka.mathapp.ai.prompt.validator.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
@@ -30,7 +31,7 @@ import java.util.Map;
  * Handles prompt creation, saving, and response validation.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Service
@@ -96,9 +97,11 @@ public class PromptService {
         for (Modifier modifier : modifiers) {
             if (modifier instanceof TemplateModifier t && t.getInformation() != null) {
                 String original = t.getModifierText();
-                String resolved = templateResolver.resolve(original, Map.of(
-                        TemplatePrefix.SET.getKey(), t.getInformation()
-                ));
+                // Zamieniamy Mapę na listę PrefixValue
+                List<PrefixValue> context = List.of(
+                        new PrefixValue(TemplatePrefix.SET.getKey(), t.getInformation().toString())
+                );
+                String resolved = templateResolver.resolve(original, context);
                 t.setModifierText(resolved);
             }
         }
