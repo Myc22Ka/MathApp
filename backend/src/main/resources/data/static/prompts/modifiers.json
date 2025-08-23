@@ -1,6 +1,12 @@
 [
   {
     "modifierType": "DIFFICULTY",
+    "modifierText": "",
+    "difficultyLevel": 2,
+    "topicId": 2
+  },
+  {
+    "modifierType": "DIFFICULTY",
     "modifierText": "Use only simple examples with basic intervals like (1, 5) or [2, 6).",
     "difficultyLevel": 1,
     "topicId": 1

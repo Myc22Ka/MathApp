@@ -1,18 +1,24 @@
 package pl.myc22ka.mathapp.ai.prompt.validator;
 
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.ai.prompt.model.ModifierPrefix;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.ai.prompt.model.modifiers.*;
+import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
+import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.SET;
+import java.util.stream.Collectors;
 
 /**
  * The type Template resolver.
@@ -25,28 +31,35 @@ import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.SET;
  * @since 11.08.2025
  */
 @Component
+@RequiredArgsConstructor
 public class TemplateResolver {
 
-    private static final Pattern TEMPLATE_PATTERN = Pattern.compile("\\$\\{([a-zA-Z]+):}");
-
-    private final Map<String, BiFunction<String, Map<String, Object>, String>> resolvers = new HashMap<>();
+    private static final Pattern TEMPLATE_PATTERN = createPattern();
+    private final ModifierRepository modifierRepository;
+    private final TopicRepository topicRepository;
 
     /**
-     * Instantiates a new Template resolver.
-     * <p>
-     * Initializes the map of resolvers with predefined handlers for each supported prefix.
+     * Creates regex pattern based on available TemplatePrefix enum values.
      */
-    public TemplateResolver() {
+    @NotNull
+    private static Pattern createPattern() {
+        String templatePrefixes = Arrays.stream(TemplatePrefix.values())
+                .map(TemplatePrefix::getKey)
+                .collect(Collectors.joining());
 
-        // Resolver for the "s" prefix (e.g. ${s:}), returning the value from context or "X" if absent
-        resolvers.put(SET.getKey(), (key, ctx) -> {
-            Object val = ctx.get(SET.getKey());
-            return val != null ? val.toString() : "X";
-        });
+        String modifierPrefixes = Arrays.stream(ModifierPrefix.values())
+                .map(ModifierPrefix::getKey)
+                .collect(Collectors.joining());
 
-        // Additional resolvers can be added here, e.g. for "f" or "a" prefixes
-        // resolvers.put("f", (key, ctx) -> ctx.getOrDefault("f", "X").toString());
-        // resolvers.put("a", (key, ctx) -> ctx.getOrDefault("a", "X").toString());
+
+        // regex:
+        // 1. przed dwukropkiem: ([templatePrefixes]\d+)
+        // 2. po dwukropku: (:([modifierPrefixes]\d+(\\|[modifierPrefixes]\d+)*))? -> opcjonalnie
+        String regex = "\\$\\{([" + templatePrefixes + "])(\\d+)(:(["
+                + modifierPrefixes
+                + "]\\d+(\\|[" + modifierPrefixes + "]\\d+)*))?}";
+
+        return Pattern.compile(regex);
     }
 
     /**
@@ -65,7 +78,8 @@ public class TemplateResolver {
         Map<String, Integer> counters = new HashMap<>();
 
         while (matcher.find()) {
-            String key = matcher.group(1);
+            String key = matcher.group(1); // prefix (np. "s")
+            String modifierId = matcher.group(2); // cyfra modyfikatora (np. "1")
 
             // Filtrujemy listę context, bierzemy tylko te o danym kluczu
             List<PrefixValue> matching = context.stream()
@@ -101,14 +115,54 @@ public class TemplateResolver {
         List<PrefixModifierEntry> result = new ArrayList<>();
 
         while (matcher.find()) {
-            String prefixKey = matcher.group(1); // np. "s"
-            TemplatePrefix.fromKey(prefixKey).ifPresent(prefix -> {
-                result.add(new PrefixModifierEntry(prefix, List.of())); // pusty placeholder
-                // TODO: tutaj później dodam ModifierRequest na podstawie template
-            });
+            String prefixKey = matcher.group(1);
+            String modifiersGroup = matcher.group(4);
+
+            TemplatePrefix prefix = TemplatePrefix.fromKey(prefixKey)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown prefix: " + prefixKey));
+
+            PromptType type = prefix.toPromptType();
+
+            // Pobranie topic po typie
+            Topic topic = topicRepository.findFirstByType(type)
+                    .orElseThrow(() -> new IllegalStateException("No Topic found for type " + type));
+
+            List<ModifierRequest> foundModifierRequests = new ArrayList<>();
+            if (modifiersGroup != null && !modifiersGroup.isEmpty()) {
+                List<String> codes = Arrays.asList(modifiersGroup.split("\\|"));
+
+                // Pobranie modifierów z bazy
+                List<Modifier> foundModifiers = modifierRepository.findByTemplateCodeIn(codes);
+
+                // Filtracja po topic.id + konwersja na ModifierRequest
+                foundModifierRequests = foundModifiers.stream()
+                        .filter(m -> m.getTopic().getId().equals(topic.getId()))
+                        .map(this::toRequest)
+                        .toList();
+            }
+
+            result.add(new PrefixModifierEntry(prefix, foundModifierRequests));
         }
 
         return result;
     }
 
+
+    @NotNull
+    private ModifierRequest toRequest(Modifier modifier) {
+        switch (modifier) {
+            case DifficultyModifier dm -> {
+                return new ModifierRequest("DIFFICULTY", dm.getDifficultyLevel(), null, null, null);
+            }
+            case RequirementModifier rm -> {
+                return new ModifierRequest("REQUIREMENT", null, rm.getRequirement(), null, null);
+            }
+            case TemplateModifier tm -> {
+                String info = tm.getInformation() != null ? tm.getInformation().toString() : null;
+                return new ModifierRequest("TEMPLATE", null, null, tm.getTemplate(), info);
+            }
+            case null, default ->
+                    throw new IllegalArgumentException("Unknown Modifier type");
+        }
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 
@@ -13,7 +14,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Topic;
  * Defines a specific requirement for a topic.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Entity
@@ -34,8 +35,8 @@ public class RequirementModifier extends Modifier {
      * @param modifierText text describing the modifier
      * @param requirement  requirement type
      */
-    public RequirementModifier(Topic topic, String modifierText, Requirement requirement) {
-        super(null, modifierText, topic);
+    public RequirementModifier(Topic topic, String modifierText, @NotNull Requirement requirement) {
+        super(null, modifierText, topic, "R" + requirement.getCode());
         this.requirement = requirement;
     }
 }

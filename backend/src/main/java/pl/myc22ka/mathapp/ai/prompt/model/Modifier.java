@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  * to distinguish modifier types (e.g., Difficulty, Requirement, Template).
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Entity
@@ -34,4 +34,7 @@ public abstract class Modifier {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
+
+    @Column(name = "template_code", nullable = false, length = 50)
+    private String templateCode;
 }

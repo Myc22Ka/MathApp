@@ -2,8 +2,18 @@
   {
     "category": "SET",
     "difficulty": "1",
-    "templateText": "Wykonaj AuB dla zbiorów: A = ${s:} B = ${s:}",
-    "templateAnswer": "${s:}",
+    "templateText": "Wykonaj AuB dla zbiorów: A = ${s1:} B = ${s2:}",
+    "templateAnswer": "${s1:}",
+    "steps": [
+      { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
+      { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }
+    ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wykonaj AuB dla zbiorów: A = ${s1:R1|D2} B = ${s2:}",
+    "templateAnswer": "${s1:}",
     "steps": [
       { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
       { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }

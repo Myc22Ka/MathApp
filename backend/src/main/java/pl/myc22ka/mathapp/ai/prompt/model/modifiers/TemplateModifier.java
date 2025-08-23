@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
@@ -14,7 +15,7 @@ import pl.myc22ka.mathapp.model.expression.MathExpression;
  * Represents a modifier based on a user-provided additional information.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Entity
@@ -38,8 +39,8 @@ public class TemplateModifier extends Modifier {
      * @param modifierText text describing the modifier
      * @param template     the template type
      */
-    public TemplateModifier(Topic topic, String modifierText, Template template) {
-        super(null, modifierText, topic);
+    public TemplateModifier(Topic topic, String modifierText, @NotNull Template template) {
+        super(null, modifierText, topic, "T" + template.getCode());
         this.template = template;
     }
 }
