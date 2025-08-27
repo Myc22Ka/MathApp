@@ -12,7 +12,7 @@ import java.util.List;
  * @param modifiers list of modifiers to customize the expression
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.2
  * @since 06.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -40,4 +40,37 @@ public record MathExpressionChatRequest(
 
         @Schema(description = "List of modifiers to customize the expression")
         List<ModifierRequest> modifiers
-) {}
+) {
+
+        public MathExpressionChatRequest withContext(List<PrefixValue> context) {
+                if (modifiers == null) {
+                        return this;
+                }
+
+                List<ModifierRequest> resolvedModifiers = modifiers.stream()
+                        .map(m -> {
+                                if ("TEMPLATE".equalsIgnoreCase(m.type()) && m.templateInformation() != null) {
+                                        String placeholderKey = m.templateInformation();
+
+                                        String replacement = context.stream()
+                                                .filter(c -> c.key().equals(placeholderKey))
+                                                .map(PrefixValue::value)
+                                                .findFirst()
+                                                .orElse(m.templateInformation());
+
+                                        return new ModifierRequest(
+                                                m.type(),
+                                                m.difficultyLevel(),
+                                                m.requirement(),
+                                                m.template(),
+                                                replacement
+                                        );
+                                } else {
+                                        return m;
+                                }
+                        })
+                        .toList();
+
+                return new MathExpressionChatRequest(topicType, resolvedModifiers);
+        }
+}
