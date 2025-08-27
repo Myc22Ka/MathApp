@@ -1,6 +1,5 @@
 package pl.myc22ka.mathapp.exercise.template.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
