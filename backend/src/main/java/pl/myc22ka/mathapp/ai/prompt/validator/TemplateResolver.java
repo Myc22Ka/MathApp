@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * Enhanced to support TemplateModifier with set reference resolution.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.4
  * @since 11.08.2025
  */
 @Component
@@ -228,5 +228,42 @@ public class TemplateResolver {
             }
             case null, default -> throw new IllegalArgumentException("Unknown Modifier type");
         }
+    }
+
+    /**
+     * Returns the input string with all template placeholders removed.
+     *
+     * @param input the input string possibly containing template placeholders like ${s1}, ${T1:D1}, etc.
+     * @return input string without any template placeholders
+     */
+    public String removeTemplatePlaceholders(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        Matcher matcher = TEMPLATE_PATTERN.matcher(input);
+        return matcher.replaceAll(""); // usuwa wszystkie dopasowania
+    }
+
+    /**
+     * Returns all template prefixes found in the input string.
+     * Example: for input "Calculate ${s1} and ${T2:D1}", returns ["s", "T"].
+     *
+     * @param input the input string containing template placeholders
+     * @return set of template prefix keys found in the input
+     */
+    public Set<String> findTemplatePrefixes(String input) {
+        if (input == null || input.isEmpty()) {
+            return Set.of();
+        }
+
+        Matcher matcher = TEMPLATE_PATTERN.matcher(input);
+        Set<String> prefixes = new LinkedHashSet<>(); // LinkedHashSet zachowuje kolejność
+
+        while (matcher.find()) {
+            String prefixKey = matcher.group(1); // w regexie grupa 1 to prefix
+            prefixes.add(prefixKey);
+        }
+
+        return prefixes;
     }
 }

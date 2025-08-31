@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,5 +32,5 @@ public class TemplateExercise {
 
     @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private final List<Step> steps = List.of();
+    private final List<Step> steps = new ArrayList<>();
 }
