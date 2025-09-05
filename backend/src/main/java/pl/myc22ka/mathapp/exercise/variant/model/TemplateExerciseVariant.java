@@ -1,7 +1,8 @@
-package pl.myc22ka.mathapp.exercise.template.model;
+package pl.myc22ka.mathapp.exercise.variant.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 
 @Entity
 @Table(name = "template_exercise_variants")

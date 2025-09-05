@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.ai.prompt.validator;
+package pl.myc22ka.mathapp.ai.prompt.component;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * Enhanced to support TemplateModifier with set reference resolution.
  *
  * @author Myc22Ka
- * @version 1.0.4
+ * @version 1.0.5
  * @since 11.08.2025
  */
 @Component
@@ -168,10 +168,10 @@ public class TemplateResolver {
                                 ModifierRequest baseReq = toModifierRequest(m);
 
                                 ModifierRequest req = new ModifierRequest(
-                                        baseReq.type(),
-                                        baseReq.difficultyLevel(),
-                                        baseReq.requirement(),
-                                        baseReq.template(),
+                                        baseReq.getType(),
+                                        baseReq.getDifficultyLevel(),
+                                        baseReq.getRequirement(),
+                                        baseReq.getTemplate(),
                                         finalPlaceholder // tu trafia to po "->"
                                 );
 

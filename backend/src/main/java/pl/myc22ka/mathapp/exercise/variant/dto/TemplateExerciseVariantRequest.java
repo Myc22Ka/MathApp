@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.exercise.template.dto;
+package pl.myc22ka.mathapp.exercise.variant.dto;
 
 public record TemplateExerciseVariantRequest(
         String difficulty,

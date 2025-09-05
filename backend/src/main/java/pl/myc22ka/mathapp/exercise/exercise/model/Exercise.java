@@ -35,4 +35,8 @@ public class Exercise {
 
     @Column(name = "text", columnDefinition = "TEXT")
     private String text;
+
+    @Column(name = "verified", nullable = false)
+    @Builder.Default
+    private boolean verified = false;
 }

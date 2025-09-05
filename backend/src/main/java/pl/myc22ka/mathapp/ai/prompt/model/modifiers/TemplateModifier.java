@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.ai.prompt.model.ModifierPrefix;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 
@@ -52,5 +54,14 @@ public class TemplateModifier extends Modifier {
         this.template = original.getTemplate();
         this.information = original.getInformation();
         this.informationPlaceholder = original.getInformationPlaceholder();
+    }
+
+    public ModifierRequest toModifierRequest() {
+        ModifierRequest mr = new ModifierRequest();
+        mr.setType(ModifierPrefix.TEMPLATE.name());
+        mr.setTemplate(this.template);
+        mr.setTemplateInformation(information != null ? information.toString() : informationPlaceholder);
+
+        return mr;
     }
 }

@@ -3,14 +3,13 @@ package pl.myc22ka.mathapp.exercise.template.service;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import pl.myc22ka.mathapp.ai.prompt.validator.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 
 @Service

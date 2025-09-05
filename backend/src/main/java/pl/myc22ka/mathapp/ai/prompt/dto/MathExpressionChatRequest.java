@@ -49,20 +49,20 @@ public record MathExpressionChatRequest(
 
                 List<ModifierRequest> resolvedModifiers = modifiers.stream()
                         .map(m -> {
-                                if ("TEMPLATE".equalsIgnoreCase(m.type()) && m.templateInformation() != null) {
-                                        String placeholderKey = m.templateInformation();
+                                if ("TEMPLATE".equalsIgnoreCase(m.getType()) && m.getTemplateInformation() != null) {
+                                        String placeholderKey = m.getTemplateInformation();
 
                                         String replacement = context.stream()
                                                 .filter(c -> c.key().equals(placeholderKey))
                                                 .map(PrefixValue::value)
                                                 .findFirst()
-                                                .orElse(m.templateInformation());
+                                                .orElse(m.getTemplateInformation());
 
                                         return new ModifierRequest(
-                                                m.type(),
-                                                m.difficultyLevel(),
-                                                m.requirement(),
-                                                m.template(),
+                                                m.getType(),
+                                                m.getDifficultyLevel(),
+                                                m.getRequirement(),
+                                                m.getTemplate(),
                                                 replacement
                                         );
                                 } else {

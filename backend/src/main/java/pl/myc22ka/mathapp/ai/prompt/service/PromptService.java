@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.prompt.dto.*;
 import pl.myc22ka.mathapp.ai.prompt.validator.ModifierExecutor;
-import pl.myc22ka.mathapp.ai.prompt.validator.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
@@ -29,7 +29,7 @@ import java.util.Set;
  * Handles prompt creation, saving, and response validation.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 11.08.2025
  */
 @Service
@@ -155,5 +155,35 @@ public class PromptService {
         return modifierRequests.stream()
                 .map(req -> req.toModifier(topic, modifierRepository))
                 .toList();
+    }
+
+    /**
+     * Verifies a list of ModifierRequest values for a given prompt type.
+     *
+     * @param modifierRequests list of modifier requests to verify
+     * @param value            corresponding value to verify
+     * @param type             prompt type
+     * @return true if all values pass validation, false otherwise
+     */
+    public boolean verifyModifierRequestsWithValue(@NotNull List<ModifierRequest> modifierRequests,
+                                                   @NotNull String value,
+                                                   @NotNull PromptType type) {
+        if (modifierRequests.isEmpty()) {
+            return true; // brak modyfikatorów = nic do weryfikacji
+        }
+
+        Topic topic = findTopicByType(type);
+        var expression = expressionFactory.parse(value);
+
+        // Dla jednej wartości sprawdzamy wszystkie modyfikatory
+        for (ModifierRequest request : modifierRequests) {
+            Modifier modifier = request.toModifier(topic, modifierRepository);
+
+            if (!modifierExecutor.validate(modifier, type, expression)) {
+                return false; // jeśli choć jedna weryfikacja nie przejdzie, zwracamy false
+            }
+        }
+
+        return true; // wartość przeszła wszystkie modyfikatory
     }
 }

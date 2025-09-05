@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 
 /**
  * Base entity for all modifiers.
