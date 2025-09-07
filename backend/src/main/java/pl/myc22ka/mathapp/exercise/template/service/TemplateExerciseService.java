@@ -46,6 +46,6 @@ public class TemplateExerciseService {
     }
 
     public void delete(Long id) {
-        templateRepository.delete(getById(id));
+        templateRepository.deleteById(id);
     }
 }

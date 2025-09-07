@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.exercise.template.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 @Entity
 @Table(name = "exercise_step")
@@ -26,4 +27,10 @@ public class Step {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private TemplateExercise exercise;
+
+    @ManyToOne
+    @JoinColumn(name = "variant_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private TemplateExerciseVariant variant;
 }

@@ -3,60 +3,62 @@ package pl.myc22ka.mathapp.exercise.variant.service;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
-import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 public class TemplateExerciseVariantService {
 
-    private final TemplateExerciseRepository exerciseRepository;
+    private final VariantExerciseHelper variantExerciseHelper;
     private final TemplateExerciseVariantRepository variantRepository;
+    private final TemplateExerciseHelper templateExerciseHelper;
 
-    // CREATE
-    public TemplateExerciseVariant createVariant(Long exerciseId, @NotNull TemplateExerciseVariantRequest request) {
-        TemplateExercise exercise = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> new IllegalArgumentException("TemplateExercise not found with id: " + exerciseId));
+    @Transactional
+    public TemplateExerciseVariant create(Long templateId, @NotNull TemplateExerciseVariantRequest request) {
+        TemplateExercise template = templateExerciseHelper.getTemplate(templateId);
 
         TemplateExerciseVariant variant = TemplateExerciseVariant.builder()
-                .templateExercise(exercise)
+                .templateText(request.text())
+                .templateAnswer(request.answer())
                 .difficulty(request.difficulty())
-                .text(request.text())
-                .answer(request.answer())
+                .category(template.getCategory())
+                .steps(request.steps())
                 .build();
+
+        variant.setTemplateExercise(template);
+
+        variantExerciseHelper.validateUnique(variant);
+        variantExerciseHelper.prepareForCreate(variant);
 
         return variantRepository.save(variant);
     }
 
-    // READ ALL for one template
-    public List<TemplateExerciseVariant> getVariantsByExercise(Long exerciseId) {
-        return variantRepository.findByTemplateExerciseId(exerciseId);
+    public List<TemplateExerciseVariant> getAll() {
+        return variantRepository.findAll();
     }
 
-    // READ ONE
     public TemplateExerciseVariant getById(Long id) {
-        return variantRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Variant not found with id " + id));
+        return variantExerciseHelper.getVariant(id);
     }
 
-    // UPDATE
+    @Transactional
     public TemplateExerciseVariant update(Long id, @NotNull TemplateExerciseVariantRequest request) {
-        TemplateExerciseVariant existing = getById(id);
+        TemplateExerciseVariant existing = variantExerciseHelper.getVariant(id);
 
-        existing.setDifficulty(request.difficulty());
-        existing.setText(request.text());
-        existing.setAnswer(request.answer());
+        variantExerciseHelper.validateCleanTextVariant(existing, request.text());
+        variantExerciseHelper.applyHardUpdateVariant(existing, request);
 
         return variantRepository.save(existing);
     }
 
-    // DELETE
     public void delete(Long id) {
         variantRepository.deleteById(id);
     }

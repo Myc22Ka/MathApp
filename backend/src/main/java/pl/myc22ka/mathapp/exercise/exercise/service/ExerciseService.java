@@ -15,6 +15,7 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 import java.util.*;
@@ -27,6 +28,7 @@ public class ExerciseService {
     private final OllamaService ollamaService;
     private final ExerciseHelper exerciseHelper;
     private final TemplateExerciseHelper templateExerciseHelper;
+    private final VariantExerciseHelper variantExerciseHelper;
     private final ValidationHelper validationHelper;
 
     public ExerciseDTO createExercise(Long templateId, Long variantId, @NotNull List<String> values) {
@@ -36,7 +38,7 @@ public class ExerciseService {
         if (templateId != null) {
             template = templateExerciseHelper.getTemplate(templateId);
         } else {
-            TemplateExerciseVariant variant = exerciseHelper.getVariant(variantId);
+            TemplateExerciseVariant variant = variantExerciseHelper.getVariant(variantId);
             template = variant.getTemplateExercise();
         }
 
@@ -80,7 +82,7 @@ public class ExerciseService {
         if (templateId != null) {
             template = templateExerciseHelper.getTemplate(templateId);
         } else {
-            TemplateExerciseVariant variant = exerciseHelper.getVariant(variantId);
+            TemplateExerciseVariant variant = variantExerciseHelper.getVariant(variantId);
             template = variant.getTemplateExercise();
         }
 

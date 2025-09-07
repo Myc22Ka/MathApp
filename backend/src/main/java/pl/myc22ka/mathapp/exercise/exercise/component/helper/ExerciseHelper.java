@@ -11,9 +11,6 @@ import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
-import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
-import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
-import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
 import java.util.ArrayList;
@@ -26,13 +23,7 @@ public class ExerciseHelper {
     private final ExerciseRepository exerciseRepository;
     private final TemplateResolver templateResolver;
     private final ExpressionFactory expressionFactory;
-    private final TemplateExerciseVariantRepository templateVariantRepository;
     private final PromptService promptService;
-
-    public TemplateExerciseVariant getVariant(Long variantId) {
-        return templateVariantRepository.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Variant not found with id " + variantId));
-    }
 
     public Exercise getExercise(Long id) {
         return exerciseRepository.findById(id)
