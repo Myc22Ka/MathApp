@@ -13,6 +13,7 @@ import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
+import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
@@ -25,6 +26,7 @@ public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final OllamaService ollamaService;
     private final ExerciseHelper exerciseHelper;
+    private final TemplateExerciseHelper templateExerciseHelper;
     private final ValidationHelper validationHelper;
 
     public ExerciseDTO createExercise(Long templateId, Long variantId, @NotNull List<String> values) {
@@ -32,7 +34,7 @@ public class ExerciseService {
 
         TemplateExercise template;
         if (templateId != null) {
-            template = exerciseHelper.getTemplate(templateId);
+            template = templateExerciseHelper.getTemplate(templateId);
         } else {
             TemplateExerciseVariant variant = exerciseHelper.getVariant(variantId);
             template = variant.getTemplateExercise();
@@ -76,7 +78,7 @@ public class ExerciseService {
 
         TemplateExercise template;
         if (templateId != null) {
-            template = exerciseHelper.getTemplate(templateId);
+            template = templateExerciseHelper.getTemplate(templateId);
         } else {
             TemplateExerciseVariant variant = exerciseHelper.getVariant(variantId);
             template = variant.getTemplateExercise();
@@ -107,7 +109,7 @@ public class ExerciseService {
 
     public ExerciseDTO updateExercise(Long id, @NotNull List<String> values) {
         Exercise exercise = exerciseHelper.getExercise(id);
-        TemplateExercise template = exerciseHelper.getTemplate(exercise.getTemplateExercise().getId());
+        TemplateExercise template = templateExerciseHelper.getTemplate(exercise.getTemplateExercise().getId());
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
         exerciseHelper.validatePlaceholderCount(placeholders, values);

@@ -246,7 +246,7 @@ public class TemplateResolver {
 
     /**
      * Returns all template prefixes found in the input string.
-     * Example: for input "Calculate ${s1} and ${T2:D1}", returns ["s", "T"].
+     * Example: for input "Calculate ${s1} and ${s2:D1}", returns ["s1", "s2"].
      *
      * @param input the input string containing template placeholders
      * @return set of template prefix keys found in the input
@@ -257,11 +257,12 @@ public class TemplateResolver {
         }
 
         Matcher matcher = TEMPLATE_PATTERN.matcher(input);
-        Set<String> prefixes = new LinkedHashSet<>(); // LinkedHashSet zachowuje kolejność
+        Set<String> prefixes = new LinkedHashSet<>();
 
         while (matcher.find()) {
-            String prefixKey = matcher.group(1); // w regexie grupa 1 to prefix
-            prefixes.add(prefixKey);
+            String prefixKey = matcher.group(1);
+            String prefixNumber = matcher.group(2);
+            prefixes.add(prefixKey + prefixNumber);
         }
 
         return prefixes;

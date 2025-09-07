@@ -5,11 +5,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Loads template exercises from a JSON file at application startup.
@@ -25,6 +28,7 @@ public class TemplateExerciseInitializer {
 
     private final TemplateExerciseRepository exerciseRepository;
     private final ObjectMapper objectMapper;
+    private final TemplateResolver templateResolver;
 
     /**
      * Initializes template exercises from a JSON file if the database is empty.
@@ -37,11 +41,20 @@ public class TemplateExerciseInitializer {
             return;
         }
 
-        var inputStream = new ClassPathResource("data/static/exercises/template-exercises.json").getInputStream();
+        var inputStream =
+                new ClassPathResource("data/static/exercises/template-exercises.json").getInputStream();
         List<TemplateExercise> exercises =
                 List.of(objectMapper.readValue(inputStream, TemplateExercise[].class));
 
         for (TemplateExercise exercise : exercises) {
+            String cleanText = templateResolver.removeTemplatePlaceholders(exercise.getTemplateText());
+            exercise.setClearText(cleanText);
+
+            Set<String> prefixes = templateResolver.findTemplatePrefixes(exercise.getTemplateText());
+            exercise.setTemplatePrefixes(new ArrayList<>(prefixes));
+
+            exercise.setExerciseCounter(0L);
+
             if (exercise.getSteps() != null) {
                 exercise.getSteps().forEach(step -> step.setExercise(exercise));
             }

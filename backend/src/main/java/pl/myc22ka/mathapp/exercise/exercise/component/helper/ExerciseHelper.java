@@ -24,16 +24,10 @@ import java.util.List;
 public class ExerciseHelper {
 
     private final ExerciseRepository exerciseRepository;
-    private final TemplateExerciseRepository templateExerciseRepository;
     private final TemplateResolver templateResolver;
     private final ExpressionFactory expressionFactory;
     private final TemplateExerciseVariantRepository templateVariantRepository;
     private final PromptService promptService;
-
-    public TemplateExercise getTemplate(Long templateId) {
-        return templateExerciseRepository.findById(templateId)
-                .orElseThrow(() -> new IllegalArgumentException("Template not found with id " + templateId));
-    }
 
     public TemplateExerciseVariant getVariant(Long variantId) {
         return templateVariantRepository.findById(variantId)
