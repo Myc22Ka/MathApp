@@ -2,7 +2,7 @@
   {
     "category": "SET",
     "difficulty": "1",
-    "templateText": "Wykonaj AuB dla zbiorów: A = ${s1} B = ${s2}",
+    "templateText": "Wykonaj A u B dla zbiorów: A = ${s1} B = ${s2}",
     "templateAnswer": "${s1}",
     "steps": [
       { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
@@ -12,7 +12,37 @@
   {
     "category": "SET",
     "difficulty": "1",
-    "templateText": "Wykonaj AuB dla zbiorów: A = ${s1:R1|D2} B = ${s2:T1->${s1}}",
+    "templateText": "Wykonaj A ∩ B dla zbiorów: A = ${s1} B = ${s2}",
+    "templateAnswer": "${s1}",
+    "steps": [
+      { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
+      { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }
+    ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wykonaj A ∖ B dla zbiorów: A = ${s1} B = ${s2}",
+    "templateAnswer": "${s1}",
+    "steps": [
+      { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
+      { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }
+    ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wykonaj B ∖ A dla zbiorów: A = ${s1} B = ${s2}",
+    "templateAnswer": "${s1}",
+    "steps": [
+      { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },
+      { "stepText": "Divide both sides by 2: x = 3", "orderIndex": 2 }
+    ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wykonaj (A ∩ B) u C dla zbiorów: A = ${s1} B = ${s2} C = ${s3}",
     "templateAnswer": "${s1}",
     "steps": [
       { "stepText": "Subtract 4 from both sides: 2x = 6", "orderIndex": 1 },

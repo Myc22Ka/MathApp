@@ -1,8 +1,9 @@
-package pl.myc22ka.mathapp.exercise.template.initializer;
+package pl.myc22ka.mathapp.exercise.template.component.initializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
@@ -35,6 +36,7 @@ public class TemplateExerciseInitializer {
      *
      * @throws IOException if reading the JSON file fails
      */
+    @Order(1)
     @PostConstruct
     public void init() throws IOException {
         if (exerciseRepository.count() > 0) {

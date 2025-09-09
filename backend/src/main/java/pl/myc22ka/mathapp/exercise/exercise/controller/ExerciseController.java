@@ -18,7 +18,7 @@ import java.util.List;
  * based on predefined templates.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 31.08.2025
  */
 @RestController
@@ -46,7 +46,7 @@ public class ExerciseController {
             @RequestParam(required = false) Long variantId,
             @RequestBody List<String> values
     ) {
-        return ResponseEntity.ok(exerciseService.createExercise(templateId, variantId, values));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.create(templateId, variantId, values)));
     }
 
     /**
@@ -61,7 +61,7 @@ public class ExerciseController {
             @RequestParam(required = false) Long templateId,
             @RequestParam(required = false) Long variantId
     ) {
-        return ResponseEntity.ok(exerciseService.generateExercise(templateId, variantId));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.generate(templateId, variantId)));
     }
 
     /**
@@ -73,9 +73,7 @@ public class ExerciseController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<ExerciseDTO> get(@PathVariable Long id) {
-        return exerciseService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.getById(id)));
     }
 
     /**
@@ -87,7 +85,11 @@ public class ExerciseController {
     )
     @GetMapping
     public ResponseEntity<List<ExerciseDTO>> getAll() {
-        return ResponseEntity.ok(exerciseService.findAll());
+        List<ExerciseDTO> exercises = exerciseService.getAll().stream()
+                .map(ExerciseDTO::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(exercises);
     }
 
     /**
@@ -99,9 +101,7 @@ public class ExerciseController {
     )
     @GetMapping("/random")
     public ResponseEntity<ExerciseDTO> getRandom() {
-        return exerciseScheduler.getLastRandomExercise()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseScheduler.getLastRandomExercise()));
     }
 
     /**
@@ -113,7 +113,8 @@ public class ExerciseController {
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        exerciseService.deleteById(id);
+        exerciseService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -129,6 +130,6 @@ public class ExerciseController {
             @PathVariable Long id,
             @RequestBody List<String> values
     ) {
-        return ResponseEntity.ok(exerciseService.updateExercise(id, values));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.update(id, values)));
     }
 }

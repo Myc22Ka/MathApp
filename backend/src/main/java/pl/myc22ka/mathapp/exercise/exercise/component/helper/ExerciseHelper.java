@@ -79,7 +79,6 @@ public class ExerciseHelper {
             var placeholder = placeholders.get(i);
             String currentValue = values.get(i);
 
-            // Podmień templateInformation
             for (var modifier : placeholder.modifiers()) {
                 if (modifier.getTemplateInformation() != null) {
                     var resolved = templateResolver.replaceTemplatePlaceholders(
@@ -89,7 +88,6 @@ public class ExerciseHelper {
                 }
             }
 
-            // Weryfikacja
             boolean verified = promptService.verifyModifierRequestsWithValue(
                     placeholder.modifiers(),
                     currentValue,

@@ -17,6 +17,7 @@ import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -59,9 +60,9 @@ public class PromptService {
      *
      * @param prompt prompt to verify
      */
-    public void verifyPromptResponse(@NotNull Prompt prompt) {
+    public void verifyPromptResponse(@NotNull Prompt prompt, MathExpression parsedExpression) {
         boolean allVerified = verify(
-                prompt.getResponseText(),
+                parsedExpression,
                 prompt.getTopic().getType(),
                 prompt.getModifiers()
         );
@@ -79,7 +80,9 @@ public class PromptService {
         Topic topic = findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
-        return verify(request.response(), request.topicType(), modifiers);
+        var parsed = expressionFactory.parse(request.response());
+
+        return verify(parsed, request.topicType(), modifiers);
     }
 
     /**
@@ -93,12 +96,11 @@ public class PromptService {
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
         List<PrefixValue> context = new ArrayList<>();
-        List<Modifier> promptModifiers = new ArrayList<>(); // nowa lista do promptu
+        List<Modifier> promptModifiers = new ArrayList<>();
 
         for (Modifier modifier : modifiers) {
             if (modifier instanceof TemplateModifier tmOriginal && tmOriginal.getModifierText() != null) {
 
-                // Tworzymy kopię TemplateModifier
                 TemplateModifier t = new TemplateModifier(tmOriginal);
 
                 String templateText = t.getModifierText();
@@ -123,7 +125,7 @@ public class PromptService {
 
         Prompt prompt = Prompt.builder()
                 .topic(topic)
-                .modifiers(promptModifiers) // używamy nowej listy
+                .modifiers(promptModifiers)
                 .build();
 
         prompt.buildFinalPromptText();
@@ -131,8 +133,7 @@ public class PromptService {
         return prompt;
     }
 
-    private boolean verify(String responseText, PromptType type, @NotNull List<Modifier> modifiers) {
-        var expression = expressionFactory.parse(responseText);
+    private boolean verify(MathExpression expression, PromptType type, @NotNull List<Modifier> modifiers) {
         for (Modifier modifier : modifiers) {
             if (!modifierExecutor.validate(modifier, type, expression)) {
                 return false;
@@ -169,21 +170,20 @@ public class PromptService {
                                                    @NotNull String value,
                                                    @NotNull PromptType type) {
         if (modifierRequests.isEmpty()) {
-            return true; // brak modyfikatorów = nic do weryfikacji
+            return true;
         }
 
         Topic topic = findTopicByType(type);
         var expression = expressionFactory.parse(value);
 
-        // Dla jednej wartości sprawdzamy wszystkie modyfikatory
         for (ModifierRequest request : modifierRequests) {
             Modifier modifier = request.toModifier(topic, modifierRepository);
 
             if (!modifierExecutor.validate(modifier, type, expression)) {
-                return false; // jeśli choć jedna weryfikacja nie przejdzie, zwracamy false
+                return false;
             }
         }
 
-        return true; // wartość przeszła wszystkie modyfikatory
+        return true;
     }
 }

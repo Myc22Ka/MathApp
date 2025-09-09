@@ -7,10 +7,10 @@ import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
-import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
@@ -31,7 +31,7 @@ public class ExerciseService {
     private final VariantExerciseHelper variantExerciseHelper;
     private final ValidationHelper validationHelper;
 
-    public ExerciseDTO createExercise(Long templateId, Long variantId, @NotNull List<String> values) {
+    public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
         TemplateExercise template;
@@ -54,28 +54,22 @@ public class ExerciseService {
         Exercise exercise = exerciseHelper.buildExercise(template, values, finalText);
         exercise.setVerified(allVerified);
 
-        return ExerciseDTO.fromEntity(exerciseRepository.save(exercise));
+        return exerciseRepository.save(exercise);
     }
 
-    public Optional<ExerciseDTO> findById(Long id) {
-        return exerciseRepository.findById(id).map(ExerciseDTO::fromEntity);
+    public Exercise getById(Long id) {
+        return exerciseHelper.getExercise(id);
     }
 
-    public List<ExerciseDTO> findAll() {
-        return exerciseRepository.findAll()
-                .stream()
-                .map(ExerciseDTO::fromEntity)
-                .toList();
+    public List<Exercise> getAll() {
+        return exerciseRepository.findAll();
     }
 
-    public void deleteById(Long id) {
-        if (!exerciseRepository.existsById(id)) {
-            throw new IllegalArgumentException("Exercise not found with id " + id);
-        }
+    public void delete(Long id) {
         exerciseRepository.deleteById(id);
     }
 
-    public ExerciseDTO generateExercise(Long templateId, Long variantId) {
+    public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
         TemplateExercise template;
@@ -91,25 +85,33 @@ public class ExerciseService {
         List<String> values = new ArrayList<>();
         List<PrefixValue> context = new ArrayList<>();
 
+        boolean allVerified = true;
+
         for (var entry : placeholders) {
-            String generatedText = ollamaService.generateMathExpression(
+            Prompt prompt = ollamaService.generatePrompt(
                     new MathExpressionChatRequest(
                             PromptType.valueOf(entry.prefix().name()),
                             entry.modifiers() == null ? new ArrayList<>() : entry.modifiers()
                     ).withContext(context)
             );
 
-            String parsedText = exerciseHelper.parseValue(generatedText);
-            values.add(parsedText);
-            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), parsedText));
+            values.add(prompt.getResponseText());
+            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), prompt.getResponseText()));
+
+            if(!prompt.isVerified()) {
+                allVerified = false;
+            }
         }
 
         String finalText = exerciseHelper.resolveText(template, context);
         Exercise exercise = exerciseHelper.buildExercise(template, values, finalText);
-        return ExerciseDTO.fromEntity(exerciseRepository.save(exercise));
+
+        exercise.setVerified(allVerified);
+
+        return exerciseRepository.save(exercise);
     }
 
-    public ExerciseDTO updateExercise(Long id, @NotNull List<String> values) {
+    public Exercise update(Long id, @NotNull List<String> values) {
         Exercise exercise = exerciseHelper.getExercise(id);
         TemplateExercise template = templateExerciseHelper.getTemplate(exercise.getTemplateExercise().getId());
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
@@ -125,6 +127,6 @@ public class ExerciseService {
         exercise.setText(finalText);
         exercise.setVerified(allVerified);
 
-        return ExerciseDTO.fromEntity(exerciseRepository.save(exercise));
+        return exerciseRepository.save(exercise);
     }
 }
