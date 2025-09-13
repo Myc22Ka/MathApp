@@ -22,15 +22,11 @@ public class Step {
     @Column(name = "order_index")
     private int orderIndex;
 
-    @ManyToOne
-    @JoinColumn(name = "exercise_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exercise_id")
     private TemplateExercise exercise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private TemplateExerciseVariant variant;
 }

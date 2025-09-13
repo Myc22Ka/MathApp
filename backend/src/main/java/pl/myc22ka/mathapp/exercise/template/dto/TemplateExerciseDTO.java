@@ -8,6 +8,7 @@ import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import java.util.List;
 
 public record TemplateExerciseDTO(
+        Long id,
         String category,
         String difficulty,
         String templateText,
@@ -17,6 +18,7 @@ public record TemplateExerciseDTO(
     @NotNull
     public static TemplateExerciseDTO fromEntity(@NotNull TemplateExercise exercise) {
         return new TemplateExerciseDTO(
+                exercise.getId(),
                 exercise.getCategory().name(),
                 exercise.getDifficulty(),
                 exercise.getTemplateText(),
@@ -32,6 +34,7 @@ public record TemplateExerciseDTO(
     @NotNull
     public TemplateExercise toEntity() {
         TemplateExercise exercise = new TemplateExercise();
+        exercise.setId(this.id());
         exercise.setCategory(PromptType.valueOf(this.category()));
         exercise.setDifficulty(this.difficulty());
         exercise.setTemplateText(this.templateText());
@@ -40,7 +43,7 @@ public record TemplateExerciseDTO(
         if (this.steps() != null) {
             exercise.getSteps().addAll(
                     this.steps().stream()
-                            .map(stepDto -> stepDto.toEntity(exercise))
+                            .map(stepDto -> stepDto.toEntityForTemplate(exercise))
                             .toList()
             );
         }

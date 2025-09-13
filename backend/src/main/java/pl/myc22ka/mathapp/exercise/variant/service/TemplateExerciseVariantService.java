@@ -26,14 +26,20 @@ public class TemplateExerciseVariantService {
         TemplateExercise template = templateExerciseHelper.getTemplate(templateId);
 
         TemplateExerciseVariant variant = TemplateExerciseVariant.builder()
-                .templateText(request.text())
-                .templateAnswer(request.answer())
-                .difficulty(request.difficulty())
+                .templateExercise(template)
                 .category(template.getCategory())
-                .steps(request.steps())
+                .difficulty(request.difficulty())
+                .templateText(request.templateText())
+                .templateAnswer(request.templateAnswer())
                 .build();
 
-        variant.setTemplateExercise(template);
+        if (request.steps() != null) {
+            variant.getSteps().addAll(
+                    request.steps().stream()
+                            .map(stepDto -> stepDto.toEntityForVariant(variant))
+                            .toList()
+            );
+        }
 
         variantExerciseHelper.validateUnique(variant);
         variantExerciseHelper.prepareForCreate(variant);
@@ -53,7 +59,7 @@ public class TemplateExerciseVariantService {
     public TemplateExerciseVariant update(Long id, @NotNull TemplateExerciseVariantRequest request) {
         TemplateExerciseVariant existing = variantExerciseHelper.getVariant(id);
 
-        variantExerciseHelper.validateCleanTextVariant(existing, request.text());
+        variantExerciseHelper.validateCleanTextVariant(existing, request.templateText());
         variantExerciseHelper.applyHardUpdateVariant(existing, request);
 
         return variantRepository.save(existing);
