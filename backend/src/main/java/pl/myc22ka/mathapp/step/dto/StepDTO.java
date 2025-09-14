@@ -1,8 +1,8 @@
-package pl.myc22ka.mathapp.exercise.template.dto;
+package pl.myc22ka.mathapp.step.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.exercise.template.model.Step;
+import pl.myc22ka.mathapp.step.model.Step;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 

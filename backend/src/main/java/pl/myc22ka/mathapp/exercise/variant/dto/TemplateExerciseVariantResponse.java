@@ -2,7 +2,7 @@ package pl.myc22ka.mathapp.exercise.variant.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.exercise.template.dto.StepDTO;
+import pl.myc22ka.mathapp.step.dto.StepDTO;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 import java.util.List;

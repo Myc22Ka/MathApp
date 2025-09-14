@@ -5,6 +5,7 @@ import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.step.model.Step;
 
 import java.util.ArrayList;
 import java.util.List;

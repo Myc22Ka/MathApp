@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.exercise.variant.model;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
-import pl.myc22ka.mathapp.exercise.template.model.Step;
+import pl.myc22ka.mathapp.step.model.Step;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 
 import java.util.ArrayList;

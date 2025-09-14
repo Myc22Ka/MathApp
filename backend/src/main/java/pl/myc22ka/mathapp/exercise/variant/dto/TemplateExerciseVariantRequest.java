@@ -1,7 +1,7 @@
 package pl.myc22ka.mathapp.exercise.variant.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import pl.myc22ka.mathapp.exercise.template.dto.StepDTO;
+import pl.myc22ka.mathapp.step.dto.StepDTO;
 
 import java.util.List;
 
