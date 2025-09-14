@@ -9,6 +9,15 @@ import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing a template exercise.
+ * A template defines the structure of an exercise, including placeholders,
+ * category, difficulty, solution steps, and possible variants.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Entity
 @Table(name = "template_exercises")
 @Data

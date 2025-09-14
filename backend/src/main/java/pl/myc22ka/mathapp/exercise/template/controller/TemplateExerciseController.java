@@ -14,6 +14,14 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+/**
+ * REST controller for managing TemplateExercise entities.
+ * Provides endpoints for CRUD operations on template exercises.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @RestController
 @RequestMapping("/api/template-exercises")
 @RequiredArgsConstructor

@@ -4,6 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
+/**
+ * Entity representing a single step in solving a template exercise or its variant.
+ * Each step contains text, an order index, and is linked to either a template exercise
+ * or a variant.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Entity
 @Table(name = "exercise_step")
 @Data

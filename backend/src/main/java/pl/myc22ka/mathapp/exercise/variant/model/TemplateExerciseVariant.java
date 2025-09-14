@@ -3,13 +3,20 @@ package pl.myc22ka.mathapp.exercise.variant.model;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
-import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.template.model.Step;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing a variant of a template exercise.
+ * Each variant can have its own text, answer, difficulty, steps, and track how many exercises were generated from it.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Entity
 @Table(name = "template_exercise_variants")
 @Data

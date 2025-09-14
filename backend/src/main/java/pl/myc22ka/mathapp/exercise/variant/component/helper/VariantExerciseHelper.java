@@ -15,6 +15,14 @@ import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRep
 
 import java.util.List;
 
+/**
+ * Helper component for handling operations on {@link TemplateExerciseVariant}.
+ * Encapsulates validation, preparation, and update logic separate from the service layer.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Component
 @RequiredArgsConstructor
 public class VariantExerciseHelper {
@@ -23,11 +31,24 @@ public class VariantExerciseHelper {
     private final TemplateExerciseRepository templateExerciseRepository;
     private final TemplateResolver templateResolver;
 
+    /**
+     * Retrieves a variant by its id.
+     *
+     * @param variantId the id of the variant
+     * @return the found variant
+     * @throws IllegalArgumentException if the variant is not found
+     */
     public TemplateExerciseVariant getVariant(Long variantId) {
         return templateVariantRepository.findById(variantId)
                 .orElseThrow(() -> new IllegalArgumentException("Variant not found with id " + variantId));
     }
 
+    /**
+     * Prepares a new variant for creation by removing placeholders
+     * and initializing default values.
+     *
+     * @param template the variant to prepare
+     */
     public void prepareForCreate(@NotNull TemplateExerciseVariant template) {
         String cleanText = templateResolver.removeTemplatePlaceholders(template.getTemplateText());
 
@@ -35,6 +56,19 @@ public class VariantExerciseHelper {
         template.setExerciseCounter(0L);
     }
 
+    /**
+     * Validates that the given variant is unique across both
+     * variants of the same template and all templates in the system.
+     * <p>
+     * Checks uniqueness based on:
+     * <ul>
+     *   <li>Exact template text</li>
+     *   <li>Prefix modifiers extracted from the template</li>
+     * </ul>
+     *
+     * @param variant the variant to validate
+     * @throws TemplateAlreadyExistsException if a duplicate is found
+     */
     public void validateUnique(@NotNull TemplateExerciseVariant variant) {
         String text = variant.getTemplateText();
         var modifiers = templateResolver.findPrefixModifiers(text);
@@ -67,6 +101,14 @@ public class VariantExerciseHelper {
         }
     }
 
+    /**
+     * Ensures that the clean text of the variant does not change
+     * when updating the template text.
+     *
+     * @param variant       the existing variant
+     * @param templateText2 the new template text
+     * @throws VariantTextMismatch if the clean text remains the same (i.e., text hasn’t really changed)
+     */
     public void validateCleanTextVariant(@NotNull TemplateExerciseVariant variant, String templateText2){
         String cleanText1 = variant.getClearText();
         String cleanText2 = templateResolver.removeTemplatePlaceholders(templateText2);
@@ -76,6 +118,13 @@ public class VariantExerciseHelper {
         };
     }
 
+    /**
+     * Performs a hard update on an existing variant using the given request.
+     * Replaces all fields and steps with the new values.
+     *
+     * @param existing the variant to update
+     * @param request  the update request containing new values
+     */
     public void applyHardUpdateVariant(@NotNull TemplateExerciseVariant existing,
                                        @NotNull TemplateExerciseVariantRequest request) {
         existing.getSteps().clear();

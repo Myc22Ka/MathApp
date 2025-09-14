@@ -13,6 +13,14 @@ import pl.myc22ka.mathapp.exercise.variant.service.TemplateExerciseVariantServic
 
 import java.util.List;
 
+/**
+ * REST controller for managing template exercise variants.
+ * Provides CRUD operations (create, read, update, delete).
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @RestController
 @RequestMapping("/api/template-exercises/variants")
 @RequiredArgsConstructor

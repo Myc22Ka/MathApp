@@ -20,6 +20,14 @@ import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 import java.util.*;
 
+/**
+ * Service class for managing Exercise entities.
+ * Handles creation, generation, update, retrieval, and deletion of exercises.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Service
 @RequiredArgsConstructor
 public class ExerciseService {
@@ -31,6 +39,14 @@ public class ExerciseService {
     private final VariantExerciseHelper variantExerciseHelper;
     private final ValidationHelper validationHelper;
 
+    /**
+     * Creates a new Exercise from a template or variant with given values.
+     *
+     * @param templateId the template ID (nullable)
+     * @param variantId the variant ID (nullable)
+     * @param values the list of values for placeholders
+     * @return the saved Exercise entity
+     */
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
@@ -56,19 +72,41 @@ public class ExerciseService {
 
         return exerciseRepository.save(exercise);
     }
-
+    /**
+     * Retrieves an Exercise by its ID.
+     *
+     * @param id the Exercise ID
+     * @return the Exercise entity
+     */
     public Exercise getById(Long id) {
         return exerciseHelper.getExercise(id);
     }
 
+    /**
+     * Retrieves all exercises from the database.
+     *
+     * @return list of all Exercise entities
+     */
     public List<Exercise> getAll() {
         return exerciseRepository.findAll();
     }
 
+    /**
+     * Deletes an Exercise by its ID.
+     *
+     * @param id the Exercise ID
+     */
     public void delete(Long id) {
         exerciseRepository.deleteById(id);
     }
 
+    /**
+     * Generates a new Exercise using AI prompts for placeholders.
+     *
+     * @param templateId the template ID (nullable)
+     * @param variantId the variant ID (nullable)
+     * @return the generated and saved Exercise entity
+     */
     public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
@@ -111,6 +149,13 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
+    /**
+     * Updates an existing Exercise with new values.
+     *
+     * @param id the Exercise ID
+     * @param values the new list of values for placeholders
+     * @return the updated Exercise entity
+     */
     public Exercise update(Long id, @NotNull List<String> values) {
         Exercise exercise = exerciseHelper.getExercise(id);
         TemplateExercise template = templateExerciseHelper.getTemplate(exercise.getTemplateExercise().getId());

@@ -10,6 +10,13 @@ import pl.myc22ka.mathapp.exercise.exercise.service.ExerciseService;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Schedules and picks a random exercise daily at 9 AM.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Component
 @RequiredArgsConstructor
 public class ExerciseScheduler {
@@ -20,6 +27,10 @@ public class ExerciseScheduler {
     @Getter
     private Exercise lastRandomExercise;
 
+    /**
+     * Picks a random exercise from all available exercises.
+     * Runs every day at 9 AM.
+     */
     @Scheduled(cron = "0 0 9 * * *")
     public void pickRandomExercise() {
         List<Exercise> allExercises = exerciseService.getAll();

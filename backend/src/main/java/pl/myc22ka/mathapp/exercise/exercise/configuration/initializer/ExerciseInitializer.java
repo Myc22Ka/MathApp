@@ -16,6 +16,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Initializes exercises from a static JSON file on application startup.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
 @Configuration
 @RequiredArgsConstructor
 public class ExerciseInitializer {
@@ -24,6 +31,12 @@ public class ExerciseInitializer {
     private final TemplateExerciseRepository templateExerciseRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Loads exercises from "exercises.json" and saves them to the database.
+     * Runs as a CommandLineRunner with order 3.
+     *
+     * @return the CommandLineRunner bean
+     */
     @Bean
     @Order(3)
     public CommandLineRunner initExercises() {
