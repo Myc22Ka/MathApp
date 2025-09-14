@@ -1,0 +1,172 @@
+package pl.myc22ka.mathapp.exercise.exercise.component.helper;
+
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
+import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
+import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
+import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Helper class for working with exercises and templates.
+ * Provides methods to fetch, build, and verify exercises.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 13.09.2025
+ */
+@Component
+@RequiredArgsConstructor
+public class ExerciseHelper {
+
+    private final ExerciseRepository exerciseRepository;
+    private final TemplateResolver templateResolver;
+    private final ExpressionFactory expressionFactory;
+    private final PromptService promptService;
+
+    /**
+     * Fetches an exercise by ID.
+     *
+     * @param id the exercise ID
+     * @return the found exercise
+     * @throws IllegalArgumentException if exercise not found
+     */
+    public Exercise getExercise(Long id) {
+        return exerciseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id " + id));
+    }
+
+    /**
+     * Extracts placeholders from a template exercise text.
+     *
+     * @param template the template exercise
+     * @return list of placeholder entries
+     */
+    public List<PrefixModifierEntry> getPlaceholders(@NotNull TemplateExercise template) {
+        return templateResolver.findPrefixModifiers(template.getTemplateText());
+    }
+
+    /**
+     * Validates that the number of values matches the number of placeholders.
+     *
+     * @param placeholders list of placeholders
+     * @param values list of provided values
+     * @throws IllegalArgumentException if counts do not match
+     */
+    public void validatePlaceholderCount(@NotNull List<PrefixModifierEntry> placeholders, @NotNull List<String> values) {
+        if (placeholders.size() != values.size()) {
+            throw new IllegalArgumentException("Number of values does not match number of placeholders in template");
+        }
+    }
+
+    /**
+     * Builds a context mapping placeholders to their parsed values.
+     *
+     * @param placeholders list of placeholders
+     * @param values list of raw values
+     * @return list of PrefixValue representing the context
+     */
+    public List<PrefixValue> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
+        List<PrefixValue> context = new ArrayList<>();
+        for (int i = 0; i < placeholders.size(); i++) {
+            PrefixModifierEntry entry = placeholders.get(i);
+            String parsedText = parseValue(values.get(i));
+            values.set(i, parsedText);
+            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), parsedText));
+        }
+        return context;
+    }
+
+    /**
+     * Parses a value using the expression factory.
+     *
+     * @param value the raw value
+     * @return parsed string representation
+     */
+    public String parseValue(String value) {
+        return expressionFactory.parse(value).toString();
+    }
+
+    /**
+     * Resolves the template text with a given context.
+     *
+     * @param template the template exercise
+     * @param context list of PrefixValue for placeholders
+     * @return resolved text
+     */
+    public String resolveText(@NotNull TemplateExercise template, List<PrefixValue> context) {
+        return templateResolver.resolve(template.getTemplateText(), context);
+    }
+
+    /**
+     * Builds a final Exercise object.
+     *
+     * @param template the template exercise
+     * @param values list of parsed values
+     * @param text resolved exercise text
+     * @return new Exercise
+     */
+    public Exercise buildExercise(TemplateExercise template, List<String> values, String text) {
+        return Exercise.builder()
+                .templateExercise(template)
+                .values(values)
+                .text(text)
+                .build();
+    }
+
+    /**
+     * Verifies that all placeholders and their modifiers are valid for the given category.
+     *
+     * @param placeholders list of placeholders
+     * @param values list of values for placeholders
+     * @param context resolved placeholder values
+     * @param category the prompt category for verification
+     * @return true if all modifiers are verified successfully, false otherwise
+     */
+    public boolean verifyPlaceholders(
+            @NotNull List<PrefixModifierEntry> placeholders,
+            @NotNull List<String> values,
+            @NotNull List<PrefixValue> context,
+            @NotNull PromptType category
+    ) {
+        boolean allVerified = true;
+
+        for (int i = 0; i < placeholders.size(); i++) {
+            var placeholder = placeholders.get(i);
+            String currentValue = values.get(i);
+
+            for (var modifier : placeholder.modifiers()) {
+                if (modifier.getTemplateInformation() != null) {
+                    var resolved = templateResolver.replaceTemplatePlaceholders(
+                            "${" + modifier.getTemplateInformation() + "}", context
+                    );
+                    modifier.setTemplateInformation(resolved);
+                }
+            }
+
+            boolean verified = promptService.verifyModifierRequestsWithValue(
+                    placeholder.modifiers(),
+                    currentValue,
+                    category
+            );
+
+            if (!verified) {
+                allVerified = false;
+                break;
+            }
+        }
+
+        return allVerified;
+    }
+}
+
+

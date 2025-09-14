@@ -47,6 +47,6 @@ public class OllamaController {
     @Operation(summary = "Generate math expression", description = "Generate mathematical set expression based on difficulty and constraints")
     @PostMapping("/generate-math-expression")
     public String generateMathExpression(@RequestBody MathExpressionChatRequest request) {
-        return ollamaService.generateMathExpression(request);
+        return ollamaService.generatePrompt(request).getResponseText();
     }
 }

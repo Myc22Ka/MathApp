@@ -9,6 +9,8 @@ import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.Map;
 
@@ -31,6 +33,7 @@ public class OllamaService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final PromptService promptService;
+    private final ExpressionFactory expressionFactory;
 
     /**
      * Sends prompt to Ollama AI and returns response.
@@ -62,24 +65,20 @@ public class OllamaService {
         }
     }
 
-    /**
-     * Generates and verifies math expression using AI.
-     *
-     * @param request request with expression parameters
-     * @return generated math expression
-     */
-    public String generateMathExpression(MathExpressionChatRequest request) {
+    public Prompt generatePrompt(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
         String response = chat(prompt.getFinalPromptText()).replace("\n", "").replaceFirst("^\\+", "");
 
-        prompt.setResponseText(response);
+        var parsed = expressionFactory.parse(response);
 
-        promptService.verifyPromptResponse(prompt);
+        prompt.setResponseText(parsed.toString());
+
+        promptService.verifyPromptResponse(prompt, parsed);
 
         promptService.save(prompt);
 
-        return response;
+        return prompt;
     }
 
     /**

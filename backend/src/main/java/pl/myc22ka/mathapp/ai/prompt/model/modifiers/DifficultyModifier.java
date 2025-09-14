@@ -15,7 +15,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Topic;
  * Represents difficulty level for a given topic.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Entity
@@ -36,7 +36,7 @@ public class DifficultyModifier extends Modifier {
      * @param difficultyLevel numeric difficulty level
      */
     public DifficultyModifier(Topic topic, String modifierText, Integer difficultyLevel) {
-        super(null, modifierText, topic);
+        super(null, modifierText, topic, "D" + difficultyLevel);
         this.difficultyLevel = difficultyLevel;
     }
 }

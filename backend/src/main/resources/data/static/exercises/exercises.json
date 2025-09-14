@@ -1,0 +1,37 @@
+[
+  {
+    "templateExerciseId": 1,
+    "text": "Wykonaj A ∪ B dla zbiorów: A = {1,2,3} B = {2,4,6}",
+    "verified": true,
+    "values": ["{1,2,3}", "{2,4,6}"],
+    "steps": []
+  },
+  {
+    "templateExerciseId": 2,
+    "text": "Wykonaj A ∩ B dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "verified": true,
+    "values": ["{1,2,3}", "{2,3,4}"],
+    "steps": []
+  },
+  {
+    "templateExerciseId": 3,
+    "text": "Wykonaj A ∖ B dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "verified": true,
+    "values": ["{1,2,3}", "{2,3,4}"],
+    "steps": []
+  },
+  {
+    "templateExerciseId": 4,
+    "text": "Wykonaj B ∖ A dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "verified": true,
+    "values": ["{1,2,3}", "{2,3,4}"],
+    "steps": []
+  },
+  {
+    "templateExerciseId": 5,
+    "text": "Wykonaj (A ∩ B) ∪ C dla zbiorów: A = {1,2} B = {2,3} C = {3,4}",
+    "verified": true,
+    "values": ["{1,2}", "{2,3}", "{3,4}"],
+    "steps": []
+  }
+]

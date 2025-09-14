@@ -9,6 +9,10 @@ import java.util.Optional;
 
 /**
  * The interface Topic repository.
+ *
+ * @author Myc22Ka
+ * @version 1.0.1
+ * @since 23.08.2025
  */
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {

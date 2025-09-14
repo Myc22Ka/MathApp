@@ -8,6 +8,7 @@ import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -68,4 +69,6 @@ public interface ModifierRepository extends JpaRepository<Modifier, Long> {
      */
     @Query("SELECT MAX(d.difficultyLevel) FROM DifficultyModifier d WHERE d.topic = :topic")
     Optional<Integer> findMaxDifficultyLevelByTopic(@Param("topic") Topic topic);
+
+    List<Modifier> findByTemplateCodeIn(List<String> codes);
 }
