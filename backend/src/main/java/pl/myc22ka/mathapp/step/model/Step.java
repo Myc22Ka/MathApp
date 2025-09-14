@@ -29,6 +29,10 @@ public class Step {
     @Column(name = "step_text", columnDefinition = "TEXT")
     private String stepText;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "step_type", nullable = false)
+    private StepType stepType;
+
     @Column(name = "order_index")
     private int orderIndex;
 

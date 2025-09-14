@@ -23,4 +23,6 @@ spring:
 logging:
   level:
     root: INFO
+    org.springframework: INFO
+    org.hibernate: WARN
     org.springframework.boot.autoconfigure: INFO
