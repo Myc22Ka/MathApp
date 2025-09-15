@@ -16,7 +16,9 @@ import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
-import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.step.model.Step;
+import pl.myc22ka.mathapp.step.service.MemoryService;
+import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
 
 import java.util.*;
 
@@ -25,7 +27,7 @@ import java.util.*;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Service
@@ -38,6 +40,8 @@ public class ExerciseService {
     private final TemplateExerciseHelper templateExerciseHelper;
     private final VariantExerciseHelper variantExerciseHelper;
     private final ValidationHelper validationHelper;
+    private final MemoryService memoryService;
+    private final StepExecutorRegistry registry;
 
     /**
      * Creates a new Exercise from a template or variant with given values.
@@ -50,13 +54,9 @@ public class ExerciseService {
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateExercise template;
-        if (templateId != null) {
-            template = templateExerciseHelper.getTemplate(templateId);
-        } else {
-            TemplateExerciseVariant variant = variantExerciseHelper.getVariant(variantId);
-            template = variant.getTemplateExercise();
-        }
+        TemplateExercise template = templateId != null
+                ? templateExerciseHelper.getTemplate(templateId)
+                : variantExerciseHelper.getVariant(variantId).getTemplateExercise();
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
         exerciseHelper.validatePlaceholderCount(placeholders, values);
@@ -64,19 +64,15 @@ public class ExerciseService {
         List<PrefixValue> context = exerciseHelper.buildContext(placeholders, values);
 
         boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
-
         String finalText = exerciseHelper.resolveText(template, context);
 
-        Exercise exercise = exerciseHelper.buildExercise(template, values, finalText);
-        exercise.setVerified(allVerified);
+        Exercise exercise = exerciseHelper.buildExercise(template, context, finalText, allVerified);
 
         return exerciseRepository.save(exercise);
     }
+
     /**
      * Retrieves an Exercise by its ID.
-     *
-     * @param id the Exercise ID
-     * @return the Exercise entity
      */
     public Exercise getById(Long id) {
         return exerciseHelper.getExercise(id);
@@ -84,8 +80,6 @@ public class ExerciseService {
 
     /**
      * Retrieves all exercises from the database.
-     *
-     * @return list of all Exercise entities
      */
     public List<Exercise> getAll() {
         return exerciseRepository.findAll();
@@ -93,8 +87,6 @@ public class ExerciseService {
 
     /**
      * Deletes an Exercise by its ID.
-     *
-     * @param id the Exercise ID
      */
     public void delete(Long id) {
         exerciseRepository.deleteById(id);
@@ -102,27 +94,17 @@ public class ExerciseService {
 
     /**
      * Generates a new Exercise using AI prompts for placeholders.
-     *
-     * @param templateId the template ID (nullable)
-     * @param variantId the variant ID (nullable)
-     * @return the generated and saved Exercise entity
      */
     public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateExercise template;
-        if (templateId != null) {
-            template = templateExerciseHelper.getTemplate(templateId);
-        } else {
-            TemplateExerciseVariant variant = variantExerciseHelper.getVariant(variantId);
-            template = variant.getTemplateExercise();
-        }
+        TemplateExercise template = templateId != null
+                ? templateExerciseHelper.getTemplate(templateId)
+                : variantExerciseHelper.getVariant(variantId).getTemplateExercise();
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
-        List<String> values = new ArrayList<>();
         List<PrefixValue> context = new ArrayList<>();
-
         boolean allVerified = true;
 
         for (var entry : placeholders) {
@@ -133,28 +115,23 @@ public class ExerciseService {
                     ).withContext(context)
             );
 
-            values.add(prompt.getResponseText());
-            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), prompt.getResponseText()));
+            String response = prompt.getResponseText();
+            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), response));
 
-            if(!prompt.isVerified()) {
+            if (!prompt.isVerified()) {
                 allVerified = false;
             }
         }
 
         String finalText = exerciseHelper.resolveText(template, context);
-        Exercise exercise = exerciseHelper.buildExercise(template, values, finalText);
 
-        exercise.setVerified(allVerified);
+        Exercise exercise = exerciseHelper.buildExercise(template, context, finalText, allVerified);
 
         return exerciseRepository.save(exercise);
     }
 
     /**
      * Updates an existing Exercise with new values.
-     *
-     * @param id the Exercise ID
-     * @param values the new list of values for placeholders
-     * @return the updated Exercise entity
      */
     public Exercise update(Long id, @NotNull List<String> values) {
         Exercise exercise = exerciseHelper.getExercise(id);
@@ -163,14 +140,32 @@ public class ExerciseService {
 
         exerciseHelper.validatePlaceholderCount(placeholders, values);
         List<PrefixValue> context = exerciseHelper.buildContext(placeholders, values);
-
         boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
-
         String finalText = exerciseHelper.resolveText(template, context);
 
-        exercise.setValues(values);
         exercise.setText(finalText);
         exercise.setVerified(allVerified);
+        exercise.setContextJson(exerciseHelper.serializeContext(context));
+
+        return exerciseRepository.save(exercise);
+    }
+
+    public Exercise solve(Long exerciseId) {
+        Exercise exercise = exerciseHelper.getExercise(exerciseId);
+
+        var context = exerciseHelper.deserializeContext(exercise.getContextJson());
+
+        memoryService.clear();
+        memoryService.putAll(context);
+
+        List<PrefixValue> contextList = new ArrayList<>(memoryService.getMemory().values());
+
+        for (Step step : exercise.getTemplateExercise().getSteps()) {
+            registry.executeStep(step, contextList);
+        }
+
+        String answer = contextList.getLast().value();
+        exercise.setAnswer(answer);
 
         return exerciseRepository.save(exercise);
     }

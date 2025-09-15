@@ -21,7 +21,7 @@ import java.util.Set;
  * Automatically creates default steps for each exercise.
  *
  * @author Myc22Ka
- * @version 1.0.5
+ * @version 1.0.6
  * @since 14.09.2025
  */
 @Component
@@ -34,6 +34,7 @@ public class TemplateExerciseInitializer {
     @PostConstruct
     public void init() throws IOException {
         System.out.println("[INIT] TemplateExerciseInitializer");
+
         if (exerciseRepository.count() > 0) {
             System.out.println("[INIT] Template exercises already exist, skipping initialization.");
             return;
@@ -57,8 +58,13 @@ public class TemplateExerciseInitializer {
                 if (exercise.getSteps() != null) {
                     for (Step step : exercise.getSteps()) {
                         step.setExercise(exercise);
+
                         if (step.getStepText() == null || step.getStepText().isEmpty()) {
                             step.setStepText(step.getStepType().getDescription());
+                        }
+
+                        if (step.getPrefixes() == null) {
+                            step.setPrefixes(new ArrayList<>());
                         }
                     }
                 }

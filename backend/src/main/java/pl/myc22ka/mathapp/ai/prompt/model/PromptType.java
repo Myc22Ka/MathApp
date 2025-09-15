@@ -17,5 +17,9 @@ public enum PromptType {
     /**
      * Math topic functions.
      */
-    FUNCTION
+    FUNCTION,
+    /**
+     * Math rest topics.
+     */
+    COMMON
 }

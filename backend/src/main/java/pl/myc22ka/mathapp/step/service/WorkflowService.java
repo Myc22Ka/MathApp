@@ -1,27 +1,35 @@
 package pl.myc22ka.mathapp.step.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
+import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.step.model.Step;
-import pl.myc22ka.mathapp.step.repository.StepRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class WorkflowService {
 
-    private final StepRepository stepRepository;
     private final StepExecutorRegistry registry;
-
-    public WorkflowService(StepRepository stepRepository, StepExecutorRegistry registry) {
-        this.stepRepository = stepRepository;
-        this.registry = registry;
-    }
+    private final ExerciseHelper exerciseHelper;
+    private final MemoryService memoryService;
 
     public void executeExercise(Long exerciseId) {
-        List<Step> steps = stepRepository.findByExerciseIdOrderByOrderIndex(exerciseId);
+        Exercise exercise = exerciseHelper.getExercise(exerciseId);
 
-        for (Step step : steps) {
-            registry.executeStep(step);
+        var context = exerciseHelper.deserializeContext(exercise.getContextJson());
+
+        memoryService.clear();
+        memoryService.putAll(context);
+
+        List<PrefixValue> contextList = new ArrayList<>(memoryService.getMemory().values());
+
+        for (Step step : exercise.getTemplateExercise().getSteps()) {
+            registry.executeStep(step, contextList);
         }
     }
 }

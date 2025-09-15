@@ -1,0 +1,67 @@
+package pl.myc22ka.mathapp.step.component.helper;
+
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.set.ISet;
+import pl.myc22ka.mathapp.step.model.Step;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Component
+@RequiredArgsConstructor
+public class StepExecutionHelper {
+
+    private final ExpressionFactory expressionFactory;
+
+    public List<ISet> getSetsFromContext(@NotNull Step step, @NotNull List<PrefixValue> context) {
+        Map<String, String> contextMap = context.stream()
+                .collect(Collectors.toMap(PrefixValue::key, PrefixValue::value));
+
+        Map<String, String> stepContext = step.getPrefixes().stream()
+                .filter(contextMap::containsKey)
+                .collect(Collectors.toMap(p -> p, contextMap::get));
+
+        List<ISet> sets = new ArrayList<>();
+
+        for (String value : stepContext.values()) {
+            MathExpression expr = expressionFactory.parse(value);
+            if (expr instanceof ISet setExpr) {
+                sets.add(setExpr);
+            }
+        }
+
+        return sets;
+    }
+
+    /**
+     * Generates the next available context key like context1, context2, etc.
+     */
+    public String nextContextKey(@NotNull List<PrefixValue> context) {
+        int max = context.stream()
+                .map(PrefixValue::key)
+                .filter(k -> k.startsWith("context"))
+                .map(k -> k.substring(7)) // wyciągamy numer
+                .filter(s -> s.matches("\\d+"))
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0);
+        return "context" + (max + 1);
+    }
+
+    public void ensureTwoSets(@NotNull List<ISet> sets) {
+        if (sets.size() != 2) {
+            throw new IllegalArgumentException(
+                    "Step requires exactly two sets. Found: " + sets.size()
+            );
+        }
+    }
+
+
+}

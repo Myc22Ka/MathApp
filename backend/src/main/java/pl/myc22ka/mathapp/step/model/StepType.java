@@ -2,14 +2,21 @@ package pl.myc22ka.mathapp.step.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+
+import static pl.myc22ka.mathapp.ai.prompt.model.PromptType.*;
 
 @Getter
 @AllArgsConstructor
 public enum StepType {
-    N1("Przygotowanie do ćwiczenia"),
-    N2("Rozgrzewka"),
-    N3("Właściwe ćwiczenie"),
-    N4("Odpoczynek");
+    SET_UNION("Łączenie zbiorów", SET),
+
+    FUNCTION_DERIVATIVE("Obliczanie pochodnej", FUNCTION),
+
+    WARMUP("Rozgrzewka", COMMON),
+    EXERCISE("Właściwe ćwiczenie", COMMON),
+    REST("Odpoczynek", COMMON);
 
     private final String description;
+    private final PromptType category;
 }

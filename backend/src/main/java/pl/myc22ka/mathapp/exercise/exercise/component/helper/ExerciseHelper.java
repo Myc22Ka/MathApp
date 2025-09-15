@@ -1,5 +1,8 @@
 package pl.myc22ka.mathapp.exercise.exercise.component.helper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -12,16 +15,18 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.step.service.MemoryService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class for working with exercises and templates.
  * Provides methods to fetch, build, and verify exercises.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Component
@@ -32,6 +37,9 @@ public class ExerciseHelper {
     private final TemplateResolver templateResolver;
     private final ExpressionFactory expressionFactory;
     private final PromptService promptService;
+    private final MemoryService memoryService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Fetches an exercise by ID.
@@ -108,18 +116,22 @@ public class ExerciseHelper {
     }
 
     /**
-     * Builds a final Exercise object.
+     * Builds a final Exercise object with context JSON instead of values.
      *
      * @param template the template exercise
-     * @param values list of parsed values
+     * @param context list of PrefixValue representing the context
      * @param text resolved exercise text
+     * @param verified tells if exercises values are verified to theirs modifiers
      * @return new Exercise
      */
-    public Exercise buildExercise(TemplateExercise template, List<String> values, String text) {
+    public Exercise buildExercise(TemplateExercise template, List<PrefixValue> context, String text, boolean verified) {
+        String contextJson = serializeContext(context);
+
         return Exercise.builder()
                 .templateExercise(template)
-                .values(values)
                 .text(text)
+                .contextJson(contextJson)
+                .verified(verified)
                 .build();
     }
 
@@ -166,6 +178,25 @@ public class ExerciseHelper {
         }
 
         return allVerified;
+    }
+
+    public String serializeContext(List<PrefixValue> context) {
+        try {
+            return objectMapper.writeValueAsString(context);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize exercise context", e);
+        }
+    }
+
+    public List<PrefixValue> deserializeContext(String json) {
+        if (json == null || json.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to deserialize exercise context", e);
+        }
     }
 }
 

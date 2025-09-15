@@ -5,6 +5,9 @@ import lombok.*;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Entity representing a single step in solving a template exercise or its variant.
  * Each step contains text, an order index, and is linked to either a template exercise
@@ -43,4 +46,13 @@ public class Step {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id")
     private TemplateExerciseVariant variant;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "step_prefixes",
+            joinColumns = @JoinColumn(name = "step_id")
+    )
+    @Column(name = "prefix")
+    @Builder.Default
+    private List<String> prefixes = new ArrayList<>();
 }

@@ -12,7 +12,7 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
  * @param templateExerciseId the associated template exercise ID, can be null
  * @param text               the exercise text
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Schema(description = "DTO representing an exercise with its essential fields.")
@@ -25,7 +25,10 @@ public record ExerciseDTO(
         Long templateExerciseId,
 
         @Schema(description = "The text of the exercise", example = "Solve the equation: 2x + 3 = 7")
-        String text
+        String text,
+
+        @Schema(description = "The answer of the exercise", example = "x = 2")
+        String answer
 
 ) {
 
@@ -40,7 +43,8 @@ public record ExerciseDTO(
         return new ExerciseDTO(
                 exercise.getId(),
                 exercise.getTemplateExercise() != null ? exercise.getTemplateExercise().getId() : null,
-                exercise.getText()
+                exercise.getText(),
+                exercise.getAnswer()
         );
     }
 }

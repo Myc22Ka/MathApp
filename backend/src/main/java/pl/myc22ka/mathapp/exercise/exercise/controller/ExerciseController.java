@@ -132,4 +132,13 @@ public class ExerciseController {
     ) {
         return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.update(id, values)));
     }
+
+    @Operation(
+            summary = "Solve exercise",
+            description = "Executes all steps of the exercise and returns the final answer."
+    )
+    @PostMapping("/solve/{id}")
+    public ResponseEntity<ExerciseDTO> solve(@PathVariable Long id) {
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.solve(id)));
+    }
 }

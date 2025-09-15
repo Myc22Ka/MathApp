@@ -5,10 +5,10 @@
     "templateText": "Wykonaj A u B dla zbiorów: A = ${s1} B = ${s2}",
     "templateAnswer": "${s1}",
     "steps": [
-      { "stepType": "N1", "orderIndex": 1 },
-      { "stepType": "N2", "orderIndex": 2 },
-      { "stepType": "N3", "orderIndex": 3 },
-      { "stepType": "N4", "orderIndex": 4 }
+      { "stepType": "SET_UNION",
+        "orderIndex": 1,
+        "prefixes": ["s1", "s2"]
+      }
     ]
   },
   {
@@ -17,10 +17,6 @@
     "templateText": "Wykonaj A ∩ B dla zbiorów: A = ${s1} B = ${s2}",
     "templateAnswer": "${s1}",
     "steps": [
-      { "stepType": "N1", "orderIndex": 1 },
-      { "stepType": "N2", "orderIndex": 2 },
-      { "stepType": "N3", "orderIndex": 3 },
-      { "stepType": "N4", "orderIndex": 4 }
     ]
   },
   {
@@ -29,10 +25,6 @@
     "templateText": "Wykonaj A ∖ B dla zbiorów: A = ${s1} B = ${s2}",
     "templateAnswer": "${s1}",
     "steps": [
-      { "stepType": "N1", "orderIndex": 1 },
-      { "stepType": "N2", "orderIndex": 2 },
-      { "stepType": "N3", "orderIndex": 3 },
-      { "stepType": "N4", "orderIndex": 4 }
     ]
   },
   {
@@ -41,10 +33,6 @@
     "templateText": "Wykonaj B ∖ A dla zbiorów: A = ${s1} B = ${s2}",
     "templateAnswer": "${s1}",
     "steps": [
-      { "stepType": "N1", "orderIndex": 1 },
-      { "stepType": "N2", "orderIndex": 2 },
-      { "stepType": "N3", "orderIndex": 3 },
-      { "stepType": "N4", "orderIndex": 4 }
     ]
   },
   {
@@ -53,10 +41,6 @@
     "templateText": "Wykonaj (A ∩ B) u C dla zbiorów: A = ${s1} B = ${s2} C = ${s3}",
     "templateAnswer": "${s1}",
     "steps": [
-      { "stepType": "N1", "orderIndex": 1 },
-      { "stepType": "N2", "orderIndex": 2 },
-      { "stepType": "N3", "orderIndex": 3 },
-      { "stepType": "N4", "orderIndex": 4 }
     ]
   }
 ]

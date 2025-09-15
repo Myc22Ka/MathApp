@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.step.service;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.step.component.StepExecutor;
 import pl.myc22ka.mathapp.step.model.Step;
 import pl.myc22ka.mathapp.step.model.StepType;
@@ -21,11 +22,11 @@ public class StepExecutorRegistry {
         }
     }
 
-    public void executeStep(@NotNull Step step) {
+    public void executeStep(@NotNull Step step, List<PrefixValue> context) {
         StepExecutor executor = executors.get(step.getStepType());
         if (executor == null) {
             throw new IllegalArgumentException("Brak implementacji dla kroku: " + step.getStepType());
         }
-        executor.execute(step);
+        executor.execute(step, context);
     }
 }
