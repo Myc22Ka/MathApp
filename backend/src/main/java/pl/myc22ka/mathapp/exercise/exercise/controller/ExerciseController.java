@@ -18,7 +18,7 @@ import java.util.List;
  * based on predefined templates.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 31.08.2025
  */
 @RestController
@@ -138,7 +138,16 @@ public class ExerciseController {
             description = "Executes all steps of the exercise and returns the final answer."
     )
     @PostMapping("/solve/{id}")
-    public ResponseEntity<ExerciseDTO> solve(@PathVariable Long id) {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.solve(id)));
+    public ResponseEntity<String> solve(@PathVariable Long id) {
+        return ResponseEntity.ok(exerciseService.solve(id));
+    }
+
+    @Operation(
+            summary = "Resolve exercise",
+            description = "Recalculates all steps of the exercise and updates the answer in the database."
+    )
+    @PostMapping("/resolve/{id}")
+    public ResponseEntity<ExerciseDTO> resolve(@PathVariable Long id) {
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.resolve(id)));
     }
 }

@@ -10,6 +10,8 @@ import static pl.myc22ka.mathapp.ai.prompt.model.PromptType.*;
 @AllArgsConstructor
 public enum StepType {
     SET_UNION("Łączenie zbiorów", SET),
+    SET_INTERSECTION("Mnożenie zbiorów", SET),
+    SET_DIFFERENCE("Różnica zbiorów", SET),
 
     FUNCTION_DERIVATIVE("Obliczanie pochodnej", FUNCTION),
 

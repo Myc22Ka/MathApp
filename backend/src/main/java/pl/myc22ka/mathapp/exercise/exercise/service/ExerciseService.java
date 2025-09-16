@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.exercise.exercise.service;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
@@ -147,26 +148,27 @@ public class ExerciseService {
         exercise.setVerified(allVerified);
         exercise.setContextJson(exerciseHelper.serializeContext(context));
 
-        return exerciseRepository.save(exercise);
-    }
-
-    public Exercise solve(Long exerciseId) {
-        Exercise exercise = exerciseHelper.getExercise(exerciseId);
-
-        var context = exerciseHelper.deserializeContext(exercise.getContextJson());
-
-        memoryService.clear();
-        memoryService.putAll(context);
-
-        List<PrefixValue> contextList = new ArrayList<>(memoryService.getMemory().values());
-
-        for (Step step : exercise.getTemplateExercise().getSteps()) {
-            registry.executeStep(step, contextList);
-        }
-
-        String answer = contextList.getLast().value();
+        String answer = exerciseHelper.calculateAnswer(template, context);
         exercise.setAnswer(answer);
 
         return exerciseRepository.save(exercise);
+    }
+
+    @Transactional
+    public Exercise resolve(Long exerciseId) {
+        Exercise exercise = exerciseHelper.getExercise(exerciseId);
+
+        List<PrefixValue> context = exerciseHelper.deserializeContext(exercise.getContextJson());
+
+        String answer = exerciseHelper.calculateAnswer(exercise.getTemplateExercise(), context);
+        exercise.setAnswer(answer);
+
+        return exerciseRepository.save(exercise);
+    }
+
+    public String solve(Long exerciseId) {
+        Exercise exercise = exerciseHelper.getExercise(exerciseId);
+
+        return exercise.getAnswer();
     }
 }

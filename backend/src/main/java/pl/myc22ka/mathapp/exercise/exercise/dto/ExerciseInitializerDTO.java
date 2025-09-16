@@ -26,7 +26,8 @@ public record ExerciseInitializerDTO(
         Long templateExerciseId,
         String text,
         boolean verified,
-        List<PrefixValue> context
+        List<PrefixValue> context,
+        String answer
 ) {
 
     /**
@@ -51,6 +52,7 @@ public record ExerciseInitializerDTO(
                 .text(dto.text())
                 .verified(dto.verified())
                 .contextJson(contextJson)
+                .answer(dto.answer())
                 .build();
     }
 }

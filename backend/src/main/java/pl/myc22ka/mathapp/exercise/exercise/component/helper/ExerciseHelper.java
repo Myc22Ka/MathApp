@@ -6,20 +6,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.step.model.Step;
 import pl.myc22ka.mathapp.step.service.MemoryService;
+import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Helper class for working with exercises and templates.
@@ -38,6 +39,7 @@ public class ExerciseHelper {
     private final ExpressionFactory expressionFactory;
     private final PromptService promptService;
     private final MemoryService memoryService;
+    private final StepExecutorRegistry registry;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -67,7 +69,7 @@ public class ExerciseHelper {
      * Validates that the number of values matches the number of placeholders.
      *
      * @param placeholders list of placeholders
-     * @param values list of provided values
+     * @param values       list of provided values
      * @throws IllegalArgumentException if counts do not match
      */
     public void validatePlaceholderCount(@NotNull List<PrefixModifierEntry> placeholders, @NotNull List<String> values) {
@@ -80,7 +82,7 @@ public class ExerciseHelper {
      * Builds a context mapping placeholders to their parsed values.
      *
      * @param placeholders list of placeholders
-     * @param values list of raw values
+     * @param values       list of raw values
      * @return list of PrefixValue representing the context
      */
     public List<PrefixValue> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
@@ -108,7 +110,7 @@ public class ExerciseHelper {
      * Resolves the template text with a given context.
      *
      * @param template the template exercise
-     * @param context list of PrefixValue for placeholders
+     * @param context  list of PrefixValue for placeholders
      * @return resolved text
      */
     public String resolveText(@NotNull TemplateExercise template, List<PrefixValue> context) {
@@ -119,19 +121,22 @@ public class ExerciseHelper {
      * Builds a final Exercise object with context JSON instead of values.
      *
      * @param template the template exercise
-     * @param context list of PrefixValue representing the context
-     * @param text resolved exercise text
+     * @param context  list of PrefixValue representing the context
+     * @param text     resolved exercise text
      * @param verified tells if exercises values are verified to theirs modifiers
      * @return new Exercise
      */
     public Exercise buildExercise(TemplateExercise template, List<PrefixValue> context, String text, boolean verified) {
         String contextJson = serializeContext(context);
 
+        String answer = calculateAnswer(template, context);
+
         return Exercise.builder()
                 .templateExercise(template)
                 .text(text)
                 .contextJson(contextJson)
                 .verified(verified)
+                .answer(answer)
                 .build();
     }
 
@@ -139,9 +144,9 @@ public class ExerciseHelper {
      * Verifies that all placeholders and their modifiers are valid for the given category.
      *
      * @param placeholders list of placeholders
-     * @param values list of values for placeholders
-     * @param context resolved placeholder values
-     * @param category the prompt category for verification
+     * @param values       list of values for placeholders
+     * @param context      resolved placeholder values
+     * @param category     the prompt category for verification
      * @return true if all modifiers are verified successfully, false otherwise
      */
     public boolean verifyPlaceholders(
@@ -193,10 +198,24 @@ public class ExerciseHelper {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(json, new TypeReference<>() {});
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to deserialize exercise context", e);
         }
+    }
+
+    public String calculateAnswer(@NotNull TemplateExercise template, List<PrefixValue> context) {
+        memoryService.clear();
+        memoryService.putAll(context);
+
+        List<PrefixValue> contextList = new ArrayList<>(memoryService.getMemory().values());
+
+        for (Step step : template.getSteps()) {
+            registry.executeStep(step, contextList);
+        }
+
+        return contextList.getLast().value();
     }
 }
 
