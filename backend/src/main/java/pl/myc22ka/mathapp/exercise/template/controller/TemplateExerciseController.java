@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * Provides endpoints for CRUD operations on template exercises.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @RestController
@@ -39,7 +39,7 @@ public class TemplateExerciseController {
             description = "Creates a new template exercise and returns a success or error message."
     )
     public ResponseEntity<DefaultResponse> create(@NotNull @RequestBody TemplateExerciseDTO dto) {
-        service.create(dto.toEntity());
+        service.create(dto);
 
         return ResponseEntity.ok(new DefaultResponse(
                 Instant.now().toString(),
@@ -90,7 +90,7 @@ public class TemplateExerciseController {
             @PathVariable Long id,
             @NotNull @RequestBody TemplateExerciseDTO dto
     ) {
-        service.update(id, dto.toEntity());
+        service.update(id, dto);
 
         return ResponseEntity.ok(new DefaultResponse(
                 Instant.now().toString(),

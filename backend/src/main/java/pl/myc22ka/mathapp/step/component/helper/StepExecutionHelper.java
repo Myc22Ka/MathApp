@@ -2,12 +2,13 @@ package pl.myc22ka.mathapp.step.component.helper;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
-import pl.myc22ka.mathapp.step.model.Step;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +21,19 @@ public class StepExecutionHelper {
 
     private final ExpressionFactory expressionFactory;
 
-    public List<ISet> getSetsFromContext(@NotNull Step step, @NotNull List<PrefixValue> context) {
+    public List<ISet> getSetsFromContext(@NotNull StepWrapper step, @NotNull List<PrefixValue> context) {
         Map<String, String> contextMap = context.stream()
                 .collect(Collectors.toMap(PrefixValue::key, PrefixValue::value));
 
-        Map<String, String> stepContext = step.getPrefixes().stream()
-                .filter(contextMap::containsKey)
-                .collect(Collectors.toMap(p -> p, contextMap::get));
-
         List<ISet> sets = new ArrayList<>();
 
-        for (String value : stepContext.values()) {
-            MathExpression expr = expressionFactory.parse(value);
-            if (expr instanceof ISet setExpr) {
-                sets.add(setExpr);
+        for (String prefix : step.getPrefixes()) {
+            if (contextMap.containsKey(prefix)) {
+                String value = contextMap.get(prefix);
+                MathExpression expr = expressionFactory.parse(value);
+                if (expr instanceof ISet setExpr) {
+                    sets.add(setExpr);
+                }
             }
         }
 
@@ -47,7 +47,7 @@ public class StepExecutionHelper {
         int max = context.stream()
                 .map(PrefixValue::key)
                 .filter(k -> k.startsWith("context"))
-                .map(k -> k.substring(7)) // wyciągamy numer
+                .map(k -> k.substring(7))
                 .filter(s -> s.matches("\\d+"))
                 .mapToInt(Integer::parseInt)
                 .max()
@@ -62,6 +62,4 @@ public class StepExecutionHelper {
             );
         }
     }
-
-
 }

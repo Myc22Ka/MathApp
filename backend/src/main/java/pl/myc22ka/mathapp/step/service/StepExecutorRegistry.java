@@ -4,8 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.step.component.StepExecutor;
-import pl.myc22ka.mathapp.step.model.Step;
 import pl.myc22ka.mathapp.step.model.StepType;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -22,10 +22,10 @@ public class StepExecutorRegistry {
         }
     }
 
-    public void executeStep(@NotNull Step step, List<PrefixValue> context) {
-        StepExecutor executor = executors.get(step.getStepType());
+    public void executeStep(@NotNull StepWrapper step, List<PrefixValue> context) {
+        StepExecutor executor = executors.get(step.getStepDefinition().getStepType());
         if (executor == null) {
-            throw new IllegalArgumentException("Brak implementacji dla kroku: " + step.getStepType());
+            throw new IllegalArgumentException("Brak implementacji dla kroku: " + step.getStepDefinition().getStepType());
         }
         executor.execute(step, context);
     }

@@ -7,7 +7,7 @@ ollama serve &
 sleep 10
 
 # Pull model
-ollama pull qwen2-math
+ollama pull gpt-oss:20b
 
 # Kill initial server
 pkill ollama

@@ -8,10 +8,13 @@ import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
 import pl.myc22ka.mathapp.exceptions.custom.VariantTextMismatch;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class VariantExerciseHelper {
     private final TemplateExerciseVariantRepository templateVariantRepository;
     private final TemplateExerciseRepository templateExerciseRepository;
     private final TemplateResolver templateResolver;
+    private final StepDefinitionRepository stepDefinitionRepository;
 
     /**
      * Retrieves a variant by its id.
@@ -140,7 +144,16 @@ public class VariantExerciseHelper {
         if (request.steps() != null) {
             existing.getSteps().addAll(
                     request.steps().stream()
-                            .map(stepDto -> stepDto.toEntityForVariant(existing))
+                            .map(stepDto -> {
+                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                "Step definition not found with id " + stepDto.stepDefinitionId()));
+
+                                return StepWrapper.builder()
+                                        .stepDefinition(def)
+                                        .variant(existing)
+                                        .build();
+                            })
                             .toList()
             );
         }

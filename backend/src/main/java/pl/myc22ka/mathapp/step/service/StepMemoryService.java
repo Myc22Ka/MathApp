@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MemoryService {
+public class StepMemoryService {
 
     private final ThreadLocal<Map<String, PrefixValue>> programMemory = ThreadLocal.withInitial(HashMap::new);
 

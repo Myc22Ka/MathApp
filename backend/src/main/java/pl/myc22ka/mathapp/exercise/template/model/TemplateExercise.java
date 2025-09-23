@@ -5,7 +5,7 @@ import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
-import pl.myc22ka.mathapp.step.model.Step;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
  * category, difficulty, solution steps, and possible variants.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Entity
@@ -59,7 +59,7 @@ public class TemplateExercise {
 
     @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private final List<Step> steps = new ArrayList<>();
+    private final List<StepWrapper> steps = new ArrayList<>();
 
     @OneToMany(mappedBy = "templateExercise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();

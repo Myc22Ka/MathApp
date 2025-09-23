@@ -9,16 +9,15 @@ import static pl.myc22ka.mathapp.ai.prompt.model.PromptType.*;
 @Getter
 @AllArgsConstructor
 public enum StepType {
-    SET_UNION("Łączenie zbiorów", SET),
-    SET_INTERSECTION("Mnożenie zbiorów", SET),
-    SET_DIFFERENCE("Różnica zbiorów", SET),
+    SET_UNION(SET),
+    SET_INTERSECTION(SET),
+    SET_DIFFERENCE(SET),
 
-    FUNCTION_DERIVATIVE("Obliczanie pochodnej", FUNCTION),
+    FUNCTION_DERIVATIVE(FUNCTION),
 
-    WARMUP("Rozgrzewka", COMMON),
-    EXERCISE("Właściwe ćwiczenie", COMMON),
-    REST("Odpoczynek", COMMON);
+    WARMUP(COMMON),
+    EXERCISE(COMMON),
+    REST(COMMON);
 
-    private final String description;
     private final PromptType category;
 }

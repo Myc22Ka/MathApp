@@ -1,0 +1,30 @@
+[
+  {
+    "stepType": "SET_UNION",
+    "stepText": "Łączenie zbiorów"
+  },
+  {
+    "stepType": "SET_INTERSECTION",
+    "stepText": "Mnożenie zbiorów"
+  },
+  {
+    "stepType": "SET_DIFFERENCE",
+    "stepText": "Różnica zbiorów"
+  },
+  {
+    "stepType": "FUNCTION_DERIVATIVE",
+    "stepText": "Obliczanie pochodnej"
+  },
+  {
+    "stepType": "WARMUP",
+    "stepText": "Rozgrzewka"
+  },
+  {
+    "stepType": "EXERCISE",
+    "stepText": "Właściwe ćwiczenie"
+  },
+  {
+    "stepType": "REST",
+    "stepText": "Odpoczynek"
+  }
+]

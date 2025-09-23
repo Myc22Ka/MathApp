@@ -5,7 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.template.dto.TemplateExerciseDTO;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 
 import java.util.*;
@@ -25,13 +27,16 @@ public class TemplateExerciseService {
 
     private final TemplateExerciseRepository templateRepository;
     private final TemplateExerciseHelper templateExerciseHelper;
+    private final StepDefinitionRepository stepDefinitionRepository;
 
     /**
      * Creates a new template exercise after validating uniqueness and preparing required fields.
      *
      * @param template the template exercise to create
      */
-    public void create(@NotNull TemplateExercise template) {
+    public void create(@NotNull TemplateExerciseDTO dto) {
+        TemplateExercise template = dto.toEntity(stepDefinitionRepository);
+
         templateExerciseHelper.validateUnique(template);
         templateExerciseHelper.prepareForCreate(template);
 
@@ -66,8 +71,9 @@ public class TemplateExerciseService {
      * @param updated the updated template exercise data
      */
     @Transactional
-    public void update(Long id, @NotNull TemplateExercise updated) {
+    public void update(Long id, @NotNull TemplateExerciseDTO dto) {
         TemplateExercise existing = templateExerciseHelper.getTemplate(id);
+        TemplateExercise updated = dto.toEntity(stepDefinitionRepository);
 
         if (templateExerciseHelper.isSoftUpdate(existing, updated)) {
             templateExerciseHelper.applySoftUpdate(existing, updated);

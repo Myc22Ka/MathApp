@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.step.dto.StepDTO;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
 
 import java.util.List;
 
@@ -21,7 +24,7 @@ import java.util.List;
  * @param templateAnswer expected answer pattern for the template
  * @param steps          ordered list of steps for solving the exercise
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Schema(description = "Represents a template exercise with metadata, text, answer, and steps")
@@ -71,10 +74,11 @@ public record TemplateExerciseDTO(
      * Converts this DTO into a {@link TemplateExercise} entity.
      * Steps are mapped back and linked to the template exercise.
      *
+     * @param stepDefinitionRepository repozytorium do pobierania StepDefinition po ID
      * @return new {@link TemplateExercise} entity
      */
     @NotNull
-    public TemplateExercise toEntity() {
+    public TemplateExercise toEntity(@NotNull StepDefinitionRepository stepDefinitionRepository) {
         TemplateExercise exercise = new TemplateExercise();
         exercise.setId(this.id());
         exercise.setCategory(PromptType.valueOf(this.category()));
@@ -85,7 +89,15 @@ public record TemplateExerciseDTO(
         if (this.steps() != null) {
             exercise.getSteps().addAll(
                     this.steps().stream()
-                            .map(stepDto -> stepDto.toEntityForTemplate(exercise))
+                            .map(stepDto -> {
+                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
+                                        .orElseThrow(() -> new IllegalArgumentException("StepDefinition not found for id: " + stepDto.stepDefinitionId()));
+
+                                return StepWrapper.builder()
+                                        .stepDefinition(def)
+                                        .exercise(exercise)
+                                        .build();
+                            })
                             .toList()
             );
         }

@@ -1,7 +1,10 @@
 package pl.myc22ka.mathapp.step.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
@@ -14,7 +17,7 @@ import java.util.List;
  * or a variant.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.1.0
  * @since 13.09.2025
  */
 @Entity
@@ -23,18 +26,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Step {
+public class StepWrapper {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "step_text", columnDefinition = "TEXT")
-    private String stepText;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "step_definition_id")
+    private StepDefinition stepDefinition;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "step_type", nullable = false)
-    private StepType stepType;
+    @Transient
+    private Long stepDefinitionId;
 
     @Column(name = "order_index")
     private int orderIndex;
@@ -49,10 +52,11 @@ public class Step {
 
     @ElementCollection
     @CollectionTable(
-            name = "step_prefixes",
-            joinColumns = @JoinColumn(name = "step_id")
+            name = "step_definition_prefixes",
+            joinColumns = @JoinColumn(name = "step_definition_id")
     )
     @Column(name = "prefix")
     @Builder.Default
     private List<String> prefixes = new ArrayList<>();
 }
+

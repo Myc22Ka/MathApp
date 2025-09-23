@@ -1,4 +1,4 @@
-package pl.myc22ka.mathapp.exercise.exercise.configuration.initializer;
+package pl.myc22ka.mathapp.exercise.exercise.component.initializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;

@@ -15,9 +15,9 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
-import pl.myc22ka.mathapp.step.model.Step;
-import pl.myc22ka.mathapp.step.service.MemoryService;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
+import pl.myc22ka.mathapp.step.service.StepMemoryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ExerciseHelper {
     private final TemplateResolver templateResolver;
     private final ExpressionFactory expressionFactory;
     private final PromptService promptService;
-    private final MemoryService memoryService;
+    private final StepMemoryService stepMemoryService;
     private final StepExecutorRegistry registry;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -206,12 +206,12 @@ public class ExerciseHelper {
     }
 
     public String calculateAnswer(@NotNull TemplateExercise template, List<PrefixValue> context) {
-        memoryService.clear();
-        memoryService.putAll(context);
+        stepMemoryService.clear();
+        stepMemoryService.putAll(context);
 
-        List<PrefixValue> contextList = new ArrayList<>(memoryService.getMemory().values());
+        List<PrefixValue> contextList = new ArrayList<>(stepMemoryService.getMemory().values());
 
-        for (Step step : template.getSteps()) {
+        for (StepWrapper step : template.getSteps()) {
             registry.executeStep(step, contextList);
         }
 

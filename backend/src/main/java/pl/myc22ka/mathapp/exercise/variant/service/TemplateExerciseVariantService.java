@@ -5,11 +5,14 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class TemplateExerciseVariantService {
     private final VariantExerciseHelper variantExerciseHelper;
     private final TemplateExerciseVariantRepository variantRepository;
     private final TemplateExerciseHelper templateExerciseHelper;
+    private final StepDefinitionRepository stepDefinitionRepository;
 
     /**
      * Creates a new template exercise variant for a given template.
@@ -52,7 +56,18 @@ public class TemplateExerciseVariantService {
         if (request.steps() != null) {
             variant.getSteps().addAll(
                     request.steps().stream()
-                            .map(stepDto -> stepDto.toEntityForVariant(variant))
+                            .map(stepDto -> {
+                                // pobierasz definicję kroku po ID
+                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                "Step definition not found with id " + stepDto.stepDefinitionId()));
+
+                                // budujesz StepWrapper/Step dla tego wariantu
+                                return StepWrapper.builder()
+                                        .stepDefinition(def)
+                                        .variant(variant)
+                                        .build();
+                            })
                             .toList()
             );
         }

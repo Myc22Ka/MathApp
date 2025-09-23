@@ -17,9 +17,6 @@ import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
-import pl.myc22ka.mathapp.step.model.Step;
-import pl.myc22ka.mathapp.step.service.MemoryService;
-import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
 
 import java.util.*;
 
@@ -41,8 +38,6 @@ public class ExerciseService {
     private final TemplateExerciseHelper templateExerciseHelper;
     private final VariantExerciseHelper variantExerciseHelper;
     private final ValidationHelper validationHelper;
-    private final MemoryService memoryService;
-    private final StepExecutorRegistry registry;
 
     /**
      * Creates a new Exercise from a template or variant with given values.
