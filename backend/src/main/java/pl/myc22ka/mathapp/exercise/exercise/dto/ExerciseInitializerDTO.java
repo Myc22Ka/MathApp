@@ -17,7 +17,8 @@ import java.util.List;
  * @param templateExerciseId the associated template exercise ID
  * @param text               the exercise text
  * @param verified           whether the exercise is verified
- * @param context             list of placeholder key-values, {@link PrefixValue}
+ * @param context            list of placeholder key-values, {@link PrefixValue}
+ * @param rating             the rating exercise
  * @author Myc22Ka
  * @version 1.0.1
  * @since 13.09.2025
@@ -26,6 +27,7 @@ public record ExerciseInitializerDTO(
         Long templateExerciseId,
         String text,
         boolean verified,
+        Double rating,
         List<PrefixValue> context,
         String answer
 ) {
@@ -51,6 +53,7 @@ public record ExerciseInitializerDTO(
                 .templateExercise(template)
                 .text(dto.text())
                 .verified(dto.verified())
+                .rating(dto.rating())
                 .contextJson(contextJson)
                 .answer(dto.answer())
                 .build();

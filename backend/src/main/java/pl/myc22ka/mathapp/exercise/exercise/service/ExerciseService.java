@@ -2,6 +2,11 @@ package pl.myc22ka.mathapp.exercise.exercise.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
@@ -10,22 +15,26 @@ import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
+import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service class for managing Exercise entities.
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Service
@@ -43,10 +52,11 @@ public class ExerciseService {
      * Creates a new Exercise from a template or variant with given values.
      *
      * @param templateId the template ID (nullable)
-     * @param variantId the variant ID (nullable)
-     * @param values the list of values for placeholders
+     * @param variantId  the variant ID (nullable)
+     * @param values     the list of values for placeholders
      * @return the saved Exercise entity
      */
+    @Transactional
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
@@ -74,11 +84,42 @@ public class ExerciseService {
         return exerciseHelper.getExercise(id);
     }
 
-    /**
-     * Retrieves all exercises from the database.
-     */
-    public List<Exercise> getAll() {
-        return exerciseRepository.findAll();
+    public Page<ExerciseDTO> getAll(int page, int size, Double rating, String difficulty,
+                                    PromptType category, String sortBy, @NotNull String sortDirection) {
+
+        validationHelper.validateFilters(rating, difficulty);
+
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<Exercise> spec = ExerciseSpecification.withFilters(
+                rating, difficulty, category);
+
+        Page<Exercise> exercises = exerciseRepository.findAll(spec, pageable);
+
+        return exercises.map(ExerciseDTO::fromEntity);
+    }
+
+    @Transactional
+    public void rateExercise(Long exerciseId, Double newRating) {
+        Exercise exercise = exerciseHelper.getExercise(exerciseId);
+
+        Double currentRating = exercise.getRating();
+        if (currentRating == null) {
+            exercise.setRating(newRating);
+            exerciseRepository.save(exercise);
+
+            return;
+        }
+
+        // TODO: I need to change this formula when I got User in this system
+        double average = (currentRating + newRating) / 2.0;
+        exercise.setRating(average);
+
+        exerciseRepository.save(exercise);
     }
 
     /**
@@ -91,6 +132,7 @@ public class ExerciseService {
     /**
      * Generates a new Exercise using AI prompts for placeholders.
      */
+    @Transactional
     public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
@@ -129,6 +171,7 @@ public class ExerciseService {
     /**
      * Updates an existing Exercise with new values.
      */
+    @Transactional
     public Exercise update(Long id, @NotNull List<String> values) {
         Exercise exercise = exerciseHelper.getExercise(id);
         TemplateExercise template = templateExerciseHelper.getTemplate(exercise.getTemplateExercise().getId());
@@ -149,21 +192,12 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
-    @Transactional
-    public Exercise resolve(Long exerciseId) {
+    public boolean solve(Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);
 
-        List<PrefixValue> context = exerciseHelper.deserializeContext(exercise.getContextJson());
+        var userAnswer = exerciseHelper.parseValue(answer);
+        var exerciseAnswer = exerciseHelper.parseValue(exercise.getAnswer());
 
-        String answer = exerciseHelper.calculateAnswer(exercise.getTemplateExercise(), context);
-        exercise.setAnswer(answer);
-
-        return exerciseRepository.save(exercise);
-    }
-
-    public String solve(Long exerciseId) {
-        Exercise exercise = exerciseHelper.getExercise(exerciseId);
-
-        return exercise.getAnswer();
+        return userAnswer.equals(exerciseAnswer);
     }
 }

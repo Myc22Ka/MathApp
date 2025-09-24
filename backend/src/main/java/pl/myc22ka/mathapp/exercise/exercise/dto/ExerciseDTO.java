@@ -11,7 +11,7 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
  * @param id                 the exercise ID
  * @param text               the exercise text
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.4
  * @since 13.09.2025
  */
 @Schema(description = "DTO representing an exercise with its essential fields.")
@@ -21,7 +21,13 @@ public record ExerciseDTO(
         Long id,
 
         @Schema(description = "The text of the exercise", example = "Solve the equation: 2x + 3 = 7")
-        String text
+        String text,
+
+        @Schema(description = "The flag that shows if exercise passed through every given modifier", example = "false")
+        boolean verified,
+
+        @Schema(description = "The rating of the exercise", example = "4.5")
+        Double rating
 
 ) {
 
@@ -35,7 +41,9 @@ public record ExerciseDTO(
     public static ExerciseDTO fromEntity(@NotNull Exercise exercise) {
         return new ExerciseDTO(
                 exercise.getId(),
-                exercise.getText()
+                exercise.getText(),
+                exercise.isVerified(),
+                exercise.getRating()
         );
     }
 }

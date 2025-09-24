@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
@@ -15,6 +17,7 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
 import pl.myc22ka.mathapp.step.service.StepMemoryService;
@@ -89,7 +92,7 @@ public class ExerciseHelper {
         List<PrefixValue> context = new ArrayList<>();
         for (int i = 0; i < placeholders.size(); i++) {
             PrefixModifierEntry entry = placeholders.get(i);
-            String parsedText = parseValue(values.get(i));
+            String parsedText = parseValue(values.get(i)).toString();
             values.set(i, parsedText);
             context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), parsedText));
         }
@@ -100,10 +103,10 @@ public class ExerciseHelper {
      * Parses a value using the expression factory.
      *
      * @param value the raw value
-     * @return parsed string representation
+     * @return parsed {@link MathExpression} representation
      */
-    public String parseValue(String value) {
-        return expressionFactory.parse(value).toString();
+    public MathExpression parseValue(String value) {
+        return expressionFactory.parse(value);
     }
 
     /**

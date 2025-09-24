@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.exercise.exercise.component.helper;
 
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 
 /**
  * Helper for validating template and variant inputs.
@@ -25,6 +26,16 @@ public class ValidationHelper {
         }
         if (templateId == null && variantId == null) {
             throw new IllegalArgumentException("Either templateId or variantId must be provided");
+        }
+    }
+
+    public void validateFilters(Double rating, String difficulty) {
+        if (rating != null && (rating < 0.0 || rating > 5.0)) {
+            throw new IllegalArgumentException("Rating must be between 0.0 and 5.0");
+        }
+
+        if (difficulty != null && difficulty.trim().isEmpty()) {
+            throw new IllegalArgumentException("Difficulty cannot be empty string");
         }
     }
 }

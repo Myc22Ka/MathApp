@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.matheclipse.core.interfaces.IExpr;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.visitors.*;
 
 /**
