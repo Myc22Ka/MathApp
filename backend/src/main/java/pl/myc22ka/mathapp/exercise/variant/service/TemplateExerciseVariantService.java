@@ -2,9 +2,17 @@ package pl.myc22ka.mathapp.exercise.variant.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.variant.component.filter.TemplateExerciseVariantSpecification;
+import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
 import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
@@ -13,8 +21,6 @@ import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
 import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
-
-import java.util.List;
 
 /**
  * Service layer for managing {@link TemplateExerciseVariant} entities.
@@ -57,12 +63,10 @@ public class TemplateExerciseVariantService {
             variant.getSteps().addAll(
                     request.steps().stream()
                             .map(stepDto -> {
-                                // pobierasz definicję kroku po ID
                                 StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                 "Step definition not found with id " + stepDto.stepDefinitionId()));
 
-                                // budujesz StepWrapper/Step dla tego wariantu
                                 return StepWrapper.builder()
                                         .stepDefinition(def)
                                         .variant(variant)
@@ -83,8 +87,19 @@ public class TemplateExerciseVariantService {
      *
      * @return list of all variants
      */
-    public List<TemplateExerciseVariant> getAll() {
-        return variantRepository.findAll();
+    public Page<TemplateExerciseVariantResponse> getAll(int page, int size,
+                                                String difficulty, PromptType category,
+                                                String sortBy, @NotNull String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<TemplateExerciseVariant> spec = TemplateExerciseVariantSpecification.withFilters(
+                difficulty, category);
+
+        return variantRepository.findAll(spec, pageable).map(TemplateExerciseVariantResponse::fromEntity);
     }
 
     /**

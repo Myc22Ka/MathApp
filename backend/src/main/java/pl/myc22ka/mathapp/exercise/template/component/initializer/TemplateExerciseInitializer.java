@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
-import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.component.helper.StepExecutionHelper;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
-import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +32,9 @@ import java.util.Set;
 public class TemplateExerciseInitializer {
 
     private final TemplateExerciseRepository exerciseRepository;
-    private final StepDefinitionRepository stepDefinitionRepository;
     private final ObjectMapper objectMapper;
     private final TemplateResolver templateResolver;
+    private final StepExecutionHelper stepExecutionHelper;
 
     @PostConstruct
     public void init() throws IOException {
@@ -54,7 +53,6 @@ public class TemplateExerciseInitializer {
             List<TemplateExercise> exercises = List.of(exercisesArray);
 
             for (TemplateExercise exercise : exercises) {
-                // clear text i prefixy
                 String cleanText = templateResolver.removeTemplatePlaceholders(exercise.getTemplateText());
                 exercise.setClearText(cleanText);
 
@@ -69,12 +67,7 @@ public class TemplateExerciseInitializer {
                     for (StepWrapper step : exercise.getSteps()) {
                         step.setExercise(exercise);
 
-                        // pobieramy StepDefinition po stepDefinitionId z JSON-a
-                        Long defId = step.getStepDefinitionId(); // dodaj getter/setter w StepWrapper dla JSON
-                        StepDefinition definition = stepDefinitionRepository.findById(defId)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                        "StepDefinition not found with id " + defId));
-
+                        var definition = stepExecutionHelper.getStepDefinition(step.getStepDefinitionId());
                         step.setStepDefinition(definition);
 
                         if (step.getPrefixes() == null) {

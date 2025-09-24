@@ -2,8 +2,10 @@ package pl.myc22ka.mathapp.exercise.template.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.exercise.template.dto.TemplateExerciseDTO;
 import pl.myc22ka.mathapp.exercise.template.service.TemplateExerciseService;
@@ -51,17 +53,20 @@ public class TemplateExerciseController {
     /**
      * Retrieves all template exercises.
      */
-    @GetMapping
     @Operation(
-            summary = "Get all template exercises",
-            description = "Returns a list of all template exercises in the system."
+            summary = "Get template exercises",
+            description = "Returns a paginated list of template exercises with optional filters and sorting."
     )
-    public ResponseEntity<List<TemplateExerciseDTO>> getAll() {
-        List<TemplateExerciseDTO> templates = service.getAll().stream()
-                .map(TemplateExerciseDTO::fromEntity)
-                .toList();
+    @GetMapping("/templates")
+    public Page<TemplateExerciseDTO> getAllTemplates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) PromptType category,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
 
-        return ResponseEntity.ok(templates);
+        return service.getAllTemplates(page, size, difficulty, category, sortBy, sortDirection);
     }
 
     /**

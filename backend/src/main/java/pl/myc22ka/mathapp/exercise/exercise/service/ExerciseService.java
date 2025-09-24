@@ -24,7 +24,6 @@ import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ import java.util.List;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 13.09.2025
  */
 @Service
@@ -192,6 +191,13 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
+    /**
+     * Checks if answer given by user is the same as exercise answer
+     *
+     * @param exerciseId the id of the exercise
+     * @param answer     the user given value to check for being answered
+     * @return true if answer given by user is the same as exercise answer
+     */
     public boolean solve(Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);
 

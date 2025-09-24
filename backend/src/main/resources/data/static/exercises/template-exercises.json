@@ -38,18 +38,6 @@
   {
     "category": "SET",
     "difficulty": "1",
-    "templateText": "Wykonaj B ∖ A dla zbiorów: A = ${s1} B = ${s2}",
-    "templateAnswer": "${s1}",
-    "steps": [
-      {
-        "stepDefinitionId": 3,
-        "prefixes": ["s2", "s1"]
-      }
-    ]
-  },
-  {
-    "category": "SET",
-    "difficulty": "1",
     "templateText": "Wykonaj (A ∩ B) u C dla zbiorów: A = ${s1} B = ${s2} C = ${s3}",
     "templateAnswer": "${s1}",
     "steps": [

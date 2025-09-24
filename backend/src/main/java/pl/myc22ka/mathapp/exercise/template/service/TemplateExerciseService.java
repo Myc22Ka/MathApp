@@ -2,8 +2,15 @@ package pl.myc22ka.mathapp.exercise.template.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.exercise.template.component.filter.TemplateExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.dto.TemplateExerciseDTO;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
@@ -18,7 +25,7 @@ import java.util.*;
  * Delegates validation and preparation logic to {@link TemplateExerciseHelper}.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Service
@@ -48,8 +55,20 @@ public class TemplateExerciseService {
      *
      * @return list of all template exercises
      */
-    public List<TemplateExercise> getAll() {
-        return templateRepository.findAll();
+    public Page<TemplateExerciseDTO> getAllTemplates(int page, int size,
+                                                     String difficulty, PromptType category,
+                                                     String sortBy, @NotNull String sortDirection) {
+
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<TemplateExercise> spec = TemplateExerciseSpecification.withFilters(
+                difficulty, category);
+
+        return templateRepository.findAll(spec, pageable).map(TemplateExerciseDTO::fromEntity);
     }
 
     /**

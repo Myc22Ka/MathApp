@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.exercise.variant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * @since 13.09.2025
  */
 @Repository
-public interface TemplateExerciseVariantRepository extends JpaRepository<TemplateExerciseVariant, Long> {
+public interface TemplateExerciseVariantRepository extends JpaRepository<TemplateExerciseVariant, Long>, JpaSpecificationExecutor<TemplateExerciseVariant> {
 
     /**
      * Finds all variants associated with a given template exercise.

@@ -38,10 +38,10 @@ public class TemplateExerciseVariant {
 
     private String difficulty;
 
-    @Column(name = "variant_text", columnDefinition = "TEXT")
+    @Column(name = "template_text", columnDefinition = "TEXT")
     private String templateText;
 
-    @Column(name = "variant_answer", columnDefinition = "TEXT")
+    @Column(name = "template_answer", columnDefinition = "TEXT")
     private String templateAnswer;
 
     @Column(name = "clear_text", columnDefinition = "TEXT")

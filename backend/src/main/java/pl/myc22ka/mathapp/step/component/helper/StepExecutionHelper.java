@@ -8,7 +8,9 @@ import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,13 @@ import java.util.stream.Collectors;
 public class StepExecutionHelper {
 
     private final ExpressionFactory expressionFactory;
+    private final StepDefinitionRepository stepDefinitionRepository;
+
+    public StepDefinition getStepDefinition(Long id) {
+        return stepDefinitionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "StepDefinition not found with id: " + id));
+    }
 
     public List<ISet> getSetsFromContext(@NotNull StepWrapper step, @NotNull List<PrefixValue> context) {
         Map<String, String> contextMap = context.stream()

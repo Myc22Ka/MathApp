@@ -33,7 +33,7 @@
     "rating": 5.0
   },
   {
-    "templateExerciseId": 4,
+    "variantExerciseId": 1,
     "text": "Wykonaj B ∖ A dla zbiorów: A = {1,2,3} B = {2,4,6}",
     "verified": true,
     "context": [
@@ -44,7 +44,7 @@
     "rating": 5.0
   },
   {
-    "templateExerciseId": 5,
+    "templateExerciseId": 4,
     "text": "Wykonaj (A ∩ B) ∪ C dla zbiorów: A = {1,2} B = {2,3} C = {3,4}",
     "verified": true,
     "context": [

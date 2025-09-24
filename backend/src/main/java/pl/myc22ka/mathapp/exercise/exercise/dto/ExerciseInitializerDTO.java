@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,42 +21,16 @@ import java.util.List;
  * @param context            list of placeholder key-values, {@link PrefixValue}
  * @param rating             the rating exercise
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 13.09.2025
  */
 public record ExerciseInitializerDTO(
         Long templateExerciseId,
+        Long variantExerciseId,
         String text,
         boolean verified,
         Double rating,
         List<PrefixValue> context,
         String answer
 ) {
-
-    /**
-     * Converts this DTO to an Exercise entity.
-     *
-     * @param dto the ExerciseInitializerDTO
-     * @param template the TemplateExercise entity to link
-     * @return the built Exercise entity
-     */
-    public static Exercise fromRecord(@NotNull ExerciseInitializerDTO dto,
-                                      TemplateExercise template,
-                                      @NotNull ObjectMapper objectMapper) {
-        String contextJson;
-        try {
-            contextJson = objectMapper.writeValueAsString(dto.context() != null ? dto.context() : List.of());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize context for exercise initializer", e);
-        }
-
-        return Exercise.builder()
-                .templateExercise(template)
-                .text(dto.text())
-                .verified(dto.verified())
-                .rating(dto.rating())
-                .contextJson(contextJson)
-                .answer(dto.answer())
-                .build();
-    }
 }
