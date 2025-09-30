@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.exercise.variant.model;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * Each variant can have its own text, answer, difficulty, steps, and track how many exercises were generated from it.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.1.0
  * @since 13.09.2025
  */
 @Entity
@@ -23,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TemplateExerciseVariant {
+public class TemplateExerciseVariant implements TemplateLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

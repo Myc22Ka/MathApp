@@ -54,5 +54,26 @@
     ],
     "answer": "{2,3,4}",
     "rating": 5.0
+  },
+  {
+    "templateExerciseId": 5,
+    "text": "Wypisz wszystkie liczby całkowite należące do przedziału: (1,4)",
+    "verified": true,
+    "context": [
+      { "key": "s1", "value": "(1,4)" }
+    ],
+    "answer": "{2,3}",
+    "rating": 5.0
+  },
+  {
+    "templateExerciseId": 2,
+    "text": "Niech A = (-5, 3), B = (-7, 4). Ile liczb całkowitych należy do A ∩ B?",
+    "verified": true,
+    "context": [
+      { "key": "s1", "value": "(-5,3)" },
+      { "key": "s2", "value": "(-7,4)" }
+    ],
+    "answer": "{-4,-3,-2,-1,0,1,2}",
+    "rating": 5.0
   }
 ]

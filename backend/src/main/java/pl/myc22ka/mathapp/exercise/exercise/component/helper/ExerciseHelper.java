@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
@@ -15,7 +13,9 @@ import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
@@ -64,7 +64,7 @@ public class ExerciseHelper {
      * @param template the template exercise
      * @return list of placeholder entries
      */
-    public List<PrefixModifierEntry> getPlaceholders(@NotNull TemplateExercise template) {
+    public List<PrefixModifierEntry> getPlaceholders(@NotNull TemplateLike template) {
         return templateResolver.findPrefixModifiers(template.getTemplateText());
     }
 
@@ -116,7 +116,7 @@ public class ExerciseHelper {
      * @param context  list of PrefixValue for placeholders
      * @return resolved text
      */
-    public String resolveText(@NotNull TemplateExercise template, List<PrefixValue> context) {
+    public String resolveText(@NotNull TemplateLike template, List<PrefixValue> context) {
         return templateResolver.resolve(template.getTemplateText(), context);
     }
 
@@ -129,18 +129,24 @@ public class ExerciseHelper {
      * @param verified tells if exercises values are verified to theirs modifiers
      * @return new Exercise
      */
-    public Exercise buildExercise(TemplateExercise template, List<PrefixValue> context, String text, boolean verified) {
+    public Exercise buildExercise(TemplateLike template, List<PrefixValue> context, String text, boolean verified) {
         String contextJson = serializeContext(context);
-
         String answer = calculateAnswer(template, context);
 
-        return Exercise.builder()
-                .templateExercise(template)
+        Exercise.ExerciseBuilder builder = Exercise.builder()
                 .text(text)
                 .contextJson(contextJson)
                 .verified(verified)
-                .answer(answer)
-                .build();
+                .rating(1.0)
+                .answer(answer);
+
+        if (template instanceof TemplateExercise te) {
+            builder.templateExercise(te);
+        } else if (template instanceof TemplateExerciseVariant v) {
+            builder.templateExerciseVariant(v);
+        }
+
+        return builder.build();
     }
 
     /**
@@ -208,7 +214,7 @@ public class ExerciseHelper {
         }
     }
 
-    public String calculateAnswer(@NotNull TemplateExercise template, List<PrefixValue> context) {
+    public String calculateAnswer(@NotNull TemplateLike template, List<PrefixValue> context) {
         stepMemoryService.clear();
         stepMemoryService.putAll(context);
 

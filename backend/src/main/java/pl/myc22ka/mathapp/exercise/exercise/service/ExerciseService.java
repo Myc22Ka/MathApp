@@ -21,6 +21,7 @@ import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
@@ -33,7 +34,7 @@ import java.util.List;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.5
  * @since 13.09.2025
  */
 @Service
@@ -59,9 +60,9 @@ public class ExerciseService {
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateExercise template = templateId != null
+        TemplateLike template = templateId != null
                 ? templateExerciseHelper.getTemplate(templateId)
-                : variantExerciseHelper.getVariant(variantId).getTemplateExercise();
+                : variantExerciseHelper.getVariant(variantId);
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
         exerciseHelper.validatePlaceholderCount(placeholders, values);

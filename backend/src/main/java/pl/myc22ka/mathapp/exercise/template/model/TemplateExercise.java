@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * category, difficulty, solution steps, and possible variants.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.1.1
  * @since 13.09.2025
  */
 @Entity
@@ -25,7 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TemplateExercise {
+public class TemplateExercise implements TemplateLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

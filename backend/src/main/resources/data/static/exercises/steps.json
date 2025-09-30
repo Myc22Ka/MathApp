@@ -12,19 +12,7 @@
     "stepText": "Różnica zbiorów"
   },
   {
-    "stepType": "FUNCTION_DERIVATIVE",
-    "stepText": "Obliczanie pochodnej"
-  },
-  {
-    "stepType": "WARMUP",
-    "stepText": "Rozgrzewka"
-  },
-  {
-    "stepType": "EXERCISE",
-    "stepText": "Właściwe ćwiczenie"
-  },
-  {
-    "stepType": "REST",
-    "stepText": "Odpoczynek"
+    "stepType": "FIND_ALL_INTEGERS_IN_RANGE",
+    "stepText": "Znajdowanie liczb całkowitych w przedziale"
   }
 ]

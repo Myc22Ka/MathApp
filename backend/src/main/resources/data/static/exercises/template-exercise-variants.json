@@ -11,5 +11,22 @@
         "prefixes": ["s2", "s1"]
       }
     ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Niech A = ${s1}, B = ${s2}. Ile liczb całkowitych należy do A ∩ B?",
+    "templateAnswer": "${s1}",
+    "templateExerciseId": 5,
+    "steps": [
+      {
+        "stepDefinitionId": 2,
+        "prefixes": ["s1", "s2"]
+      },
+      {
+        "stepDefinitionId": 4,
+        "prefixes": ["context1"]
+      }
+    ]
   }
 ]

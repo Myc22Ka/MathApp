@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SetTest {
+class SetFileTest {
     private static List<SetRecord> records;
 
     @BeforeAll

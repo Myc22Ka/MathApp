@@ -50,5 +50,17 @@
         "prefixes": ["context1", "s3"]
       }
     ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wypisz wszystkie liczby całkowite należące do przedziału: ${s1}",
+    "templateAnswer": "${s1}",
+    "steps": [
+      {
+        "stepDefinitionId": 4,
+        "prefixes": ["s1"]
+      }
+    ]
   }
 ]

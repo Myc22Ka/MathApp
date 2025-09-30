@@ -16,6 +16,7 @@ import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRep
 import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -157,5 +158,17 @@ public class VariantExerciseHelper {
                             .toList()
             );
         }
+    }
+
+    public TemplateExercise fromVariant(@NotNull TemplateExerciseVariant variant) {
+        return TemplateExercise.builder()
+                .category(variant.getCategory())
+                .difficulty(variant.getDifficulty())
+                .templateText(variant.getTemplateText())
+                .templateAnswer(variant.getTemplateAnswer())
+                .clearText(variant.getClearText())
+                .exerciseCounter(variant.getExerciseCounter())
+                .steps(new ArrayList<>(variant.getSteps()))
+                .build();
     }
 }
