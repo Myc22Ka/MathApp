@@ -12,7 +12,11 @@
     "stepText": "Różnica zbiorów"
   },
   {
-    "stepType": "FIND_ALL_INTEGERS_IN_RANGE",
+    "stepType": "SET_FIND_ALL_INTEGERS_IN_RANGE",
     "stepText": "Znajdowanie liczb całkowitych w przedziale"
+  },
+  {
+    "stepType": "SET_COMPLEMENT",
+    "stepText": "Dopełnienie zbioru"
   }
 ]

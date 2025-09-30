@@ -24,6 +24,15 @@ class IntervalTest {
     }
 
     @Test
+    void testDisjointSets() {
+        Interval interval = new Interval("IntervalData({-1,LessEqual,Less,3}, {4,LessEqual,Less,7})"); // [-1,3) ∪ [4,7)
+
+        var result = interval.findAllIntegers();
+
+        assertEquals("{-1,0,1,2,4,5,6}", result.toString());
+    }
+
+    @Test
     void testOpenIntervalExcludesBounds() {
         IExpr start = evaluator.eval("1");
         IExpr end = evaluator.eval("5");

@@ -72,12 +72,19 @@ public class Interval implements ISet {
                 int first = (int) Math.ceil(element.getAt(1).evalf());
                 int last = (int) Math.floor(element.getAt(4).evalf());
 
+                Interval interval = new Interval(
+                        element.getAt(1),
+                        BoundType.fromInclusive(element.getAt(2).toString()),
+                        BoundType.fromInclusive(element.getAt(3).toString()),
+                        element.getAt(4)
+                );
+
                 for (int k = first; k <= last; k++) {
                     IExpr candidate = evaluator.eval(Integer.toString(k));
 
                     String boundCheck = "IntervalData({" + candidate + "," + BoundType.CLOSED.getInclusive() + "," + BoundType.CLOSED.getInclusive() + "," + candidate + "})";
 
-                    if (contains(boundCheck)) {
+                    if (interval.contains(boundCheck)) {
                         integers.add(candidate);
                     }
                 }
@@ -89,7 +96,6 @@ public class Interval implements ISet {
         }
         return new Finite(integers);
     }
-
 
     /**
      * Attempts to simplify the current set representation.

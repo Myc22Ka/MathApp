@@ -75,5 +75,16 @@
     ],
     "answer": "{-4,-3,-2,-1,0,1,2}",
     "rating": 5.0
+  },
+  {
+    "templateExerciseId": 6,
+    "text": "Wyznacz zbiór A' dla zbioru A = (1,3)∪{5} w uniwersum U = [2,5)∪(5,9)",
+    "verified": true,
+    "context": [
+      { "key": "s1", "value": "(1,3)∪{5}" },
+      { "key": "s2", "value": "[2,5)∪(5,9)" }
+    ],
+    "answer": "[3,5)∪(5,9)",
+    "rating": 5.0
   }
 ]

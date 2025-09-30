@@ -62,5 +62,17 @@
         "prefixes": ["s1"]
       }
     ]
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wyznacz zbiór A' dla zbioru A = ${s1} w uniwersum U = ${s2}",
+    "templateAnswer": "${s1}",
+    "steps": [
+      {
+        "stepDefinitionId": 5,
+        "prefixes": ["s1", "s2"]
+      }
+    ]
   }
 ]
