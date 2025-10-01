@@ -23,6 +23,7 @@ public record ModifierSeed(
         Integer difficultyLevel,
         Requirement requirement,
         Template template,
+        String description,
         Long topicId
 ) {
 }

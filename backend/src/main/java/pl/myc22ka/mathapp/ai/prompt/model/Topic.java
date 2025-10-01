@@ -40,6 +40,9 @@ public class Topic {
     @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     private String text;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

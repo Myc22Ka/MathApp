@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.ai.prompt.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * @since 11.08.2025
  */
 @Repository
-public interface ModifierRepository extends JpaRepository<Modifier, Long> {
+public interface ModifierRepository extends JpaRepository<Modifier, Long>, JpaSpecificationExecutor<Modifier> {
 
     /**
      * Find DifficultyModifier by topic and difficulty level.
@@ -70,5 +71,11 @@ public interface ModifierRepository extends JpaRepository<Modifier, Long> {
     @Query("SELECT MAX(d.difficultyLevel) FROM DifficultyModifier d WHERE d.topic = :topic")
     Optional<Integer> findMaxDifficultyLevelByTopic(@Param("topic") Topic topic);
 
+    /**
+     * Find all modifiers with template codes in the given list.
+     *
+     * @param codes template codes
+     * @return list of modifiers
+     */
     List<Modifier> findByTemplateCodeIn(List<String> codes);
 }

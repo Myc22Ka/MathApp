@@ -17,7 +17,7 @@ import pl.myc22ka.mathapp.model.expression.MathExpression;
  * Represents a modifier based on a user-provided additional information.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 11.08.2025
  */
 @Entity
@@ -44,24 +44,15 @@ public class TemplateModifier extends Modifier {
      * @param modifierText text describing the modifier
      * @param template     the template type
      */
-    public TemplateModifier(Topic topic, String modifierText, @NotNull Template template) {
-        super(null, modifierText, topic, "T" + template.getCode());
+    public TemplateModifier(Topic topic, String modifierText, @NotNull Template template, String description) {
+        super(null, modifierText, topic, "T" + template.getCode(),description);
         this.template = template;
     }
 
     public TemplateModifier(@NotNull TemplateModifier original) {
-        super(original.getId(), original.getModifierText(), original.getTopic(), original.getTemplateCode());
+        super(original.getId(), original.getModifierText(), original.getTopic(), original.getTemplateCode(), original.getDescription());
         this.template = original.getTemplate();
         this.information = original.getInformation();
         this.informationPlaceholder = original.getInformationPlaceholder();
-    }
-
-    public ModifierRequest toModifierRequest() {
-        ModifierRequest mr = new ModifierRequest();
-        mr.setType(ModifierPrefix.TEMPLATE.name());
-        mr.setTemplate(this.template);
-        mr.setTemplateInformation(information != null ? information.toString() : informationPlaceholder);
-
-        return mr;
     }
 }

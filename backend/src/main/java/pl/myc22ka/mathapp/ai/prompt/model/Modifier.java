@@ -38,4 +38,7 @@ public abstract class Modifier {
 
     @Column(name = "template_code", nullable = false, length = 50)
     private String templateCode;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 }

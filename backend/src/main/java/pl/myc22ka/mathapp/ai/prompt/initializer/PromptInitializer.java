@@ -67,9 +67,9 @@ public class PromptInitializer {
     private Modifier getModifier(@NotNull ModifierSeed seed, Topic topic) {
         Modifier modifier;
         switch (seed.modifierType().toUpperCase()) {
-            case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel());
-            case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement());
-            case "TEMPLATE" -> modifier = new TemplateModifier(topic, seed.modifierText(), seed.template());
+            case "DIFFICULTY" -> modifier = new DifficultyModifier(topic, seed.modifierText(), seed.difficultyLevel(), seed.description());
+            case "REQUIREMENT" -> modifier = new RequirementModifier(topic, seed.modifierText(), seed.requirement(), seed.description());
+            case "TEMPLATE" -> modifier = new TemplateModifier(topic, seed.modifierText(), seed.template(), seed.description());
             default -> throw new IllegalArgumentException("Unknown modifier type: " + seed.modifierType());
         }
         return modifier;

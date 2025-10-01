@@ -1,7 +1,16 @@
 package pl.myc22ka.mathapp.ai.prompt.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import pl.myc22ka.mathapp.ai.prompt.component.filter.ModifierSpecifications;
+import pl.myc22ka.mathapp.ai.prompt.dto.ModifierDTO;
+import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 
@@ -27,5 +36,18 @@ public class ModifierService {
      */
     public int getMaxDifficultyLevel(Topic topic) {
         return modifierRepository.findMaxDifficultyLevelByTopic(topic).orElse(1);
+    }
+
+    public Page<ModifierDTO> getModifiers(int page, int size,
+                                          String sortBy,
+                                          String sortDirection,
+                                          PromptType category) {
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Modifier> spec = ModifierSpecifications.buildSpecification(category);
+
+        return ModifierDTO.fromPage(modifierRepository.findAll(spec, pageable));
     }
 }

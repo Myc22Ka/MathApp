@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 /**
  * The type Template resolver.
  * <p>
- * Responsible for resolving template placeholders in the form ${prefix:} within the input string,
+ * Responsible for resolving template placeholders in the form ${prefix:[mod1]|[mod2]} within the input string,
  * replacing them with corresponding values from the provided context map.
  * Enhanced to support TemplateModifier with set reference resolution.
  *
  * @author Myc22Ka
- * @version 1.0.5
+ * @version 1.0.6
  * @since 11.08.2025
  */
 @Component
@@ -109,7 +109,7 @@ public class TemplateResolver {
      * Enhanced to handle TemplateModifier with set reference resolution in format T1->${s1}.
      *
      * @param input   the input string containing template placeholders
-     * @return map of prefix -> list of Modifier with resolved information
+     * @return list of prefix -> list of Modifier with resolved information
      */
     public List<PrefixModifierEntry> findPrefixModifiers(String input) {
         Matcher matcher = TEMPLATE_PATTERN.matcher(input);

@@ -85,7 +85,7 @@ public class ExerciseService {
     }
 
     public Page<ExerciseDTO> getAll(int page, int size, Double rating, String difficulty,
-                                    PromptType category, String sortBy, @NotNull String sortDirection) {
+                                    PromptType category, String sortBy, @NotNull String sortDirection, Long templateId) {
 
         validationHelper.validateFilters(rating, difficulty);
 
@@ -96,7 +96,8 @@ public class ExerciseService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Specification<Exercise> spec = ExerciseSpecification.withFilters(
-                rating, difficulty, category);
+                rating, difficulty, category, templateId
+        );
 
         Page<Exercise> exercises = exerciseRepository.findAll(spec, pageable);
 
@@ -194,10 +195,6 @@ public class ExerciseService {
 
     /**
      * Checks if answer given by user is the same as exercise answer
-     *
-     * @param exerciseId the id of the exercise
-     * @param answer     the user given value to check for being answered
-     * @return true if answer given by user is the same as exercise answer
      */
     public boolean solve(Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);

@@ -35,8 +35,8 @@ public class RequirementModifier extends Modifier {
      * @param modifierText text describing the modifier
      * @param requirement  requirement type
      */
-    public RequirementModifier(Topic topic, String modifierText, @NotNull Requirement requirement) {
-        super(null, modifierText, topic, "R" + requirement.getCode());
+    public RequirementModifier(Topic topic, String modifierText, @NotNull Requirement requirement, String description) {
+        super(null, modifierText, topic, "R" + requirement.getCode(), description);
         this.requirement = requirement;
     }
 }

@@ -101,15 +101,16 @@ public class ExerciseController {
     public Page<ExerciseDTO> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "Filter by rating", example = "4.5")
+            @Parameter(description = "Filter by rating", example = "1.0")
             @RequestParam(required = false) Double rating,
             @Parameter(description = "Filter by difficulty level", example = "1")
             @RequestParam(required = false) String difficulty,
             @RequestParam(required = false) PromptType category,
+            @RequestParam(required = false) Long templateId,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
 
-        return exerciseService.getAll(page, size, rating, difficulty, category, sortBy, sortDirection);
+        return exerciseService.getAll(page, size, rating, difficulty, category, sortBy, sortDirection, templateId);
     }
 
     /**

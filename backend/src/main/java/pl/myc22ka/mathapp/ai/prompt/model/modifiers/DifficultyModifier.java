@@ -35,8 +35,8 @@ public class DifficultyModifier extends Modifier {
      * @param modifierText    text describing the modifier
      * @param difficultyLevel numeric difficulty level
      */
-    public DifficultyModifier(Topic topic, String modifierText, Integer difficultyLevel) {
-        super(null, modifierText, topic, "D" + difficultyLevel);
+    public DifficultyModifier(Topic topic, String modifierText, Integer difficultyLevel, String description) {
+        super(null, modifierText, topic, "D" + difficultyLevel, description);
         this.difficultyLevel = difficultyLevel;
     }
 }

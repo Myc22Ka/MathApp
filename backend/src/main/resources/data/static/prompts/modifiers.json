@@ -2,72 +2,84 @@
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "",
+    "description": "",
     "difficultyLevel": 2,
     "topicId": 2
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Use only simple examples with basic intervals like (-1, 5) or [2, 6).",
+    "description": "Only simple intervals",
     "difficultyLevel": 1,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Include finite sets like {-1, 2, 3} in addition to intervals.",
+    "description": "Include finite sets",
     "difficultyLevel": 2,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Use intervals, finite sets, and also include fundamental sets like ℝ and ∅.",
+    "description": "Include fundamental sets",
     "difficultyLevel": 3,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Include intervals, finite sets, ℝ, ∅ and introduce elements like fractions (e.g., 1/2) or radicals (e.g., -√2).",
+    "description": "Include fractions and radicals",
     "difficultyLevel": 4,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Include more advanced expressions with set operations like ∪ (union), ∩ (intersection), and ∖ (difference).",
+    "description": "Include advanced set operations",
     "difficultyLevel": 5,
     "topicId": 1
   },
   {
     "modifierType": "DIFFICULTY",
     "modifierText": "Create an extremely challenging set example with complex nested structures, combining multiple types of intervals, finite sets, fundamental sets like ℝ and ∅, fractions, radicals, and advanced set operations such as ∪, ∩, and ∖ (difference). Use all types of brackets (), [], {} in intricate, nested patterns. The example **must** be exceptionally difficult to reason about.",
+    "description": "Extremely challenging set example",
     "difficultyLevel": 6,
     "topicId": 1
   },
   {
     "modifierType": "REQUIREMENT",
     "modifierText": "You **must** use only interval notation like [a, b] or (a, b).",
+    "description": "Intervals only",
     "requirement": "INTERVALS_ONLY",
     "topicId": 1
   },
   {
     "modifierType": "REQUIREMENT",
     "modifierText": "You **must** use only finite sets. You **must not** use infinite sets or intervals.",
+    "description": "Finite sets only",
     "requirement": "FINITE_SETS_ONLY",
     "topicId": 1
   },
   {
     "modifierType": "REQUIREMENT",
     "modifierText": "You **must** include only positive numbers in the sets. You **must not** include zero or negative numbers.",
+    "description": "Positive numbers only",
     "requirement": "POSITIVE_ONLY",
     "topicId": 1
   },
   {
     "modifierType": "REQUIREMENT",
     "modifierText": "All sets **must** be disjoint. No element **must** appear in more than one set.",
+    "description": "Disjoint sets only",
     "requirement": "DISJOINT_SETS",
     "topicId": 1
   },
   {
     "modifierType": "TEMPLATE",
     "modifierText": "Your generated set **must** be disjoint from the set ${s1}.\n- You **must not** include any number inside ${s1}.\n- You **must not** overlap, including endpoints unless intervals are open.\n- The output **must not** intersect with ${s1}.",
+    "description": "Disjoint from given set",
     "template": "DISJOINT_SETS",
     "topicId": 1
   }

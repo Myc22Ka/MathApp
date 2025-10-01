@@ -3,7 +3,6 @@ package pl.myc22ka.mathapp.exercise.exercise.component.filter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
@@ -17,20 +16,42 @@ import java.util.List;
 public class ExerciseSpecification {
 
     @NotNull
-    @Contract(pure = true)
     public static Specification<Exercise> hasRating(Double rating) {
         return (root, query, criteriaBuilder) -> {
-            if (rating == null) return null;
+            if (rating == null) return criteriaBuilder.conjunction();
+
             return criteriaBuilder.equal(root.get("rating"), rating);
         };
     }
 
     @NotNull
-    @Contract(pure = true)
+    public static Specification<Exercise> hasTemplateId(Long templateId) {
+        return (root, query, cb) -> {
+            if (templateId == null) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Przypadek 1: Exercise.templateExercise.id = templateId
+            Join<Exercise, TemplateExercise> templateJoin = root.join("templateExercise", JoinType.LEFT);
+            predicates.add(cb.equal(templateJoin.get("id"), templateId));
+
+            // Przypadek 2: Exercise.templateExerciseVariant.templateExercise.id = templateId
+            Join<Exercise, TemplateExerciseVariant> variantJoin = root.join("templateExerciseVariant", JoinType.LEFT);
+            Join<TemplateExerciseVariant, TemplateExercise> variantTemplateJoin =
+                    variantJoin.join("templateExercise", JoinType.LEFT);
+            predicates.add(cb.equal(variantTemplateJoin.get("id"), templateId));
+
+            return cb.or(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    @NotNull
     public static Specification<Exercise> hasDifficultyOrCategory(String difficulty, PromptType category) {
         return (root, query, cb) -> {
             if ((difficulty == null || difficulty.trim().isEmpty()) && category == null) {
-                return null;
+                return cb.conjunction();
             }
 
             Join<Exercise, TemplateExercise> templateJoin = root.join("templateExercise", JoinType.LEFT);
@@ -58,15 +79,21 @@ public class ExerciseSpecification {
                 return cb.or(templateSpec, variantSpec);
             } else if (templateSpec != null) {
                 return templateSpec;
-            } else {
+            } else if (variantSpec != null) {
                 return variantSpec;
+            } else {
+                return cb.conjunction();
             }
         };
     }
 
     @NotNull
-    public static Specification<Exercise> withFilters(Double rating, String difficulty, PromptType category) {
-        return hasRating(rating)
-                .and(hasDifficultyOrCategory(difficulty, category));
+    public static Specification<Exercise> withFilters(Double rating, String difficulty,
+                                                      PromptType category, Long templateId) {
+        return Specification.allOf(
+                hasRating(rating),
+                hasDifficultyOrCategory(difficulty, category),
+                hasTemplateId(templateId)
+        );
     }
 }
