@@ -12,7 +12,7 @@ import java.util.List;
  * @param modifiers list of modifiers to customize the expression
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 06.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -42,7 +42,7 @@ public record MathExpressionChatRequest(
         List<ModifierRequest> modifiers
 ) {
 
-        public MathExpressionChatRequest withContext(List<PrefixValue> context) {
+        public MathExpressionChatRequest withContext(List<ContextRecord> context) {
                 if (modifiers == null) {
                         return this;
                 }
@@ -53,21 +53,14 @@ public record MathExpressionChatRequest(
                                         String placeholderKey = m.getTemplateInformation();
 
                                         String replacement = context.stream()
-                                                .filter(c -> c.key().equals(placeholderKey))
-                                                .map(PrefixValue::value)
+                                                .filter(c -> c.key().templateString().equals(placeholderKey))
+                                                .map(ContextRecord::value)
                                                 .findFirst()
                                                 .orElse(m.getTemplateInformation());
 
-                                        return new ModifierRequest(
-                                                m.getType(),
-                                                m.getDifficultyLevel(),
-                                                m.getRequirement(),
-                                                m.getTemplate(),
-                                                replacement
-                                        );
-                                } else {
-                                        return m;
+                                        return m.withTemplateInformation(replacement);
                                 }
+                                return m;
                         })
                         .toList();
 

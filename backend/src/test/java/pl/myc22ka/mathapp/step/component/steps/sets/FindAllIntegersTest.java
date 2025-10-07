@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
 import pl.myc22ka.mathapp.step.component.helper.StepExecutionHelper;
@@ -38,7 +38,7 @@ class FindAllIntegersTest {
     private FindAllIntegers findAllIntegers;
 
     private StepWrapper step;
-    private List<PrefixValue> context;
+    private List<ContextRecord> context;
 
     /**
      * Initializes test data before each test.

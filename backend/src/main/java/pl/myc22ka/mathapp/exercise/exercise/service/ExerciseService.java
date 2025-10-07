@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
@@ -34,7 +34,7 @@ import java.util.List;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.6
+ * @version 1.0.7
  * @since 13.09.2025
  */
 @Service
@@ -67,7 +67,7 @@ public class ExerciseService {
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
         exerciseHelper.validatePlaceholderCount(placeholders, values);
 
-        List<PrefixValue> context = exerciseHelper.buildContext(placeholders, values);
+        List<ContextRecord> context = exerciseHelper.buildContext(placeholders, values);
 
         boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
         String finalText = exerciseHelper.resolveText(template, context);
@@ -143,7 +143,7 @@ public class ExerciseService {
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
-        List<PrefixValue> context = new ArrayList<>();
+        List<ContextRecord> context = new ArrayList<>();
         boolean allVerified = true;
 
         for (var entry : placeholders) {
@@ -155,7 +155,8 @@ public class ExerciseService {
             );
 
             String response = prompt.getResponseText();
-            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), response));
+
+            context.add(exerciseHelper.buildContextRecord(entry, response));
 
             if (!prompt.isVerified()) {
                 allVerified = false;
@@ -179,7 +180,7 @@ public class ExerciseService {
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
         exerciseHelper.validatePlaceholderCount(placeholders, values);
-        List<PrefixValue> context = exerciseHelper.buildContext(placeholders, values);
+        List<ContextRecord> context = exerciseHelper.buildContext(placeholders, values);
         boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
         String finalText = exerciseHelper.resolveText(template, context);
 

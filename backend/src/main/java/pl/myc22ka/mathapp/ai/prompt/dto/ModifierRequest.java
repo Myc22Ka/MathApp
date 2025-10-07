@@ -24,7 +24,7 @@ import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
  * </ul>
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 11.08.2025
  */
 @Data
@@ -72,5 +72,15 @@ public class ModifierRequest {
             }
             default -> throw new IllegalArgumentException("Unknown modifier type: " + type);
         };
+    }
+
+    public ModifierRequest withTemplateInformation(String newInfo) {
+        return new ModifierRequest(
+                this.type,
+                this.difficultyLevel,
+                this.requirement,
+                this.template,
+                newInfo
+        );
     }
 }

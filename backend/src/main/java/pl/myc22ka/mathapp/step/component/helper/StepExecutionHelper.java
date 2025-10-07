@@ -3,7 +3,8 @@ package pl.myc22ka.mathapp.step.component.helper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.ai.prompt.dto.TemplateString;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.ISet;
@@ -29,9 +30,9 @@ public class StepExecutionHelper {
                         "StepDefinition not found with id: " + id));
     }
 
-    public List<ISet> getSetsFromContext(@NotNull StepWrapper step, @NotNull List<PrefixValue> context) {
+    public List<ISet> getSetsFromContext(@NotNull StepWrapper step, @NotNull List<ContextRecord> context) {
         Map<String, String> contextMap = context.stream()
-                .collect(Collectors.toMap(PrefixValue::key, PrefixValue::value));
+                .collect(Collectors.toMap(c -> c.key().templateString(), ContextRecord::value));
 
         List<ISet> sets = new ArrayList<>();
 
@@ -51,9 +52,10 @@ public class StepExecutionHelper {
     /**
      * Generates the next available context key like context1, context2, etc.
      */
-    public String nextContextKey(@NotNull List<PrefixValue> context) {
+    public String nextContextKey(@NotNull List<ContextRecord> context) {
         int max = context.stream()
-                .map(PrefixValue::key)
+                .map(ContextRecord::key)
+                .map(TemplateString::templateString)
                 .filter(k -> k.startsWith("context"))
                 .map(k -> k.substring(7))
                 .filter(s -> s.matches("\\d+"))

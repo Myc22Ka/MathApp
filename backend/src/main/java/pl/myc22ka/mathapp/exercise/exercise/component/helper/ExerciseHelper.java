@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.ai.prompt.dto.TemplateString;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
@@ -30,7 +32,7 @@ import java.util.List;
  * Provides methods to fetch, build, and verify exercises.
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 13.09.2025
  */
 @Component
@@ -39,8 +41,8 @@ public class ExerciseHelper {
 
     private final ExerciseRepository exerciseRepository;
     private final TemplateResolver templateResolver;
+    private final PromptHelper promptHelper;
     private final ExpressionFactory expressionFactory;
-    private final PromptService promptService;
     private final StepMemoryService stepMemoryService;
     private final StepExecutorRegistry registry;
 
@@ -88,15 +90,24 @@ public class ExerciseHelper {
      * @param values       list of raw values
      * @return list of PrefixValue representing the context
      */
-    public List<PrefixValue> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
-        List<PrefixValue> context = new ArrayList<>();
+    public List<ContextRecord> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
+        List<ContextRecord> context = new ArrayList<>();
         for (int i = 0; i < placeholders.size(); i++) {
             PrefixModifierEntry entry = placeholders.get(i);
             String parsedText = parseValue(values.get(i)).toString();
             values.set(i, parsedText);
-            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), parsedText));
+
+            context.add(buildContextRecord(entry, parsedText));
         }
         return context;
+    }
+
+    public ContextRecord buildContextRecord(@NotNull PrefixModifierEntry entry, String value) {
+        var prefix = entry.prefix();
+
+        var templateString = new TemplateString(prefix.getKey() + entry.index(), prefix);
+
+        return new ContextRecord(templateString, value);
     }
 
     /**
@@ -116,7 +127,7 @@ public class ExerciseHelper {
      * @param context  list of PrefixValue for placeholders
      * @return resolved text
      */
-    public String resolveText(@NotNull TemplateLike template, List<PrefixValue> context) {
+    public String resolveText(@NotNull TemplateLike template, List<ContextRecord> context) {
         return templateResolver.resolve(template.getTemplateText(), context);
     }
 
@@ -129,7 +140,7 @@ public class ExerciseHelper {
      * @param verified tells if exercises values are verified to theirs modifiers
      * @return new Exercise
      */
-    public Exercise buildExercise(TemplateLike template, List<PrefixValue> context, String text, boolean verified) {
+    public Exercise buildExercise(TemplateLike template, List<ContextRecord> context, String text, boolean verified) {
         String contextJson = serializeContext(context);
         String answer = calculateAnswer(template, context);
 
@@ -161,7 +172,7 @@ public class ExerciseHelper {
     public boolean verifyPlaceholders(
             @NotNull List<PrefixModifierEntry> placeholders,
             @NotNull List<String> values,
-            @NotNull List<PrefixValue> context,
+            @NotNull List<ContextRecord> context,
             @NotNull TemplatePrefix category
     ) {
         boolean allVerified = true;
@@ -179,7 +190,7 @@ public class ExerciseHelper {
                 }
             }
 
-            boolean verified = promptService.verifyModifierRequestsWithValue(
+            boolean verified = promptHelper.verifyModifierRequestsWithValue(
                     placeholder.modifiers(),
                     currentValue,
                     category
@@ -194,7 +205,7 @@ public class ExerciseHelper {
         return allVerified;
     }
 
-    public String serializeContext(List<PrefixValue> context) {
+    public String serializeContext(List<ContextRecord> context) {
         try {
             return objectMapper.writeValueAsString(context);
         } catch (JsonProcessingException e) {
@@ -202,7 +213,7 @@ public class ExerciseHelper {
         }
     }
 
-    public List<PrefixValue> deserializeContext(String json) {
+    public List<ContextRecord> deserializeContext(String json) {
         if (json == null || json.isEmpty()) {
             return new ArrayList<>();
         }
@@ -214,11 +225,11 @@ public class ExerciseHelper {
         }
     }
 
-    public String calculateAnswer(@NotNull TemplateLike template, List<PrefixValue> context) {
+    public String calculateAnswer(@NotNull TemplateLike template, List<ContextRecord> context) {
         stepMemoryService.clear();
         stepMemoryService.putAll(context);
 
-        List<PrefixValue> contextList = new ArrayList<>(stepMemoryService.getMemory().values());
+        List<ContextRecord> contextList = new ArrayList<>(stepMemoryService.getMemory().values());
 
         for (StepWrapper step : template.getSteps()) {
             registry.executeStep(step, contextList);

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.ModifierPrefix;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * Enhanced to support TemplateModifier with set reference resolution.
  *
  * @author Myc22Ka
- * @version 1.0.7
+ * @version 1.0.8
  * @since 11.08.2025
  */
 @Component
@@ -72,7 +72,7 @@ public class TemplateResolver {
      * @param context the context map holding keys and their replacement values
      * @return the input string with all placeholders resolved
      */
-    public String resolve(String input, List<PrefixValue> context) {
+    public String resolve(String input, List<ContextRecord> context) {
         Matcher matcher = TEMPLATE_PATTERN.matcher(input);
         StringBuilder sb = new StringBuilder();
 
@@ -83,8 +83,8 @@ public class TemplateResolver {
             String key = matcher.group(1) + matcher.group(2); // prefix (np. "s1")
 
             // Filtrujemy listę context, bierzemy tylko te o danym kluczu
-            List<PrefixValue> matching = context.stream()
-                    .filter(pv -> pv.key().equals(key))
+            List<ContextRecord> matching = context.stream()
+                    .filter(pv -> pv.key().templateString().equals(key))
                     .toList();
 
             int count = counters.getOrDefault(key, 0);
@@ -162,15 +162,7 @@ public class TemplateResolver {
                             .findFirst()
                             .ifPresent(m -> {
                                 ModifierRequest baseReq = toModifierRequest(m);
-
-                                ModifierRequest req = new ModifierRequest(
-                                        baseReq.getType(),
-                                        baseReq.getDifficultyLevel(),
-                                        baseReq.getRequirement(),
-                                        baseReq.getTemplate(),
-                                        finalPlaceholder // tu trafia to po "->"
-                                );
-
+                                ModifierRequest req = baseReq.withTemplateInformation(finalPlaceholder);
                                 foundModifierRequests.add(req);
                             });
                 }
@@ -188,17 +180,17 @@ public class TemplateResolver {
      * @param context      lista PrefixValue z kluczami i wartościami do podmiany
      * @return tekst po podmianie wszystkich kluczy z context
      */
-    public String replaceTemplatePlaceholders(String templateText, List<PrefixValue> context) {
+    public String replaceTemplatePlaceholders(String templateText, List<ContextRecord> context) {
         if (templateText == null || context == null || context.isEmpty()) {
             return templateText;
         }
 
         String result = templateText;
 
-        for (PrefixValue pv : context) {
+        for (ContextRecord pv : context) {
             if (pv.value() != null) {
                 // replaceAll wymaga escapowania dolara i klamry w regexie
-                String regex = "\\$\\{" + Pattern.quote(pv.key()) + "}";
+                String regex = "\\$\\{" + Pattern.quote(pv.key().templateString()) + "}";
                 result = result.replaceAll(regex, Matcher.quoteReplacement(pv.value()));
             }
         }

@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.step.component.steps.sets;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.model.set.SetSymbols;
 import pl.myc22ka.mathapp.model.set.sets.Interval;
@@ -26,7 +26,7 @@ public class FindAllIntegers implements StepExecutor {
     }
 
     @Override
-    public void execute(@NotNull StepWrapper step, List<PrefixValue> context) {
+    public void execute(@NotNull StepWrapper step, List<ContextRecord> context) {
         List<ISet> sets = helper.getSetsFromContext(step, context);
 
         ISet first = sets.getFirst();
@@ -39,7 +39,7 @@ public class FindAllIntegers implements StepExecutor {
             var allIntegers = interval.findAllIntegers();
             String newKey = helper.nextContextKey(context);
 
-            context.add(new PrefixValue(newKey, allIntegers.toString()));
+            context.add(new ContextRecord(newKey, allIntegers.getTemplatePrefix(), allIntegers.toString()));
         } else {
             throw new IllegalArgumentException("Expected Interval but got: " + first.getClass().getSimpleName());
         }

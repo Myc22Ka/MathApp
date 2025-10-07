@@ -1,24 +1,30 @@
 package pl.myc22ka.mathapp.ai.ollama.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
+import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
+import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Service for Ollama AI communication and math expression generation.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 06.08.2025
  */
 @Service
@@ -34,6 +40,8 @@ public class OllamaService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final PromptService promptService;
     private final ExpressionFactory expressionFactory;
+    private final TopicHelper topicHelper;
+    private final PromptHelper promptHelper;
 
     /**
      * Sends prompt to Ollama AI and returns response.
@@ -74,7 +82,7 @@ public class OllamaService {
 
         prompt.setResponseText(parsed.toString());
 
-        promptService.verifyPromptResponse(prompt, parsed);
+        promptHelper.verifyPromptResponse(prompt, parsed);
 
         promptService.save(prompt);
 
@@ -87,7 +95,12 @@ public class OllamaService {
      * @param request math expression to verify
      * @return true if expression is valid
      */
-    public boolean useMathString(MathExpressionRequest request) {
-        return promptService.verifyUserMathExpressionRequest(request);
+    public boolean useMathString(@NotNull MathExpressionRequest request) {
+        Topic topic = topicHelper.findTopicByType(request.topicType());
+        List<Modifier> modifiers = promptService.createOrFindModifiers(request.modifiers(), topic);
+
+        var parsed = expressionFactory.parse(request.response());
+
+        return promptHelper.verify(parsed, request.topicType(), modifiers);
     }
 }

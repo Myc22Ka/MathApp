@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.step.component.steps.sets;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.model.set.ISet;
 import pl.myc22ka.mathapp.step.component.StepExecutor;
 import pl.myc22ka.mathapp.step.component.helper.StepExecutionHelper;
@@ -24,7 +24,7 @@ public class Complement implements StepExecutor {
     }
 
     @Override
-    public void execute(@NotNull StepWrapper step, List<PrefixValue> context) {
+    public void execute(@NotNull StepWrapper step, List<ContextRecord> context) {
         List<ISet> sets = helper.getSetsFromContext(step, context);
         helper.ensureTwoSets(sets);
 
@@ -34,6 +34,6 @@ public class Complement implements StepExecutor {
         ISet complement = first.complement(uniwersum);
 
         String newKey = helper.nextContextKey(context);
-        context.add(new PrefixValue(newKey, complement.toString()));
+        context.add(new ContextRecord(newKey, complement.getTemplatePrefix(), complement.toString()));
     }
 }
