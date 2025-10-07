@@ -3,19 +3,16 @@ package pl.myc22ka.mathapp.ai.prompt.dto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 public record ModifierDTO(
         Long id,
         String description,
-        PromptType topicName,
+        TemplatePrefix topicName,
         String templateCode,
         String modifierType
 ) {
 
-    /**
-     * Tworzy DTO z encji Modifier
-     */
     public static ModifierDTO fromEntity(Modifier modifier) {
         if (modifier == null) {
             return null;
@@ -30,9 +27,6 @@ public record ModifierDTO(
         );
     }
 
-    /**
-     * Konwertuje Page<Modifier> na Page<ModifierDTO>
-     */
     @NotNull
     public static Page<ModifierDTO> fromPage(@NotNull Page<Modifier> modifierPage) {
         return modifierPage.map(ModifierDTO::fromEntity);

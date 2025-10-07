@@ -7,18 +7,18 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.service.TemplateExerciseVariantService;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * REST controller for managing template exercise variants.
  * Provides CRUD operations (create, read, update, delete).
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @RestController
@@ -57,7 +57,7 @@ public class TemplateExerciseVariantController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String difficulty,
-            @RequestParam(required = false) PromptType category,
+            @RequestParam(required = false) TemplatePrefix category,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
 

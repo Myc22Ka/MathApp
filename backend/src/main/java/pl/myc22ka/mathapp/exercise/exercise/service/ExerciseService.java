@@ -14,7 +14,6 @@ import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
@@ -25,6 +24,7 @@ import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.List;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.5
+ * @version 1.0.6
  * @since 13.09.2025
  */
 @Service
@@ -85,7 +85,7 @@ public class ExerciseService {
     }
 
     public Page<ExerciseDTO> getAll(int page, int size, Double rating, String difficulty,
-                                    PromptType category, String sortBy, @NotNull String sortDirection, Long templateId) {
+                                    TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId) {
 
         validationHelper.validateFilters(rating, difficulty);
 
@@ -149,7 +149,7 @@ public class ExerciseService {
         for (var entry : placeholders) {
             Prompt prompt = ollamaService.generatePrompt(
                     new MathExpressionChatRequest(
-                            PromptType.valueOf(entry.prefix().name()),
+                            entry.prefix(),
                             entry.modifiers() == null ? new ArrayList<>() : entry.modifiers()
                     ).withContext(context)
             );

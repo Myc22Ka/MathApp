@@ -2,7 +2,6 @@ package pl.myc22ka.mathapp.step.component.helper;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;

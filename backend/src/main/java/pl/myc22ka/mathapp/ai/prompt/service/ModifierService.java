@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 import pl.myc22ka.mathapp.ai.prompt.component.filter.ModifierSpecifications;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierDTO;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * Service for handling Modifier-related operations.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Service
@@ -41,7 +41,7 @@ public class ModifierService {
     public Page<ModifierDTO> getModifiers(int page, int size,
                                           String sortBy,
                                           String sortDirection,
-                                          PromptType category) {
+                                          TemplatePrefix category) {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);

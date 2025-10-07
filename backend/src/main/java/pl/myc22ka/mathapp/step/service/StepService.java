@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.dto.StepDTO;
 import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepType;
@@ -22,7 +22,7 @@ public class StepService {
     private final StepDefinitionRepository stepDefinitionRepository;
 
     public Page<StepDTO> getSteps(int page, int size, StepType stepType,
-                                  PromptType category, String sortBy, String sortDirection) {
+                                  TemplatePrefix category, String sortBy, String sortDirection) {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);

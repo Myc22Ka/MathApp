@@ -1,10 +1,10 @@
 package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
-public record TopicDTO(Long id, PromptType type, String description) {
+public record TopicDTO(Long id, TemplatePrefix type, String description) {
 
     @NotNull
     public static TopicDTO fromEntity(@NotNull Topic topic) {

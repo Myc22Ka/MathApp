@@ -4,14 +4,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.matheclipse.core.interfaces.IExpr;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.set.visitors.*;
 
 /**
  * A wrapper implementation of {@link ISet}. Acts as a unified entry point for all set types.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 2025.06.19
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

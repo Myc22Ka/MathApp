@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
  * Holds prompt type and associated text, plus linked prompts.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Entity
@@ -35,7 +36,7 @@ public class Topic {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private PromptType type;
+    private TemplatePrefix type;
 
     @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     private String text;

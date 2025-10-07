@@ -3,7 +3,6 @@ package pl.myc22ka.mathapp.model.expression;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
  * Enum representing different template prefixes used to identify expression types.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.3
  * @since 11.08.2025
  */
 @Getter
@@ -23,15 +22,16 @@ public enum TemplatePrefix {
     /**
      * Prefix representing a set expression.
      */
-    SET("s", PromptType.SET),
+    SET("s"),
 
     /**
      * Prefix representing a function expression.
      */
-    FUNCTION("f", PromptType.FUNCTION);
+    FUNCTION("f"),
+
+    COMMON("c");
 
     private final String key;
-    private final PromptType promptType;
 
     private static final Map<String, TemplatePrefix> lookup = Arrays.stream(values())
             .collect(Collectors.toMap(TemplatePrefix::getKey, e -> e));
@@ -45,12 +45,5 @@ public enum TemplatePrefix {
     @NotNull
     public static Optional<TemplatePrefix> fromKey(String key) {
         return Optional.ofNullable(lookup.get(key));
-    }
-
-    /**
-     * Get corresponding PromptType for this prefix.
-     */
-    public PromptType toPromptType() {
-        return this.promptType;
     }
 }

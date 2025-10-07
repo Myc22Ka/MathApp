@@ -2,9 +2,9 @@ package pl.myc22ka.mathapp.exercise.variant.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class TemplateExerciseVariant implements TemplateLike {
     private TemplateExercise templateExercise;
 
     @Enumerated(EnumType.STRING)
-    private PromptType category;
+    private TemplatePrefix category;
 
     private String difficulty;
 

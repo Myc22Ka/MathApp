@@ -3,8 +3,8 @@ package pl.myc22ka.mathapp.ai.prompt.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * Delegates to first supporting ModifierValidator from injected handlers.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Component
@@ -27,20 +27,20 @@ public class ModifierExecutor {
      * Validate modifier with response for prompt type.
      *
      * @param modifier   the modifier to validate
-     * @param promptType the prompt type context
+     * @param type the prompt type context
      * @param response   the user's response expression
      * @return true if valid, false otherwise
      */
-    public boolean validate(Modifier modifier, PromptType promptType, MathExpression response) {
+    public boolean validate(Modifier modifier, TemplatePrefix type, MathExpression response) {
         return handlers.stream()
                 .filter(h -> h.supports(modifier))
                 .findFirst()
-                .map(h -> applyWithCast(h, modifier, promptType, response))
+                .map(h -> applyWithCast(h, modifier, type, response))
                 .orElse(false);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Modifier> boolean applyWithCast(ModifierValidator<?> handler, Modifier modifier, PromptType promptType, MathExpression response) {
-        return ((ModifierValidator<T>) handler).validate((T) modifier, promptType, response);
+    private <T extends Modifier> boolean applyWithCast(ModifierValidator<?> handler, Modifier modifier, TemplatePrefix type, MathExpression response) {
+        return ((ModifierValidator<T>) handler).validate((T) modifier, type, response);
     }
 }

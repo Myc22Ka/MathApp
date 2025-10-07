@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.exercise.exercise.annotation.rating.Rating;
 import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.service.ExerciseService;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
  * based on predefined templates.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 31.08.2025
  */
 @RestController
@@ -92,6 +92,7 @@ public class ExerciseController {
      * @param sortBy        Field name used for sorting (default: id)
      * @param sortDirection Sorting direction: "asc" or "desc" (default: asc)
      * @return Paginated list of exercises matching the criteria
+     * TODO: Change comment
      */
     @Operation(
             summary = "Get exercises",
@@ -105,7 +106,7 @@ public class ExerciseController {
             @RequestParam(required = false) Double rating,
             @Parameter(description = "Filter by difficulty level", example = "1")
             @RequestParam(required = false) String difficulty,
-            @RequestParam(required = false) PromptType category,
+            @RequestParam(required = false) TemplatePrefix category,
             @RequestParam(required = false) Long templateId,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {

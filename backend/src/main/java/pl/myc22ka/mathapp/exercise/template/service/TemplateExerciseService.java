@@ -9,15 +9,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.component.filter.TemplateExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.dto.TemplateExerciseDTO;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
-
-import java.util.*;
 
 /**
  * Service layer for managing {@link TemplateExercise} entities.
@@ -25,7 +23,7 @@ import java.util.*;
  * Delegates validation and preparation logic to {@link TemplateExerciseHelper}.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 13.09.2025
  */
 @Service
@@ -56,7 +54,7 @@ public class TemplateExerciseService {
      * @return list of all template exercises
      */
     public Page<TemplateExerciseDTO> getAllTemplates(int page, int size,
-                                                     String difficulty, PromptType category,
+                                                     String difficulty, TemplatePrefix category,
                                                      String sortBy, @NotNull String sortDirection) {
 
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
@@ -88,6 +86,7 @@ public class TemplateExerciseService {
      *
      * @param id      the id of the template exercise to update
      * @param updated the updated template exercise data
+     *                TODO: Consider better comments here :)
      */
     @Transactional
     public void update(Long id, @NotNull TemplateExerciseDTO dto) {

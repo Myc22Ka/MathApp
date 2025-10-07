@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
@@ -16,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.SET;
 
 @ExtendWith(MockitoExtension.class)
 class TemplateResolverTest {
@@ -38,9 +37,9 @@ class TemplateResolverTest {
 
         mockTopic = new Topic();
         mockTopic.setId(1L);
-        mockTopic.setType(PromptType.SET);
+        mockTopic.setType(SET);
 
-        when(topicRepository.findFirstByType(PromptType.SET))
+        when(topicRepository.findFirstByType(SET))
                 .thenReturn(Optional.of(mockTopic));
     }
 

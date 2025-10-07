@@ -3,18 +3,17 @@ package pl.myc22ka.mathapp.ai.prompt.component;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.ModifierPrefix;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.DifficultyModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.RequirementModifier;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.*;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
  * Enhanced to support TemplateModifier with set reference resolution.
  *
  * @author Myc22Ka
- * @version 1.0.6
+ * @version 1.0.7
  * @since 11.08.2025
  */
 @Component
@@ -40,7 +39,7 @@ public class TemplateResolver {
     private static final Pattern TEMPLATE_PATTERN = createPattern();
 
     private final ModifierRepository modifierRepository;
-    private final TopicRepository topicRepository;
+    private final TopicHelper topicHelper;
 
     /**
      * Creates regex pattern based on available TemplatePrefix enum values.
@@ -123,11 +122,8 @@ public class TemplateResolver {
             TemplatePrefix prefix = TemplatePrefix.fromKey(prefixKey)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown prefix: " + prefixKey));
 
-            PromptType type = prefix.toPromptType();
-
             // Pobranie topic po typie
-            Topic topic = topicRepository.findFirstByType(type)
-                    .orElseThrow(() -> new IllegalStateException("No Topic found for type " + type));
+            Topic topic = topicHelper.findTopicByType(prefix);
 
             List<ModifierRequest> foundModifierRequests = new ArrayList<>();
 

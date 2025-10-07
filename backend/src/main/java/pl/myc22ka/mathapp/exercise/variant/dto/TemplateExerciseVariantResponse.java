@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.exercise.variant.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.dto.StepDTO;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * @param steps              ordered list of steps associated with the variant
  * @param exerciseCounter    number of exercises generated from this variant
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Schema(description = "Response object representing a template exercise variant")
@@ -31,7 +32,7 @@ public record TemplateExerciseVariantResponse(
         Long templateExerciseId,
 
         @Schema(description = "Main Topic", example = "SET")
-        String category,
+        TemplatePrefix category,
 
         @Schema(description = "Difficulty level of the variant", example = "1")
         String difficulty,
@@ -59,7 +60,7 @@ public record TemplateExerciseVariantResponse(
         return new TemplateExerciseVariantResponse(
                 variant.getId(),
                 variant.getTemplateExercise() != null ? variant.getTemplateExercise().getId() : null,
-                variant.getCategory() != null ? variant.getCategory().name() : null,
+                variant.getCategory(),
                 variant.getDifficulty(),
                 variant.getTemplateText(),
                 variant.getTemplateAnswer(),

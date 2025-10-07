@@ -1,8 +1,8 @@
 package pl.myc22ka.mathapp.ai.prompt.validator;
 
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * Interface for validating specific types of Modifiers.
@@ -10,7 +10,7 @@ import pl.myc22ka.mathapp.model.expression.MathExpression;
  * @param <T> the type of Modifier this validator supports
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 public interface ModifierValidator<T extends Modifier> {
@@ -27,9 +27,9 @@ public interface ModifierValidator<T extends Modifier> {
      * Validates the given modifier against the prompt type and user response.
      *
      * @param modifier   the modifier to validate
-     * @param promptType the prompt type context
+     * @param type       the prompt type context
      * @param response   the user's response expression
      * @return true if validation passes, false otherwise
      */
-    boolean validate(T modifier, PromptType promptType, MathExpression response);
+    boolean validate(T modifier, TemplatePrefix type, MathExpression response);
 }

@@ -5,19 +5,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.*;
 import pl.myc22ka.mathapp.ai.prompt.validator.ModifierExecutor;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -30,7 +31,7 @@ import java.util.Set;
  * Handles prompt creation, saving, and response validation.
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 11.08.2025
  */
 @Service
@@ -39,7 +40,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PromptService {
 
-    private final TopicRepository topicRepository;
+    private final TopicHelper topicHelper;
+    private final PromptHelper promptHelper;
     private final ModifierRepository modifierRepository;
     private final PromptRepository promptRepository;
     private final ModifierExecutor modifierExecutor;
@@ -61,7 +63,7 @@ public class PromptService {
      * @param prompt prompt to verify
      */
     public void verifyPromptResponse(@NotNull Prompt prompt, MathExpression parsedExpression) {
-        boolean allVerified = verify(
+        boolean allVerified = promptHelper.verify(
                 parsedExpression,
                 prompt.getTopic().getType(),
                 prompt.getModifiers()
@@ -77,12 +79,12 @@ public class PromptService {
      * @return true if valid, false otherwise
      */
     public boolean verifyUserMathExpressionRequest(@NotNull MathExpressionRequest request) {
-        Topic topic = findTopicByType(request.topicType());
+        Topic topic = topicHelper.findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
         var parsed = expressionFactory.parse(request.response());
 
-        return verify(parsed, request.topicType(), modifiers);
+        return promptHelper.verify(parsed, request.topicType(), modifiers);
     }
 
     /**
@@ -92,7 +94,7 @@ public class PromptService {
      * @return created prompt
      */
     public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
-        Topic topic = findTopicByType(request.topicType());
+        Topic topic = topicHelper.findTopicByType(request.topicType());
         List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
 
         List<PrefixValue> context = new ArrayList<>();
@@ -133,21 +135,6 @@ public class PromptService {
         return prompt;
     }
 
-    private boolean verify(MathExpression expression, PromptType type, @NotNull List<Modifier> modifiers) {
-        for (Modifier modifier : modifiers) {
-            if (!modifierExecutor.validate(modifier, type, expression)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Topic findTopicByType(PromptType topicType) {
-        return topicRepository.findFirstByType(topicType)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Nie znaleziono tematu dla typu: " + topicType));
-    }
-
     public List<Modifier> createOrFindModifiers(List<ModifierRequest> modifierRequests, Topic topic) {
         if (modifierRequests == null || modifierRequests.isEmpty()) {
             return List.of();
@@ -168,12 +155,12 @@ public class PromptService {
      */
     public boolean verifyModifierRequestsWithValue(@NotNull List<ModifierRequest> modifierRequests,
                                                    @NotNull String value,
-                                                   @NotNull PromptType type) {
+                                                   @NotNull TemplatePrefix type) {
         if (modifierRequests.isEmpty()) {
             return true;
         }
 
-        Topic topic = findTopicByType(type);
+        Topic topic = topicHelper.findTopicByType(type);
         var expression = expressionFactory.parse(value);
 
         for (ModifierRequest request : modifierRequests) {

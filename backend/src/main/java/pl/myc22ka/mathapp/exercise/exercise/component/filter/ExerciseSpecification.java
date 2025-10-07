@@ -5,10 +5,10 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ExerciseSpecification {
     }
 
     @NotNull
-    public static Specification<Exercise> hasDifficultyOrCategory(String difficulty, PromptType category) {
+    public static Specification<Exercise> hasDifficultyOrCategory(String difficulty, TemplatePrefix category) {
         return (root, query, cb) -> {
             if ((difficulty == null || difficulty.trim().isEmpty()) && category == null) {
                 return cb.conjunction();
@@ -89,7 +89,7 @@ public class ExerciseSpecification {
 
     @NotNull
     public static Specification<Exercise> withFilters(Double rating, String difficulty,
-                                                      PromptType category, Long templateId) {
+                                                      TemplatePrefix category, Long templateId) {
         return Specification.allOf(
                 hasRating(rating),
                 hasDifficultyOrCategory(difficulty, category),

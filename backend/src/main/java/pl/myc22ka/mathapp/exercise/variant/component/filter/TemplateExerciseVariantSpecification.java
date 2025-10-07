@@ -2,8 +2,8 @@ package pl.myc22ka.mathapp.exercise.variant.component.filter;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 public class TemplateExerciseVariantSpecification {
 
@@ -17,7 +17,7 @@ public class TemplateExerciseVariantSpecification {
     }
 
     @NotNull
-    public static Specification<TemplateExerciseVariant> hasCategory(PromptType category) {
+    public static Specification<TemplateExerciseVariant> hasCategory(TemplatePrefix category) {
         return (root, query, criteriaBuilder) -> {
             if (category == null) return null;
 
@@ -26,7 +26,7 @@ public class TemplateExerciseVariantSpecification {
     }
 
     @NotNull
-    public static Specification<TemplateExerciseVariant> withFilters(String difficulty, PromptType category) {
+    public static Specification<TemplateExerciseVariant> withFilters(String difficulty, TemplatePrefix category) {
         return hasDifficulty(difficulty)
                 .and(hasCategory(category));
     }

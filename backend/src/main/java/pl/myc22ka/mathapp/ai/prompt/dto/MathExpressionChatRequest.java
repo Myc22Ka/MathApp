@@ -1,7 +1,7 @@
 package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @param modifiers list of modifiers to customize the expression
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 06.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -36,7 +36,7 @@ public record MathExpressionChatRequest(
 
         @Schema(description = "Type of mathematical expression",
                 example = "SET")
-        PromptType topicType,
+        TemplatePrefix topicType,
 
         @Schema(description = "List of modifiers to customize the expression")
         List<ModifierRequest> modifiers

@@ -9,10 +9,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.component.filter.TemplateExerciseVariantSpecification;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
@@ -28,7 +28,7 @@ import pl.myc22ka.mathapp.step.model.StepWrapper;
  * Delegates validation and preparation logic to {@link VariantExerciseHelper}.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Service
@@ -88,7 +88,7 @@ public class TemplateExerciseVariantService {
      * @return list of all variants
      */
     public Page<TemplateExerciseVariantResponse> getAll(int page, int size,
-                                                String difficulty, PromptType category,
+                                                String difficulty, TemplatePrefix category,
                                                 String sortBy, @NotNull String sortDirection) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
                 ? Sort.Direction.DESC

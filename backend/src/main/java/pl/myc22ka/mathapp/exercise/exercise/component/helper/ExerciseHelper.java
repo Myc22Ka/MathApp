@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
@@ -18,6 +17,7 @@ import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
 import pl.myc22ka.mathapp.step.service.StepMemoryService;
@@ -30,7 +30,7 @@ import java.util.List;
  * Provides methods to fetch, build, and verify exercises.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 13.09.2025
  */
 @Component
@@ -162,7 +162,7 @@ public class ExerciseHelper {
             @NotNull List<PrefixModifierEntry> placeholders,
             @NotNull List<String> values,
             @NotNull List<PrefixValue> context,
-            @NotNull PromptType category
+            @NotNull TemplatePrefix category
     ) {
         boolean allVerified = true;
 

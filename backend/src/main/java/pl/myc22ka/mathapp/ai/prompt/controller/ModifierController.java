@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.myc22ka.mathapp.ai.prompt.dto.ModifierDTO;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.ai.prompt.service.ModifierService;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * Controller responsible for listing Modifiers.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @see ModifierDTO
- * @see PromptType
+ * @see TemplatePrefix
  * @see ModifierService
  * @since 01.10.2025
  */
@@ -51,7 +51,7 @@ public class ModifierController {
             @RequestParam(defaultValue = "20") int size,
 
             @Parameter(description = "Filter by PromptType category", required = false)
-            @RequestParam(required = false) PromptType category,
+            @RequestParam(required = false) TemplatePrefix category,
 
             @Parameter(description = "Sort field", example = "id")
             @RequestParam(defaultValue = "id") String sortBy,

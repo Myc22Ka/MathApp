@@ -2,9 +2,9 @@ package pl.myc22ka.mathapp.step.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
-import static pl.myc22ka.mathapp.ai.prompt.model.PromptType.*;
+import static pl.myc22ka.mathapp.model.expression.TemplatePrefix.*;
 
 @Getter
 @AllArgsConstructor
@@ -21,5 +21,5 @@ public enum StepType {
     EXERCISE(COMMON),
     REST(COMMON);
 
-    private final PromptType category;
+    private final TemplatePrefix category;
 }

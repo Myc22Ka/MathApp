@@ -1,13 +1,12 @@
 package pl.myc22ka.mathapp.exercise.exercise.component.helper;
 
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 
 /**
  * Helper for validating template and variant inputs.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Component
