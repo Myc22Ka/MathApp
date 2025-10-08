@@ -2,10 +2,13 @@ package pl.myc22ka.mathapp.exercise.variant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for managing {@link TemplateExerciseVariant} entities.
@@ -25,4 +28,12 @@ public interface TemplateExerciseVariantRepository extends JpaRepository<Templat
      * @return list of template exercise variants
      */
     List<TemplateExerciseVariant> findByTemplateExerciseId(Long exerciseId);
+
+    @Query("""
+        SELECT v
+        FROM TemplateExerciseVariant v
+        JOIN FETCH v.templateExercise
+        WHERE v.id = :id
+    """)
+    Optional<TemplateExerciseVariant> findByIdWithTemplate(@Param("id") Long id);
 }

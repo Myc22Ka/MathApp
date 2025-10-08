@@ -35,13 +35,14 @@ public class FindAllIntegers implements StepExecutor {
             throw new IllegalArgumentException("Cannot find all integers in a range with infinity: " + first);
         }
 
+        String newKey = helper.nextContextKey(context);
+
         if (first instanceof Interval interval) {
             var allIntegers = interval.findAllIntegers();
-            String newKey = helper.nextContextKey(context);
 
             context.add(new ContextRecord(newKey, allIntegers.getTemplatePrefix(), allIntegers.toString()));
         } else {
-            throw new IllegalArgumentException("Expected Interval but got: " + first.getClass().getSimpleName());
+            context.add(new ContextRecord(newKey, first.getTemplatePrefix(), first.size().toString()));
         }
     }
 }

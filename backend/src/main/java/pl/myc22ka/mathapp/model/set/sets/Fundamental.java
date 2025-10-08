@@ -15,8 +15,7 @@ import pl.myc22ka.mathapp.model.set.visitors.DifferenceVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.IntersectionVisitor;
 import pl.myc22ka.mathapp.model.set.visitors.UnionVisitor;
 
-import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
-import static pl.myc22ka.mathapp.model.set.SetSymbols.REAL;
+import static pl.myc22ka.mathapp.model.set.SetSymbols.*;
 
 /**
  * Mathematical interval set ℝ.
@@ -78,7 +77,7 @@ public class Fundamental implements ISet {
 
     @Override
     public Integer size() {
-        return leftSymbol == EMPTY ? 0 : null;
+        return leftSymbol == EMPTY ? 0 : INFINITY.ordinal();
     }
 
     @Override

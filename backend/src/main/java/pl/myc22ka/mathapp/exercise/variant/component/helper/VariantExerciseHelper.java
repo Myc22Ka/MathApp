@@ -44,7 +44,7 @@ public class VariantExerciseHelper {
      * @throws IllegalArgumentException if the variant is not found
      */
     public TemplateExerciseVariant getVariant(Long variantId) {
-        return templateVariantRepository.findById(variantId)
+        return templateVariantRepository.findByIdWithTemplate(variantId)
                 .orElseThrow(() -> new IllegalArgumentException("Variant not found with id " + variantId));
     }
 

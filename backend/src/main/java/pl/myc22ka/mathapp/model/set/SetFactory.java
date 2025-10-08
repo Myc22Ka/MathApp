@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.model.set;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.expression.IExpressionParser;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.model.set.parsers.*;
 import pl.myc22ka.mathapp.model.set.sets.Fundamental;
 
@@ -14,7 +15,7 @@ import static pl.myc22ka.mathapp.model.set.SetSymbols.EMPTY;
  * Supports finite sets, intervals, and fundamental sets.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025.06.19
  */
 public class SetFactory implements IExpressionParser<ISet> {
@@ -41,5 +42,10 @@ public class SetFactory implements IExpressionParser<ISet> {
         }
 
         throw new IllegalArgumentException("Unsupported set expression: " + expression);
+    }
+
+    @Override
+    public TemplatePrefix getPrefix() {
+        return TemplatePrefix.SET;
     }
 }

@@ -137,9 +137,9 @@ public class ExerciseService {
     public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateExercise template = templateId != null
+        TemplateLike template = templateId != null
                 ? templateExerciseHelper.getTemplate(templateId)
-                : variantExerciseHelper.getVariant(variantId).getTemplateExercise();
+                : variantExerciseHelper.getVariant(variantId);
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
