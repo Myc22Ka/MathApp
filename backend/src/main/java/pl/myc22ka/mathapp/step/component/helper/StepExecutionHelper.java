@@ -15,6 +15,7 @@ import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,15 +32,17 @@ public class StepExecutionHelper {
     }
 
     public List<ISet> getSetsFromContext(@NotNull StepWrapper step, @NotNull List<ContextRecord> context) {
-        Map<String, String> contextMap = context.stream()
-                .collect(Collectors.toMap(c -> c.key().templateString(), ContextRecord::value));
+        Map<String, ContextRecord> contextMap = context.stream()
+                .collect(Collectors.toMap(c -> c.key().templateString(), Function.identity()));
 
         List<ISet> sets = new ArrayList<>();
 
         for (String prefix : step.getPrefixes()) {
             if (contextMap.containsKey(prefix)) {
-                String value = contextMap.get(prefix);
-                MathExpression expr = expressionFactory.parse(value);
+                ContextRecord record = contextMap.get(prefix);
+
+                MathExpression expr = expressionFactory.parse(record);
+
                 if (expr instanceof ISet setExpr) {
                     sets.add(setExpr);
                 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
@@ -25,22 +26,20 @@ class TemplateResolverTest {
     private ModifierRepository modifierRepository;
 
     @Mock
-    private TopicRepository topicRepository;
+    private TopicHelper topicHelper;
 
     private TemplateResolver resolver;
 
-    private Topic mockTopic;
-
     @BeforeEach
     void setUp() {
-        resolver = new TemplateResolver(modifierRepository, topicRepository);
+        resolver = new TemplateResolver(modifierRepository, topicHelper);
 
-        mockTopic = new Topic();
+        Topic mockTopic = new Topic();
         mockTopic.setId(1L);
         mockTopic.setType(SET);
 
-        when(topicRepository.findFirstByType(SET))
-                .thenReturn(Optional.of(mockTopic));
+        when(topicHelper.findTopicByType(SET))
+                .thenReturn(mockTopic);
     }
 
     @Test

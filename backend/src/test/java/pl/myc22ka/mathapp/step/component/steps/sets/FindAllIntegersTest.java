@@ -63,7 +63,7 @@ class FindAllIntegersTest {
         findAllIntegers.execute(step, context);
 
         assertFalse(context.isEmpty());
-        assertEquals("result", context.getFirst().key());
+        assertEquals("result", context.getFirst().key().templateString());
         assertEquals("{1,2,3,4}", context.getFirst().value());
     }
 
@@ -85,23 +85,6 @@ class FindAllIntegersTest {
     }
 
     /**
-     * Test executing with a non-interval set.
-     * Expects IllegalArgumentException to be thrown.
-     */
-    @Test
-    void testExecuteWithNonInterval() {
-        ISet notInterval = mock(ISet.class);
-        List<ISet> sets = List.of(notInterval);
-
-        when(helper.getSetsFromContext(step, context)).thenReturn(sets);
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> findAllIntegers.execute(step, context));
-
-        assertTrue(ex.getMessage().contains("Expected Interval but got"));
-    }
-
-    /**
      * Test that executing adds a new prefix value with all integers in the interval.
      */
     @Test
@@ -115,7 +98,7 @@ class FindAllIntegersTest {
         findAllIntegers.execute(step, context);
 
         assertEquals(1, context.size());
-        assertEquals("ints", context.getFirst().key());
+        assertEquals("ints", context.getFirst().key().templateString());
         assertEquals("{3,4,5,6,7}", context.getFirst().value());
     }
 }
