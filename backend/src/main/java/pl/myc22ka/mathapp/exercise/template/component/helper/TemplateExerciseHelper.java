@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
-import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 
@@ -35,25 +34,6 @@ public class TemplateExerciseHelper {
     public TemplateExercise getTemplate(Long templateId) {
         return templateExerciseRepository.findById(templateId)
                 .orElseThrow(() -> new IllegalArgumentException("Template not found with id " + templateId));
-    }
-
-    /**
-     * Validates that no existing template has the same clear text.
-     *
-     * @param template the TemplateExercise to validate
-     * @throws TemplateAlreadyExistsException if a template with the same text exists
-     */
-    public void validateUnique(@NotNull TemplateExercise template) {
-        String cleanText = templateResolver.removeTemplatePlaceholders(template.getTemplateText());
-        List<TemplateExercise> allTemplates = templateExerciseRepository.findAll();
-
-        for (TemplateExercise t : allTemplates) {
-            if (t.getClearText().equals(cleanText)) {
-                throw new TemplateAlreadyExistsException(
-                        "Template with the same text already exists"
-                );
-            }
-        }
     }
 
     /**

@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Requirement;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.Template;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
@@ -40,6 +41,7 @@ import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 public class ModifierRequest {
 
     private static final ExpressionFactory expressionFactory = new ExpressionFactory();
+
     @Schema(description = "Type of modifier", example = "DIFFICULTY")
     private String type;
     @Schema(description = "Difficulty level (required for type = DIFFICULTY)", example = "1")
@@ -51,7 +53,7 @@ public class ModifierRequest {
     @Schema(description = "Optional extra information for the template (only for type = TEMPLATE)", example = "(1,4)")
     private String templateInformation;
 
-    public Modifier toModifier(@NotNull Topic topic, @NotNull ModifierRepository repository) {
+    public Modifier toModifier(@NotNull Topic topic, @NotNull ModifierRepository repository, @NotNull TopicHelper topicHelper) {
         return switch (type.toUpperCase()) {
             case "DIFFICULTY" -> repository
                     .findByTopicAndDifficultyLevel(topic, difficultyLevel)
@@ -64,8 +66,14 @@ public class ModifierRequest {
                         .findByTopicAndTemplate(topic, template)
                         .orElseThrow(() -> new IllegalStateException("No TemplateModifier found for topic=" + topic.getId() + " and template=" + template));
 
-                if (modifier instanceof TemplateModifier templateModifier && templateInformation != null) {
-                    templateModifier.setInformation(expressionFactory.parse(templateInformation));
+                if (templateInformation != null) {
+                    var templateString = new TemplateResolver(repository, topicHelper).findTemplatePrefixes(modifier.getModifierText());
+
+                    modifier.setInformation(
+                            expressionFactory.parse(
+                                    new ContextRecord(templateString.toString(), topic.getType(), templateInformation)
+                            )
+                    );
                 }
 
                 yield modifier;

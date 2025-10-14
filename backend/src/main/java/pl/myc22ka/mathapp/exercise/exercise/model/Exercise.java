@@ -37,7 +37,7 @@ public class Exercise {
     @JoinColumn(name = "template_exercise_variant_id")
     private TemplateExerciseVariant templateExerciseVariant;
 
-    @Column(name = "text", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "text", columnDefinition = "TEXT", nullable = false, unique = true)
     private String text;
 
     @Column(name = "answer", columnDefinition = "TEXT", nullable = false)

@@ -10,7 +10,8 @@
         "stepDefinitionId": 3,
         "prefixes": ["s2", "s1"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   },
   {
     "category": "SET",
@@ -27,7 +28,8 @@
         "stepDefinitionId": 4,
         "prefixes": ["context1"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   },
   {
     "category": "SET",
@@ -44,6 +46,7 @@
         "stepDefinitionId": 4,
         "prefixes": ["context1"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   }
 ]

@@ -8,15 +8,15 @@ import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
 import pl.myc22ka.mathapp.exceptions.custom.VariantTextMismatch;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
-import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.template.repository.TemplateExerciseRepository;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
+import pl.myc22ka.mathapp.step.dto.StepDTO;
 import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,26 +82,22 @@ public class VariantExerciseHelper {
                 templateVariantRepository.findByTemplateExerciseId(variant.getTemplateExercise().getId());
 
         for (TemplateExerciseVariant t : variantsForTemplate) {
-            if (t.getTemplateText().equals(text)) {
-                throw new TemplateAlreadyExistsException("Variant already exists");
-            }
+            if (!t.getTemplateText().equals(text)) continue;
 
             var templateModifiers = templateResolver.findPrefixModifiers(t.getTemplateText());
             if (PrefixModifierEntry.areEqualLists(modifiers, templateModifiers)) {
-                throw new TemplateAlreadyExistsException("Variant already exists with the same modifiers");
+                throw new TemplateAlreadyExistsException("Variant already exists with the same text and modifiers");
             }
         }
 
         List<TemplateExercise> templates = templateExerciseRepository.findAll();
 
         for (TemplateExercise t : templates) {
-            if (t.getTemplateText().equals(text)) {
-                throw new TemplateAlreadyExistsException("A template already exists with the same text");
-            }
+            if (!t.getTemplateText().equals(text)) continue;
 
             var templateModifiers = templateResolver.findPrefixModifiers(t.getTemplateText());
             if (PrefixModifierEntry.areEqualLists(modifiers, templateModifiers)) {
-                throw new TemplateAlreadyExistsException("A template already exists with the same modifiers");
+                throw new TemplateAlreadyExistsException("A template already exists with the same text and modifiers");
             }
         }
     }
@@ -114,13 +110,13 @@ public class VariantExerciseHelper {
      * @param templateText2 the new template text
      * @throws VariantTextMismatch if the clean text remains the same (i.e., text hasn’t really changed)
      */
-    public void validateCleanTextVariant(@NotNull TemplateExerciseVariant variant, String templateText2){
+    public void validateCleanTextVariant(@NotNull TemplateExerciseVariant variant, String templateText2) {
         String cleanText1 = variant.getClearText();
         String cleanText2 = templateResolver.removeTemplatePlaceholders(templateText2);
 
-        if(cleanText1.equals(cleanText2)){
+        if (cleanText1.equals(cleanText2)) {
             throw new VariantTextMismatch("Variant text shouldn't be changed");
-        };
+        }
     }
 
     /**
@@ -143,32 +139,34 @@ public class VariantExerciseHelper {
         existing.setClearText(cleanText);
 
         if (request.steps() != null) {
-            existing.getSteps().addAll(
-                    request.steps().stream()
-                            .map(stepDto -> {
-                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
-                                        .orElseThrow(() -> new IllegalArgumentException(
-                                                "Step definition not found with id " + stepDto.stepDefinitionId()));
-
-                                return StepWrapper.builder()
-                                        .stepDefinition(def)
-                                        .variant(existing)
-                                        .build();
-                            })
-                            .toList()
-            );
+            existing.getSteps().addAll(createStepWrappers(request.steps(), existing));
         }
     }
 
-    public TemplateExercise fromVariant(@NotNull TemplateExerciseVariant variant) {
-        return TemplateExercise.builder()
-                .category(variant.getCategory())
-                .difficulty(variant.getDifficulty())
-                .templateText(variant.getTemplateText())
-                .templateAnswer(variant.getTemplateAnswer())
-                .clearText(variant.getClearText())
-                .exerciseCounter(variant.getExerciseCounter())
-                .steps(new ArrayList<>(variant.getSteps()))
-                .build();
+    /**
+     * Creates a list of StepWrapper instances from step DTOs.
+     * This method centralizes the logic for converting step definitions
+     * into StepWrapper objects, eliminating code duplication.
+     *
+     * @param stepDtos the list of step DTOs
+     * @param variant  the variant to associate with the steps
+     * @return list of StepWrapper instances
+     * @throws IllegalArgumentException if a step definition is not found
+     */
+    public List<StepWrapper> createStepWrappers(@NotNull List<StepDTO> stepDtos,
+                                                @NotNull TemplateExerciseVariant variant) {
+        return stepDtos.stream()
+                .map(stepDto -> {
+                    StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                    "Step definition not found with id " + stepDto.stepDefinitionId()));
+
+                    return StepWrapper.builder()
+                            .stepDefinition(def)
+                            .variant(variant)
+                            .prefixes(stepDto.prefixes())
+                            .build();
+                })
+                .toList();
     }
 }

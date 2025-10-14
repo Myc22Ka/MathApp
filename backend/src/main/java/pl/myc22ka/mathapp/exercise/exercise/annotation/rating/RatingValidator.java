@@ -8,13 +8,16 @@ public class RatingValidator implements ConstraintValidator<Rating, Double> {
     @Override
     public boolean isValid(Double value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
+            return true; // jeśli null jest OK
         }
-        if (value < 0.5 || value > 5.0) {
+
+        // Zakres 1.0–5.0
+        if (value < 1.0 || value > 5.0) {
             return false;
         }
 
-        double remainder = value % 0.5;
-        return remainder == 0.0;
+        // Czy to wielokrotność 0.5
+        double scaled = value * 2;
+        return Math.abs(scaled - Math.round(scaled)) < 1e-9;
     }
 }

@@ -43,7 +43,7 @@ public class TemplateExercise implements TemplateLike {
     @Column(name = "template_answer", columnDefinition = "TEXT")
     private String templateAnswer;
 
-    @Column(name = "clear_text", columnDefinition = "TEXT")
+    @Column(name = "clear_text", columnDefinition = "TEXT", unique = true)
     private String clearText;
 
     @ElementCollection

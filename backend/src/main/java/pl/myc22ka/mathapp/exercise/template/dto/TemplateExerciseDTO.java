@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
-import pl.myc22ka.mathapp.step.model.StepWrapper;
-import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.step.dto.StepDTO;
 import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
 import java.util.List;
 
@@ -46,7 +46,10 @@ public record TemplateExerciseDTO(
         String templateAnswer,
 
         @Schema(description = "Steps describing how to solve the exercise in order")
-        List<StepDTO> steps
+        List<StepDTO> steps,
+
+        @Schema(description = "Number of exercises generated from this template", example = "3")
+        Long exerciseCounter
 ) {
     /**
      * Maps a {@link TemplateExercise} entity to a {@link TemplateExerciseDTO}.
@@ -66,7 +69,8 @@ public record TemplateExerciseDTO(
                         ? exercise.getSteps().stream()
                         .map(StepDTO::fromEntity)
                         .toList()
-                        : List.of()
+                        : List.of(),
+                exercise.getExerciseCounter()
         );
     }
 
@@ -80,11 +84,13 @@ public record TemplateExerciseDTO(
     @NotNull
     public TemplateExercise toEntity(@NotNull StepDefinitionRepository stepDefinitionRepository) {
         TemplateExercise exercise = new TemplateExercise();
+
         exercise.setId(this.id());
         exercise.setCategory(this.category());
         exercise.setDifficulty(this.difficulty());
         exercise.setTemplateText(this.templateText());
         exercise.setTemplateAnswer(this.templateAnswer());
+        exercise.setExerciseCounter(0L);
 
         if (this.steps() != null) {
             exercise.getSteps().addAll(
@@ -96,6 +102,7 @@ public record TemplateExerciseDTO(
                                 return StepWrapper.builder()
                                         .stepDefinition(def)
                                         .exercise(exercise)
+                                        .prefixes(stepDto.prefixes())
                                         .build();
                             })
                             .toList()

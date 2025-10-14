@@ -13,4 +13,6 @@ public interface TemplateLike {
     String getClearText();
     List<StepWrapper> getSteps();
     Long getExerciseCounter();
+
+    void setExerciseCounter(Long counter);
 }

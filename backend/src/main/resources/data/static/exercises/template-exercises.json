@@ -9,7 +9,8 @@
         "stepDefinitionId": 1,
         "prefixes": ["s1", "s2"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   },
   {
     "category": "SET",
@@ -21,7 +22,8 @@
         "stepDefinitionId": 2,
         "prefixes": ["s1", "s2"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   },
   {
     "category": "SET",
@@ -33,7 +35,8 @@
         "stepDefinitionId": 3,
         "prefixes": ["s1", "s2"]
       }
-    ]
+    ],
+    "exerciseCounter": 2
   },
   {
     "category": "SET",
@@ -49,7 +52,8 @@
         "stepDefinitionId": 1,
         "prefixes": ["context1", "s3"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   },
   {
     "category": "SET",
@@ -61,7 +65,8 @@
         "stepDefinitionId": 4,
         "prefixes": ["s1"]
       }
-    ]
+    ],
+    "exerciseCounter": 2
   },
   {
     "category": "SET",
@@ -73,6 +78,7 @@
         "stepDefinitionId": 5,
         "prefixes": ["s1", "s2"]
       }
-    ]
+    ],
+    "exerciseCounter": 1
   }
 ]

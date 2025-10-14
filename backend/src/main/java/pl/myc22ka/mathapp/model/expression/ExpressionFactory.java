@@ -31,19 +31,6 @@ public class ExpressionFactory {
      * @param expression the expression
      * @return the math expression
      */
-    @Deprecated
-    public MathExpression parse(@NotNull String expression) {
-        String trimmed = expression.replaceAll("\\s+", "");
-
-        for (IExpressionParser<?> parser : parsers) {
-            if (parser.canHandle(trimmed)) {
-                return parser.parse(trimmed);
-            }
-        }
-
-        throw new IllegalArgumentException("Unsupported expression: " + expression);
-    }
-
     public MathExpression parse(@NotNull ContextRecord contextRecord) {
         String trimmedValue = contextRecord.value().replaceAll("\\s+", "");
 
@@ -52,7 +39,8 @@ public class ExpressionFactory {
                 return parser.parse(trimmedValue);
             }
         }
-
+        // TODO: I need to make sure that parser is chosen by prefix not by order in the list
+        //       And make sure that when user gives you values all values are parsed by same parser as provided by template string
         throw new IllegalArgumentException("Unsupported expression: " + contextRecord.value());
     }
 }

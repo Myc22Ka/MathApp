@@ -52,8 +52,8 @@ public class StepWrapper {
 
     @ElementCollection
     @CollectionTable(
-            name = "step_definition_prefixes",
-            joinColumns = @JoinColumn(name = "step_definition_id")
+            name = "step_wrapper_prefixes",
+            joinColumns = @JoinColumn(name = "step_wrapper_id")
     )
     @Column(name = "prefix")
     @Builder.Default

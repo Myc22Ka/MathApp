@@ -59,8 +59,6 @@ public class TemplateExerciseInitializer {
                 Set<String> prefixes = templateResolver.findTemplatePrefixes(exercise.getTemplateText());
                 exercise.setTemplatePrefixes(new ArrayList<>(prefixes));
 
-                exercise.setExerciseCounter(0L);
-
                 if (exercise.getSteps() != null) {
                     List<StepWrapper> wrappedSteps = new ArrayList<>();
 

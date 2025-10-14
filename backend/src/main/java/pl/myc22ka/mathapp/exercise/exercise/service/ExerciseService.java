@@ -65,11 +65,11 @@ public class ExerciseService {
                 : variantExerciseHelper.getVariant(variantId);
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
-        exerciseHelper.validatePlaceholderCount(placeholders, values);
+        exerciseHelper.validateExercise(placeholders, values);
 
         List<ContextRecord> context = exerciseHelper.buildContext(placeholders, values);
 
-        boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
+        boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, context, template.getCategory());
         String finalText = exerciseHelper.resolveText(template, context);
 
         Exercise exercise = exerciseHelper.buildExercise(template, context, finalText, allVerified);
@@ -179,9 +179,9 @@ public class ExerciseService {
         TemplateExercise template = templateExerciseHelper.getTemplate(exercise.getTemplateExercise().getId());
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
-        exerciseHelper.validatePlaceholderCount(placeholders, values);
+        exerciseHelper.validateExercise(placeholders, values);
         List<ContextRecord> context = exerciseHelper.buildContext(placeholders, values);
-        boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, values, context, template.getCategory());
+        boolean allVerified = exerciseHelper.verifyPlaceholders(placeholders, context, template.getCategory());
         String finalText = exerciseHelper.resolveText(template, context);
 
         exercise.setText(finalText);
@@ -200,8 +200,12 @@ public class ExerciseService {
     public boolean solve(Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);
 
-        var userAnswer = exerciseHelper.parseValue(answer);
-        var exerciseAnswer = exerciseHelper.parseValue(exercise.getAnswer());
+        TemplateLike template = exercise.getTemplateExercise() != null
+                ? exercise.getTemplateExercise()
+                : exercise.getTemplateExerciseVariant();
+
+        var userAnswer = exerciseHelper.parseValue(new ContextRecord(template.getCategory(), answer));
+        var exerciseAnswer = exerciseHelper.parseValue(new ContextRecord(template.getCategory(), exercise.getAnswer()));
 
         return userAnswer.equals(exerciseAnswer);
     }

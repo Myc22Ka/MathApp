@@ -6,17 +6,14 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.*;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
-import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.PromptRepository;
-import pl.myc22ka.mathapp.ai.prompt.validator.ModifierExecutor;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
-import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -29,7 +26,7 @@ import java.util.Set;
  * Handles prompt creation, saving, and response validation.
  *
  * @author Myc22Ka
- * @version 1.0.5
+ * @version 1.0.6
  * @since 11.08.2025
  */
 @Service
@@ -39,21 +36,9 @@ import java.util.Set;
 public class PromptService {
 
     private final TopicHelper topicHelper;
-    private final ModifierRepository modifierRepository;
-    private final PromptRepository promptRepository;
-    private final ModifierExecutor modifierExecutor;
+    private final PromptHelper promptHelper;
     private final TemplateResolver templateResolver;
-    private final ExpressionFactory expressionFactory;
     private final ExerciseHelper exerciseHelper;
-
-    /**
-     * Saves the given prompt.
-     *
-     * @param prompt prompt to save
-     */
-    public void save(Prompt prompt) {
-        promptRepository.save(prompt);
-    }
 
     /**
      * Creates a prompt based on the chat request.
@@ -63,7 +48,7 @@ public class PromptService {
      */
     public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
         Topic topic = topicHelper.findTopicByType(request.topicType());
-        List<Modifier> modifiers = createOrFindModifiers(request.modifiers(), topic);
+        List<Modifier> modifiers = promptHelper.createOrFindModifiers(request.modifiers(), topic);
 
         List<ContextRecord> context = new ArrayList<>();
         List<Modifier> promptModifiers = new ArrayList<>();
@@ -98,15 +83,5 @@ public class PromptService {
         prompt.buildFinalPromptText();
 
         return prompt;
-    }
-
-    public List<Modifier> createOrFindModifiers(List<ModifierRequest> modifierRequests, Topic topic) {
-        if (modifierRequests == null || modifierRequests.isEmpty()) {
-            return List.of();
-        }
-
-        return modifierRequests.stream()
-                .map(req -> req.toModifier(topic, modifierRepository))
-                .toList();
     }
 }

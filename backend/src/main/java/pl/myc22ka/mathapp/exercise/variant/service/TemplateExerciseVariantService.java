@@ -10,17 +10,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.component.filter.TemplateExerciseVariantSpecification;
-import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
-import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
-import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
-import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
-import pl.myc22ka.mathapp.step.model.StepDefinition;
-import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * Service layer for managing {@link TemplateExerciseVariant} entities.
@@ -34,11 +31,9 @@ import pl.myc22ka.mathapp.step.model.StepWrapper;
 @Service
 @RequiredArgsConstructor
 public class TemplateExerciseVariantService {
-
     private final VariantExerciseHelper variantExerciseHelper;
     private final TemplateExerciseVariantRepository variantRepository;
     private final TemplateExerciseHelper templateExerciseHelper;
-    private final StepDefinitionRepository stepDefinitionRepository;
 
     /**
      * Creates a new template exercise variant for a given template.
@@ -61,24 +56,12 @@ public class TemplateExerciseVariantService {
 
         if (request.steps() != null) {
             variant.getSteps().addAll(
-                    request.steps().stream()
-                            .map(stepDto -> {
-                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
-                                        .orElseThrow(() -> new IllegalArgumentException(
-                                                "Step definition not found with id " + stepDto.stepDefinitionId()));
-
-                                return StepWrapper.builder()
-                                        .stepDefinition(def)
-                                        .variant(variant)
-                                        .build();
-                            })
-                            .toList()
+                    variantExerciseHelper.createStepWrappers(request.steps(), variant)
             );
         }
 
         variantExerciseHelper.validateUnique(variant);
         variantExerciseHelper.prepareForCreate(variant);
-
         return variantRepository.save(variant);
     }
 
@@ -88,8 +71,8 @@ public class TemplateExerciseVariantService {
      * @return list of all variants
      */
     public Page<TemplateExerciseVariantResponse> getAll(int page, int size,
-                                                String difficulty, TemplatePrefix category,
-                                                String sortBy, @NotNull String sortDirection) {
+                                                        String difficulty, TemplatePrefix category,
+                                                        String sortBy, @NotNull String sortDirection) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
                 ? Sort.Direction.DESC
                 : Sort.Direction.ASC;

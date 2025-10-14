@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
 import pl.myc22ka.mathapp.exercise.template.component.filter.TemplateExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.dto.TemplateExerciseDTO;
@@ -33,6 +34,7 @@ public class TemplateExerciseService {
     private final TemplateExerciseRepository templateRepository;
     private final TemplateExerciseHelper templateExerciseHelper;
     private final StepDefinitionRepository stepDefinitionRepository;
+    private final TemplateResolver templateResolver;
 
     /**
      * Creates a new template exercise after validating uniqueness and preparing required fields.
@@ -42,7 +44,6 @@ public class TemplateExerciseService {
     public void create(@NotNull TemplateExerciseDTO dto) {
         TemplateExercise template = dto.toEntity(stepDefinitionRepository);
 
-        templateExerciseHelper.validateUnique(template);
         templateExerciseHelper.prepareForCreate(template);
 
         templateRepository.save(template);
@@ -92,6 +93,8 @@ public class TemplateExerciseService {
     public void update(Long id, @NotNull TemplateExerciseDTO dto) {
         TemplateExercise existing = templateExerciseHelper.getTemplate(id);
         TemplateExercise updated = dto.toEntity(stepDefinitionRepository);
+
+        updated.setClearText(templateResolver.removeTemplatePlaceholders(updated.getTemplateText()));
 
         if (templateExerciseHelper.isSoftUpdate(existing, updated)) {
             templateExerciseHelper.applySoftUpdate(existing, updated);

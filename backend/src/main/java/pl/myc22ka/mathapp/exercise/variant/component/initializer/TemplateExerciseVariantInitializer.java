@@ -60,7 +60,7 @@ public class TemplateExerciseVariantInitializer {
                         .templateText(dto.templateText())
                         .templateAnswer(dto.templateAnswer())
                         .clearText(cleanText)
-                        .exerciseCounter(0L)
+                        .exerciseCounter(dto.exerciseCounter())
                         .steps(dto.steps() != null ? dto.steps() : new ArrayList<>())
                         .build();
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
+import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
 import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
@@ -15,7 +16,6 @@ import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.ai.prompt.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 
 import java.util.List;
 import java.util.Map;
@@ -78,13 +78,13 @@ public class OllamaService {
 
         String response = chat(prompt.getFinalPromptText());
 
-        var parsed = expressionFactory.parse(response);
+        var parsed = expressionFactory.parse(new ContextRecord(request.topicType(), response));
 
         prompt.setResponseText(parsed.toString());
 
         promptHelper.verifyPromptResponse(prompt, parsed);
 
-        promptService.save(prompt);
+        promptHelper.save(prompt);
 
         return prompt;
     }
@@ -97,9 +97,9 @@ public class OllamaService {
      */
     public boolean useMathString(@NotNull MathExpressionRequest request) {
         Topic topic = topicHelper.findTopicByType(request.topicType());
-        List<Modifier> modifiers = promptService.createOrFindModifiers(request.modifiers(), topic);
+        List<Modifier> modifiers = promptHelper.createOrFindModifiers(request.modifiers(), topic);
 
-        var parsed = expressionFactory.parse(request.response());
+        var parsed = expressionFactory.parse(new ContextRecord(request.topicType(), request.response()));
 
         return promptHelper.verify(parsed, request.topicType(), modifiers);
     }

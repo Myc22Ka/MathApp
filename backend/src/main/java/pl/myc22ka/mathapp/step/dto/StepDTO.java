@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.step.model.StepDefinition;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 
+import java.util.List;
+
 /**
  * Data Transfer Object for Step entity.
  * Represents a single step in a template or variant exercise.
@@ -20,7 +22,10 @@ public record StepDTO(
         Long stepDefinitionId,
 
         @Schema(description = "Step text content", example = "Calculate the union of sets A and B")
-        String stepText
+        String stepText,
+
+        @Schema(description = "List of step prefixes, indicating which placeholders this step uses", example = "[\"s1\", \"s2\"]")
+        List<String> prefixes
 ) {
     /**
      * Converts a StepWrapper entity to StepDTO.
@@ -32,7 +37,8 @@ public record StepDTO(
     public static StepDTO fromEntity(@NotNull StepWrapper step) {
         return new StepDTO(
                 step.getStepDefinition().getId(),
-                step.getStepDefinition().getStepText()
+                step.getStepDefinition().getStepText(),
+                step.getPrefixes()
         );
     }
 
@@ -46,7 +52,8 @@ public record StepDTO(
     public static StepDTO fromStepDefinition(@NotNull StepDefinition stepDefinition) {
         return new StepDTO(
                 stepDefinition.getId(),
-                stepDefinition.getStepText()
+                stepDefinition.getStepText(),
+                null
         );
     }
 }
