@@ -2,7 +2,7 @@ package pl.myc22ka.mathapp.model.expression;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.model.set.SetFactory;
 
 import java.util.List;
@@ -26,10 +26,11 @@ public class ExpressionFactory {
     );
 
     /**
-     * Parse math expression.
+     * Parses a mathematical expression string into a {@link MathExpression} object.
      *
-     * @param expression the expression
-     * @return the math expression
+     * @param contextRecord contains both the prefix (type/category) and the raw expression value
+     * @return parsed {@link MathExpression} instance
+     * @throws IllegalArgumentException if no matching parser can handle the expression
      */
     public MathExpression parse(@NotNull ContextRecord contextRecord) {
         String trimmedValue = contextRecord.value().replaceAll("\\s+", "");

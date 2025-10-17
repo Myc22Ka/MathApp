@@ -5,15 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
-import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
+import pl.myc22ka.mathapp.topic.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.repository.ModifierRepository;
-import pl.myc22ka.mathapp.ai.prompt.repository.TopicRepository;
+import pl.myc22ka.mathapp.topic.model.Topic;
+import pl.myc22ka.mathapp.modifier.repository.ModifierRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

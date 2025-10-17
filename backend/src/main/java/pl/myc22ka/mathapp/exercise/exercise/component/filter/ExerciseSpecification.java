@@ -13,10 +13,25 @@ import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * JPA Specifications for filtering {@link Exercise} entities.
+ * <p>
+ * Provides reusable predicates to filter exercises by rating, template ID, difficulty, or category.
+ * Can be combined using {@link Specification#and(Specification)} or {@link Specification#allOf(Specification[])}.
+ *
+ * @author Myc22Ka
+ * @since 2025-10-17
+ */
 public class ExerciseSpecification {
 
+    /**
+     * Filter exercises by exact rating.
+     *
+     * @param rating rating value to filter by
+     * @return JPA specification for rating
+     */
     @NotNull
-    public static Specification<Exercise> hasRating(Double rating) {
+    private static Specification<Exercise> hasRating(Double rating) {
         return (root, query, criteriaBuilder) -> {
             if (rating == null) return criteriaBuilder.conjunction();
 
@@ -24,8 +39,16 @@ public class ExerciseSpecification {
         };
     }
 
+    /**
+     * Filter exercises by template ID.
+     * <p>
+     * Matches both direct template exercises and template exercise variants.
+     *
+     * @param templateId template ID to filter by
+     * @return JPA specification for template ID
+     */
     @NotNull
-    public static Specification<Exercise> hasTemplateId(Long templateId) {
+    private static Specification<Exercise> hasTemplateId(Long templateId) {
         return (root, query, cb) -> {
             if (templateId == null) {
                 return cb.conjunction();
@@ -47,8 +70,15 @@ public class ExerciseSpecification {
         };
     }
 
+    /**
+     * Filter exercises by difficulty and/or category.
+     *
+     * @param difficulty difficulty level (optional)
+     * @param category   template prefix category (optional)
+     * @return JPA specification for difficulty or category
+     */
     @NotNull
-    public static Specification<Exercise> hasDifficultyOrCategory(String difficulty, TemplatePrefix category) {
+    private static Specification<Exercise> hasDifficultyOrCategory(String difficulty, TemplatePrefix category) {
         return (root, query, cb) -> {
             if ((difficulty == null || difficulty.trim().isEmpty()) && category == null) {
                 return cb.conjunction();
@@ -87,6 +117,15 @@ public class ExerciseSpecification {
         };
     }
 
+    /**
+     * Combines all filters: rating, difficulty/category, and template ID.
+     *
+     * @param rating     rating to filter by
+     * @param difficulty difficulty level
+     * @param category   template category
+     * @param templateId template ID
+     * @return combined JPA specification
+     */
     @NotNull
     public static Specification<Exercise> withFilters(Double rating, String difficulty,
                                                       TemplatePrefix category, Long templateId) {

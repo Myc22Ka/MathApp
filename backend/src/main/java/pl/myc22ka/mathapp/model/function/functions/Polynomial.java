@@ -6,7 +6,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.*;
 
@@ -45,7 +44,6 @@ public class Polynomial extends Function {
     }
 
     @Override
-    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers == null || answers.isEmpty()) {
             throw new IllegalArgumentException("Musisz podać przynajmniej jedno miejsce zerowe.");

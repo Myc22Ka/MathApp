@@ -66,9 +66,16 @@ public class TemplateExerciseVariantService {
     }
 
     /**
-     * Retrieves all template exercise variants.
+     * Retrieves a paginated list of all {@link TemplateExerciseVariant} entities
+     * with optional filters for difficulty and category.
      *
-     * @return list of all variants
+     * @param page          zero-based page index (default: 0)
+     * @param size          number of items per page (default: 20)
+     * @param difficulty    optional filter for difficulty level (e.g. "easy", "hard")
+     * @param category      optional filter for exercise category (e.g. {@link TemplatePrefix#SET})
+     * @param sortBy        field name used for sorting (default: "id")
+     * @param sortDirection sorting direction — "asc" or "desc" (default: "asc")
+     * @return a {@link Page} of {@link TemplateExerciseVariantResponse} objects matching the filters
      */
     public Page<TemplateExerciseVariantResponse> getAll(int page, int size,
                                                         String difficulty, TemplatePrefix category,

@@ -5,15 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
-import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
+import pl.myc22ka.mathapp.topic.component.helper.TopicHelper;
 import pl.myc22ka.mathapp.ai.prompt.dto.*;
-import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.modifier.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.Topic;
-import pl.myc22ka.mathapp.ai.prompt.model.modifiers.TemplateModifier;
+import pl.myc22ka.mathapp.topic.model.Topic;
+import pl.myc22ka.mathapp.modifier.model.modifiers.TemplateModifier;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -48,7 +49,7 @@ public class PromptService {
      */
     public Prompt createPrompt(@NotNull MathExpressionChatRequest request) {
         Topic topic = topicHelper.findTopicByType(request.topicType());
-        List<Modifier> modifiers = promptHelper.createOrFindModifiers(request.modifiers(), topic);
+        List<Modifier> modifiers = promptHelper.findModifiers(request.modifiers(), topic);
 
         List<ContextRecord> context = new ArrayList<>();
         List<Modifier> promptModifiers = new ArrayList<>();
@@ -66,7 +67,7 @@ public class PromptService {
                     context.add(exerciseHelper.buildContextRecord(entry, t.getInformation().toString()));
                 }
 
-                String resolvedText = templateResolver.replaceTemplatePlaceholders(templateText, context);
+                String resolvedText = templateResolver.replaceTemplateStrings(templateText, context);
                 t.setModifierText(resolvedText);
 
                 promptModifiers.add(t);

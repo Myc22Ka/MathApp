@@ -24,7 +24,7 @@ import java.util.List;
  * based on predefined templates.
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 31.08.2025
  */
 @RestController
@@ -84,15 +84,6 @@ public class ExerciseController {
 
     /**
      * Retrieves a paginated list of exercises with optional filtering and sorting.
-     *
-     * @param page          Zero-based page index (default: 0)
-     * @param size          Number of items per page (default: 20)
-     * @param category      Optional filter by category
-     * @param type          Optional filter by exercise type
-     * @param sortBy        Field name used for sorting (default: id)
-     * @param sortDirection Sorting direction: "asc" or "desc" (default: asc)
-     * @return Paginated list of exercises matching the criteria
-     * TODO: Change comment
      */
     @Operation(
             summary = "Get exercises",
@@ -183,6 +174,9 @@ public class ExerciseController {
         return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.update(id, values)));
     }
 
+    /**
+     * Solves an exercise and returns whether the answer is correct.
+     */
     @PostMapping("/solve/{exerciseId}")
     @Operation(
             summary = "Solve exercise",

@@ -7,7 +7,6 @@ import pl.myc22ka.mathapp.exceptions.ServerError;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;
 
@@ -42,7 +41,6 @@ public class Linear extends Function {
     }
 
     @Override
-    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 1) {
             throw new ServerError("Linear function requires exactly one root.");

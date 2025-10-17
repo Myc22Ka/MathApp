@@ -3,7 +3,7 @@ package pl.myc22ka.mathapp.exercise.variant.component.helper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
 import pl.myc22ka.mathapp.exceptions.custom.VariantTextMismatch;

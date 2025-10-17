@@ -15,12 +15,33 @@ import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Service for retrieving and managing step definitions.
+ * Provides methods to get steps with pagination, sorting, and optional filtering by type or category.
+ *
+ * @author Myc22Ka
+ * @version 1.0.1
+ * @see StepDefinition
+ * @see StepDTO
+ * @since 17.10.2025
+ */
 @Service
 @RequiredArgsConstructor
 public class StepService {
 
     private final StepDefinitionRepository stepDefinitionRepository;
 
+    /**
+     * Retrieves a paginated list of steps with optional filtering by step type or category.
+     *
+     * @param page          zero-based page index
+     * @param size          number of items per page
+     * @param stepType      optional filter by step type
+     * @param category      optional filter by template category
+     * @param sortBy        field to sort by
+     * @param sortDirection sort direction, either "asc" or "desc"
+     * @return a page of {@link StepDTO} representing the step definitions
+     */
     public Page<StepDTO> getSteps(int page, int size, StepType stepType,
                                   TemplatePrefix category, String sortBy, String sortDirection) {
 

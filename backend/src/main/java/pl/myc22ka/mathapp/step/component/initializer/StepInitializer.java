@@ -12,6 +12,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Initializes step definitions from a JSON file if the database is empty.
+ * <p>
+ * This component runs automatically on application startup, loading predefined
+ * step definitions to the database to ensure the system has base data for exercises.
+ * </p>
+ *
+ * @author Myc22Ka
+ * @version 1.0.1
+ * @since 17.10.2025
+ */
 @Component
 @RequiredArgsConstructor
 public class StepInitializer {
@@ -19,6 +30,11 @@ public class StepInitializer {
     private final StepDefinitionRepository stepDefinitionRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Initializes step definitions from the JSON file.
+     *
+     * @throws IOException if reading or parsing the JSON file fails
+     */
     @PostConstruct
     public void init() throws IOException {
         System.out.println("[INIT] StepDefinitionInitializer");

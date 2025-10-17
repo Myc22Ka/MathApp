@@ -30,5 +30,10 @@ public interface IExpressionParser<T extends MathExpression> {
     @NotNull
     T parse(@NotNull String expression);
 
+    /**
+     * Returns the {@link TemplatePrefix} associated with this parser.
+     *
+     * @return the supported {@link TemplatePrefix}
+     */
     TemplatePrefix getPrefix();
 }

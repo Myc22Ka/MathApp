@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
@@ -51,10 +51,11 @@ public class ExerciseService {
     /**
      * Creates a new Exercise from a template or variant with given values.
      *
-     * @param templateId the template ID (nullable)
-     * @param variantId  the variant ID (nullable)
-     * @param values     the list of values for placeholders
+     * @param templateId the template ID (nullable if variantId provided)
+     * @param variantId  the variant ID (nullable if templateId provided)
+     * @param values     list of user-provided values for placeholders
      * @return the saved Exercise entity
+     * @throws IllegalArgumentException if both or neither templateId/variantId are provided, or validation fails
      */
     @Transactional
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
@@ -79,11 +80,29 @@ public class ExerciseService {
 
     /**
      * Retrieves an Exercise by its ID.
+     *
+     * @param id the exercise ID
+     * @return the Exercise entity
+     * @throws IllegalStateException if exercise not found
      */
     public Exercise getById(Long id) {
         return exerciseHelper.getExercise(id);
     }
 
+    /**
+     * Retrieves paginated and optionally filtered exercises.
+     *
+     * @param page          zero-based page index
+     * @param size          number of items per page
+     * @param rating        optional filter by rating
+     * @param difficulty    optional filter by difficulty level
+     * @param category      optional filter by category
+     * @param sortBy        field used for sorting
+     * @param sortDirection sort direction ("asc" or "desc")
+     * @param templateId    optional filter by template ID
+     * @return page of ExerciseDTO matching criteria
+     * @throws IllegalArgumentException if rating or difficulty filters are invalid
+     */
     public Page<ExerciseDTO> getAll(int page, int size, Double rating, String difficulty,
                                     TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId) {
 
@@ -104,6 +123,13 @@ public class ExerciseService {
         return exercises.map(ExerciseDTO::fromEntity);
     }
 
+    /**
+     * Rates an exercise with a new rating.
+     *
+     * @param exerciseId the exercise ID
+     * @param newRating  the rating value (1–5, step 0.5)
+     * @throws IllegalStateException if exercise not found
+     */
     @Transactional
     public void rateExercise(Long exerciseId, Double newRating) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);
@@ -124,7 +150,9 @@ public class ExerciseService {
     }
 
     /**
-     * Deletes an Exercise by its ID.
+     * Deletes an exercise by its ID.
+     *
+     * @param id the exercise ID
      */
     public void delete(Long id) {
         exerciseRepository.deleteById(id);
@@ -132,6 +160,11 @@ public class ExerciseService {
 
     /**
      * Generates a new Exercise using AI prompts for placeholders.
+     *
+     * @param templateId the template ID (nullable if variantId provided)
+     * @param variantId  the variant ID (nullable if templateId provided)
+     * @return the saved Exercise entity
+     * @throws IllegalArgumentException if both or neither templateId/variantId are provided
      */
     @Transactional
     public Exercise generate(Long templateId, Long variantId) {
@@ -172,6 +205,11 @@ public class ExerciseService {
 
     /**
      * Updates an existing Exercise with new values.
+     *
+     * @param id     the exercise ID
+     * @param values list of new values for placeholders
+     * @return the updated Exercise entity
+     * @throws IllegalStateException if exercise or template not found
      */
     @Transactional
     public Exercise update(Long id, @NotNull List<String> values) {
@@ -195,7 +233,12 @@ public class ExerciseService {
     }
 
     /**
-     * Checks if answer given by user is the same as exercise answer
+     * Checks if the user's answer matches the exercise's correct answer.
+     *
+     * @param exerciseId the exercise ID
+     * @param answer     the user's answer
+     * @return true if the answer is correct, false otherwise
+     * @throws IllegalStateException if exercise not found
      */
     public boolean solve(Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);

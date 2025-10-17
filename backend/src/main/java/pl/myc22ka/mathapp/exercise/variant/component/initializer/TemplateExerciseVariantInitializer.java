@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantInitDTO;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
@@ -19,6 +19,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Initializes {@link TemplateExerciseVariant} entities from a JSON file after the application starts.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 17.10.2025
+ */
 @Component
 @RequiredArgsConstructor
 @DependsOn("stepInitializer")
@@ -30,6 +37,11 @@ public class TemplateExerciseVariantInitializer {
     private final ObjectMapper objectMapper;
     private final TemplateResolver templateResolver;
 
+    /**
+     * Initializes template exercise variants from a JSON file at application startup.
+     *
+     * @throws IOException if reading the JSON file fails
+     */
     @PostConstruct
     public void init() throws IOException {
         System.out.println("[INIT] TemplateExerciseVariantInitializer");

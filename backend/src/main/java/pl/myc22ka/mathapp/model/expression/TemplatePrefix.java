@@ -29,6 +29,9 @@ public enum TemplatePrefix {
      */
     FUNCTION("f"),
 
+    /**
+     * Prefix representing a common expression.
+     */
     COMMON("c");
 
     private final String key;

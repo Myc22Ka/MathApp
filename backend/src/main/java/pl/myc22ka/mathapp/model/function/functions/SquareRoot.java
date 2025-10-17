@@ -6,7 +6,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 @Getter
 public class SquareRoot extends Function {
@@ -34,7 +33,6 @@ public class SquareRoot extends Function {
     }
 
     @Override
-    @NotFullyImplemented
     public void generateRandomFunction() {
         this.degree = 2;
         this.function = new Function(FunctionType.LINEAR);

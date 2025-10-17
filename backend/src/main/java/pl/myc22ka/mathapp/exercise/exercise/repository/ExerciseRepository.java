@@ -5,8 +5,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 
-import java.util.List;
-
 /**
  * Repository for Exercise entities.
  * Provides CRUD operations and query methods for Exercise.

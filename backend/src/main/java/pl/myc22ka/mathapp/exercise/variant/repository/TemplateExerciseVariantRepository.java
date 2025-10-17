@@ -15,7 +15,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom queries for variants of template exercises.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Repository
@@ -29,6 +29,13 @@ public interface TemplateExerciseVariantRepository extends JpaRepository<Templat
      */
     List<TemplateExerciseVariant> findByTemplateExerciseId(Long exerciseId);
 
+    /**
+     * Finds a {@link TemplateExerciseVariant} by its ID and eagerly fetches its parent
+     * {@link pl.myc22ka.mathapp.exercise.template.model.TemplateExercise}.
+     *
+     * @param id the ID of the variant to retrieve
+     * @return an {@link Optional} containing the found variant, if present
+     */
     @Query("""
         SELECT v
         FROM TemplateExerciseVariant v

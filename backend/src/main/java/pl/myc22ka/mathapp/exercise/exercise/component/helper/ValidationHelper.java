@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
  * Helper for validating template and variant inputs.
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Component
@@ -28,6 +28,13 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Validates filter inputs for rating and difficulty.
+     *
+     * @param rating the rating value to validate (must be between 0.0 and 5.0)
+     * @param difficulty the difficulty string to validate (cannot be empty)
+     * @throws IllegalArgumentException if rating is out of range or difficulty is invalid
+     */
     public void validateFilters(Double rating, String difficulty) {
         if (rating != null && (rating < 0.0 || rating > 5.0)) {
             throw new IllegalArgumentException("Rating must be between 0.0 and 5.0");

@@ -2,6 +2,8 @@ package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.dto.ModifierRequest;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
  * @param modifiers list of modifiers to customize the expression
  *
  * @author Myc22Ka
- * @version 1.0.4
+ * @version 1.0.5
  * @since 06.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -42,6 +44,15 @@ public record MathExpressionChatRequest(
         List<ModifierRequest> modifiers
 ) {
 
+        /**
+         * Finishes process of resolving template modifiers using provided context.
+         * <p>
+         * Used when generating expressions that depend on results of previous ones.
+         * For example, a template modifier may reference a value generated earlier.
+         *
+         * @param context list of previously generated context records
+         * @return a new {@link MathExpressionChatRequest} with resolved modifier information
+         */
         public MathExpressionChatRequest withContext(List<ContextRecord> context) {
                 if (modifiers == null) {
                         return this;

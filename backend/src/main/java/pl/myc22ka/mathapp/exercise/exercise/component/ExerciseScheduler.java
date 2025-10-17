@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
-import pl.myc22ka.mathapp.exercise.exercise.service.ExerciseService;
 
 import java.util.List;
 import java.util.Random;
@@ -29,6 +28,9 @@ public class ExerciseScheduler {
     @Getter
     private Exercise lastRandomExercise;
 
+    /**
+     * Initializes the scheduler by picking the first random exercise on startup.
+     */
     @PostConstruct
     public void init() {
         pickRandomExercise();

@@ -2,12 +2,34 @@ package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.dto.ModifierRequest;
 
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a mapping of a template prefix (e.g., s1) to its modifiers.
+ * <p>
+ * Used during template resolution to keep track of which modifiers apply to each placeholder.
+ *
+ * @param prefix    the template prefix (e.g., S, T)
+ * @param index     the numerical identifier of the prefix (e.g., "1" for s1)
+ * @param modifiers list of modifiers associated with this prefix
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 17.10.2025
+ */
 public record PrefixModifierEntry(TemplatePrefix prefix, String index, List<ModifierRequest> modifiers) {
 
+    /**
+     * Compares two lists of {@link PrefixModifierEntry} for deep equality.
+     * <p>
+     * Checks prefix, index, and all fields of each {@link ModifierRequest} in order.
+     *
+     * @param list1 first list to compare
+     * @param list2 second list to compare
+     * @return true if both lists are equal in size and content, false otherwise
+     */
     public static boolean areEqualLists(@NotNull List<PrefixModifierEntry> list1, @NotNull List<PrefixModifierEntry> list2) {
         if (list1.size() != list2.size()) return false;
 

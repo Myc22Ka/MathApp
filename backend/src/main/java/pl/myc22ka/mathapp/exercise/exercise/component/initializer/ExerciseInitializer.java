@@ -35,6 +35,11 @@ public class ExerciseInitializer {
     private final TemplateExerciseVariantRepository variantRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Initializes exercises in the database from a JSON file if no exercises exist yet.
+     *
+     * @throws IOException if reading the JSON files fails
+     */
     @PostConstruct
     public void init() throws IOException {
         System.out.println("[INIT] ExerciseInitializer");

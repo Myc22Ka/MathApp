@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.dto.ModifierRequest;
 
 import java.util.List;
 

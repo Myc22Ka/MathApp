@@ -1,6 +1,6 @@
 package pl.myc22ka.mathapp.exercise.exercise.dto;
 
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 
 import java.util.List;
 

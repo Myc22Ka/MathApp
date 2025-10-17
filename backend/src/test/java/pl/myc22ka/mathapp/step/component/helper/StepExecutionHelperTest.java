@@ -5,20 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
-import pl.myc22ka.mathapp.ai.prompt.dto.TemplateString;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
+import pl.myc22ka.mathapp.utils.resolver.dto.TemplateString;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
-import pl.myc22ka.mathapp.model.expression.MathExpression;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.model.set.ISet;
-import pl.myc22ka.mathapp.model.set.Set;
 import pl.myc22ka.mathapp.step.model.StepWrapper;
 import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;

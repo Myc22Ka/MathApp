@@ -7,13 +7,13 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
-import pl.myc22ka.mathapp.ai.prompt.component.helper.TopicHelper;
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.topic.component.helper.TopicHelper;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionRequest;
-import pl.myc22ka.mathapp.ai.prompt.model.Modifier;
+import pl.myc22ka.mathapp.modifier.model.Modifier;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
-import pl.myc22ka.mathapp.ai.prompt.model.Topic;
+import pl.myc22ka.mathapp.topic.model.Topic;
 import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
 
@@ -21,11 +21,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service for Ollama AI communication and math expression generation.
+ * Service for handling communication with the Ollama AI model.
+ * <p>
+ * This service builds prompts, sends them to the Ollama API, parses the responses
+ * into mathematical expressions, and validates user-provided expressions.
+ * </p>
  *
  * @author Myc22Ka
- * @version 1.0.1
+ * @version 1.0.2
  * @since 06.08.2025
+ * @see PromptService
+ * @see ExpressionFactory
+ * @see TopicHelper
+ * @see PromptHelper
  */
 @Service
 @RequiredArgsConstructor
@@ -73,6 +81,13 @@ public class OllamaService {
         }
     }
 
+    /**
+     * Generates a new math prompt, sends it to AI, parses and verifies the response,
+     * and saves the result.
+     *
+     * @param request request object containing topic type and prompt details
+     * @return the completed {@link Prompt} with AI response and parsed expression
+     */
     public Prompt generatePrompt(MathExpressionChatRequest request) {
         Prompt prompt = promptService.createPrompt(request);
 
@@ -97,7 +112,7 @@ public class OllamaService {
      */
     public boolean useMathString(@NotNull MathExpressionRequest request) {
         Topic topic = topicHelper.findTopicByType(request.topicType());
-        List<Modifier> modifiers = promptHelper.createOrFindModifiers(request.modifiers(), topic);
+        List<Modifier> modifiers = promptHelper.findModifiers(request.modifiers(), topic);
 
         var parsed = expressionFactory.parse(new ContextRecord(request.topicType(), request.response()));
 

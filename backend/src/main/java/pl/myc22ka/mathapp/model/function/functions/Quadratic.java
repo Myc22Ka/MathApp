@@ -8,7 +8,6 @@ import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
 import pl.myc22ka.mathapp.utils.functions.Point;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.List;
 
@@ -85,7 +84,6 @@ public class Quadratic extends Function {
     }
 
     @Override
-    @NotFullyImplemented
     public void generateRandomFunction() {
         coefficientA = F.ZZ(1); // need to be gathered trough generator...
         coefficientB = F.ZZ(-1); // need to be gathered trough generator...
@@ -95,7 +93,6 @@ public class Quadratic extends Function {
     }
 
     @Override
-    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers.size() != 2) {
             throw new IllegalArgumentException("Quadratic function requires exactly two roots.");

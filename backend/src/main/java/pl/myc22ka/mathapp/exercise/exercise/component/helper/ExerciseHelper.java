@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
-import pl.myc22ka.mathapp.ai.prompt.dto.ContextRecord;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.TemplateString;
+import pl.myc22ka.mathapp.utils.resolver.dto.TemplateString;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
@@ -118,7 +118,7 @@ public class ExerciseHelper {
     }
 
     /**
-     * Build context record context record.
+     * Build context record.
      *
      * @param entry the entry
      * @param value the value
@@ -204,7 +204,7 @@ public class ExerciseHelper {
 
             for (var modifier : placeholder.modifiers()) {
                 if (modifier.getTemplateInformation() != null) {
-                    var resolved = templateResolver.replaceTemplatePlaceholders(
+                    var resolved = templateResolver.replaceTemplateStrings(
                             "${" + modifier.getTemplateInformation() + "}", context
                     );
                     modifier.setTemplateInformation(resolved);

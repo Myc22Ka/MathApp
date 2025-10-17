@@ -10,8 +10,6 @@ import pl.myc22ka.mathapp.exceptions.ServerErrorMessages;
 import pl.myc22ka.mathapp.exceptions.ServerError;
 import pl.myc22ka.mathapp.model.function.functions.Constant;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
-import pl.myc22ka.mathapp.utils.annotations.NotTested;
 import pl.myc22ka.mathapp.utils.functions.ConditionRoots;
 import pl.myc22ka.mathapp.utils.functions.Point;
 
@@ -79,8 +77,6 @@ public class Function implements FunctionInterface {
                 .toList();
     }
 
-    @NotTested
-    @NotFullyImplemented
     @Override
     public List<IExpr> getRealRoots(double min, double max) {
         var expr = evaluator.eval(F.Solve(F.Equal(symjaExpression, F.C0), variable).toString());
@@ -98,7 +94,6 @@ public class Function implements FunctionInterface {
         return MathUtils.getRootsFromExpr(expr);
     }
 
-    @NotTested
     @Override
     public IExpr getVaraibles() {
         System.out.println(evaluator.eval(F.Variables(symjaExpression)));
@@ -145,13 +140,11 @@ public class Function implements FunctionInterface {
         return getFunctionValue(point.getX()).equals(point.getY());
     }
 
-    @NotFullyImplemented
     public void generateRandomFunction() {
         rawExpression = "Cos(x)*Sin(3*x)";
         // TO DO...
     }
 
-    @NotFullyImplemented
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         // TO DO...
     }
