@@ -2,6 +2,7 @@ package pl.myc22ka.mathapp.model.expression;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.model.set.SetFactory;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * to the first parser that can handle the given input.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.1.0
  * @since 11.08.2025
  */
 @Component
@@ -25,20 +26,22 @@ public class ExpressionFactory {
     );
 
     /**
-     * Parse math expression.
+     * Parses a mathematical expression string into a {@link MathExpression} object.
      *
-     * @param expression the expression
-     * @return the math expression
+     * @param contextRecord contains both the prefix (type/category) and the raw expression value
+     * @return parsed {@link MathExpression} instance
+     * @throws IllegalArgumentException if no matching parser can handle the expression
      */
-    public MathExpression parse(@NotNull String expression) {
-        String trimmed = expression.replaceAll("\\s+", "");
+    public MathExpression parse(@NotNull ContextRecord contextRecord) {
+        String trimmedValue = contextRecord.value().replaceAll("\\s+", "");
 
         for (IExpressionParser<?> parser : parsers) {
-            if (parser.canHandle(trimmed)) {
-                return parser.parse(trimmed);
+            if(parser.getPrefix() == contextRecord.key().prefix() && parser.canHandle(trimmedValue)) {
+                return parser.parse(trimmedValue);
             }
         }
-
-        throw new IllegalArgumentException("Unsupported expression: " + expression);
+        // TODO: I need to make sure that parser is chosen by prefix not by order in the list
+        //       And make sure that when user gives you values all values are parsed by same parser as provided by template string
+        throw new IllegalArgumentException("Unsupported expression: " + contextRecord.value());
     }
 }

@@ -229,6 +229,17 @@ public enum SetSymbols {
         return DISPLAY_LOOKUP.containsKey(element);
     }
 
+    /**
+     * Checks if the given element (as string) contains any infinity symbol.
+     *
+     * @param element the element or expression string
+     * @return true if it contains ∞ or -∞, false otherwise
+     */
+    public static boolean containsInfinity(@NotNull String element) {
+        return element.contains(SetSymbols.INFINITY.toString()) ||
+                element.contains(SetSymbols.NEGATIVE_INFINITY.toString());
+    }
+
     @Override
     public String toString() {
         return displaySymbol;

@@ -4,7 +4,6 @@ import org.matheclipse.core.expression.F;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 public class Absolute extends Function {
     private Function base;
@@ -26,7 +25,6 @@ public class Absolute extends Function {
         super(FunctionType.ABSOLUTE, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
-    @NotFullyImplemented
     @Override
     public void generateRandomFunction() {
         base = new Function("x+1");

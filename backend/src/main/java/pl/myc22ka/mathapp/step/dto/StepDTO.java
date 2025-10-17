@@ -2,69 +2,58 @@ package pl.myc22ka.mathapp.step.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.step.model.Step;
-import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
-import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
+
+import java.util.List;
 
 /**
  * Data Transfer Object for Step entity.
  * Represents a single step in a template or variant exercise.
  *
- * @param stepText   the text of the step
- * @param orderIndex the order of the step within the exercise
+ * @param stepDefinitionId the ID of the step definition
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.2
  * @since 13.09.2025
  */
 @Schema(description = "Represents a step in a template or variant exercise")
 public record StepDTO(
-        @Schema(description = "Step text", example = "Simplify the expression")
+        @Schema(description = "Step definition ID", example = "5")
+        Long stepDefinitionId,
+
+        @Schema(description = "Step text content", example = "Calculate the union of sets A and B")
         String stepText,
 
-        @Schema(description = "Order of the step in the sequence", example = "1")
-        int orderIndex
+        @Schema(description = "List of step prefixes, indicating which placeholders this step uses", example = "[\"s1\", \"s2\"]")
+        List<String> prefixes
 ) {
     /**
-     * Converts a Step entity to StepDTO.
+     * Converts a StepWrapper entity to StepDTO.
      *
      * @param step entity to convert
      * @return corresponding StepDTO
      */
     @NotNull
-    public static StepDTO fromEntity(@NotNull Step step) {
+    public static StepDTO fromEntity(@NotNull StepWrapper step) {
         return new StepDTO(
-                step.getStepText(),
-                step.getOrderIndex()
+                step.getStepDefinition().getId(),
+                step.getStepDefinition().getStepText(),
+                step.getPrefixes()
         );
     }
 
     /**
-     * Converts this DTO to a Step entity linked to a TemplateExercise.
+     * Converts a StepDefinition entity to StepDTO.
      *
-     * @param template the parent TemplateExercise
-     * @return a new Step entity
+     * @param stepDefinition entity to convert
+     * @return corresponding StepDTO
      */
     @NotNull
-    public Step toEntityForTemplate(TemplateExercise template) {
-        Step step = new Step();
-        step.setStepText(this.stepText());
-        step.setOrderIndex(this.orderIndex());
-        step.setExercise(template);
-        return step;
-    }
-
-    /**
-     * Converts this DTO to a Step entity linked to a TemplateExerciseVariant.
-     *
-     * @param variant the parent TemplateExerciseVariant
-     * @return a new Step entity
-     */
-    @NotNull
-    public Step toEntityForVariant(TemplateExerciseVariant variant) {
-        Step step = new Step();
-        step.setStepText(this.stepText());
-        step.setOrderIndex(this.orderIndex());
-        step.setVariant(variant);
-        return step;
+    public static StepDTO fromStepDefinition(@NotNull StepDefinition stepDefinition) {
+        return new StepDTO(
+                stepDefinition.getId(),
+                stepDefinition.getStepText(),
+                null
+        );
     }
 }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> the specific type of MathExpression this parser produces
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 public interface IExpressionParser<T extends MathExpression> {
@@ -29,4 +29,11 @@ public interface IExpressionParser<T extends MathExpression> {
      */
     @NotNull
     T parse(@NotNull String expression);
+
+    /**
+     * Returns the {@link TemplatePrefix} associated with this parser.
+     *
+     * @return the supported {@link TemplatePrefix}
+     */
+    TemplatePrefix getPrefix();
 }

@@ -6,7 +6,7 @@ import org.matheclipse.core.interfaces.IExpr;
  * Interface representing a mathematical expression.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 public interface MathExpression {
@@ -45,5 +45,15 @@ public interface MathExpression {
      */
     default TemplatePrefix getTemplatePrefix() {
         throw new UnsupportedOperationException("getTemplatePrefix() not supported for this expression");
+    }
+
+    /**
+     * Returns if both math expressions are equal
+     *
+     * @return true if they are the same logically or just by checking text
+     * @throws UnsupportedOperationException if not supported
+     */
+    default boolean equals(MathExpression other){
+        throw new UnsupportedOperationException("equals() not supported for this expression");
     }
 }

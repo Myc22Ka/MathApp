@@ -1,7 +1,8 @@
 package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.dto.ModifierRequest;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @param response  given by the user expression input
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 11.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -37,7 +38,7 @@ public record MathExpressionRequest(
 
         @Schema(description = "Type of mathematical expression",
                 example = "SET")
-        PromptType topicType,
+        TemplatePrefix topicType,
 
         @Schema(description = "List of modifiers to customize the expression")
         List<ModifierRequest> modifiers,

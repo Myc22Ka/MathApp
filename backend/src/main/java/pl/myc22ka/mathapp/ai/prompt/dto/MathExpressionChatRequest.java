@@ -1,7 +1,9 @@
 package pl.myc22ka.mathapp.ai.prompt.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.dto.ModifierRequest;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
  * @param modifiers list of modifiers to customize the expression
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.5
  * @since 06.08.2025
  */
 @Schema(description = "Request for generating mathematical expressions",
@@ -36,13 +38,22 @@ public record MathExpressionChatRequest(
 
         @Schema(description = "Type of mathematical expression",
                 example = "SET")
-        PromptType topicType,
+        TemplatePrefix topicType,
 
         @Schema(description = "List of modifiers to customize the expression")
         List<ModifierRequest> modifiers
 ) {
 
-        public MathExpressionChatRequest withContext(List<PrefixValue> context) {
+        /**
+         * Finishes process of resolving template modifiers using provided context.
+         * <p>
+         * Used when generating expressions that depend on results of previous ones.
+         * For example, a template modifier may reference a value generated earlier.
+         *
+         * @param context list of previously generated context records
+         * @return a new {@link MathExpressionChatRequest} with resolved modifier information
+         */
+        public MathExpressionChatRequest withContext(List<ContextRecord> context) {
                 if (modifiers == null) {
                         return this;
                 }
@@ -53,21 +64,14 @@ public record MathExpressionChatRequest(
                                         String placeholderKey = m.getTemplateInformation();
 
                                         String replacement = context.stream()
-                                                .filter(c -> c.key().equals(placeholderKey))
-                                                .map(PrefixValue::value)
+                                                .filter(c -> c.key().templateString().equals(placeholderKey))
+                                                .map(ContextRecord::value)
                                                 .findFirst()
                                                 .orElse(m.getTemplateInformation());
 
-                                        return new ModifierRequest(
-                                                m.getType(),
-                                                m.getDifficultyLevel(),
-                                                m.getRequirement(),
-                                                m.getTemplate(),
-                                                replacement
-                                        );
-                                } else {
-                                        return m;
+                                        return m.withTemplateInformation(replacement);
                                 }
+                                return m;
                         })
                         .toList();
 

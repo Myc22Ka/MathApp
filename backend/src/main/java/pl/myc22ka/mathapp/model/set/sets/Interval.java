@@ -20,7 +20,7 @@ import java.util.List;
  * Mathematical interval set [0, 4].
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025.06.19
  */
 public class Interval implements ISet {
@@ -56,6 +56,45 @@ public class Interval implements ISet {
     @Override
     public Interval toInterval() {
         return this;
+    }
+
+    public ISet findAllIntegers() {
+        if (expression == null || expression.toString().equals("IntervalData()")) {
+            return new Fundamental(SetSymbols.EMPTY);
+        }
+
+        List<IExpr> integers = new ArrayList<>();
+
+        if (expression.getAt(1).isList()) {
+            for (int i = 1; i < expression.size(); i++) {
+                IExpr element = expression.getAt(i);
+
+                int first = (int) Math.ceil(element.getAt(1).evalf());
+                int last = (int) Math.floor(element.getAt(4).evalf());
+
+                Interval interval = new Interval(
+                        element.getAt(1),
+                        BoundType.fromInclusive(element.getAt(2).toString()),
+                        BoundType.fromInclusive(element.getAt(3).toString()),
+                        element.getAt(4)
+                );
+
+                for (int k = first; k <= last; k++) {
+                    IExpr candidate = evaluator.eval(Integer.toString(k));
+
+                    String boundCheck = "IntervalData({" + candidate + "," + BoundType.CLOSED.getInclusive() + "," + BoundType.CLOSED.getInclusive() + "," + candidate + "})";
+
+                    if (interval.contains(boundCheck)) {
+                        integers.add(candidate);
+                    }
+                }
+            }
+        }
+
+        if (integers.isEmpty()) {
+            return new Fundamental(SetSymbols.EMPTY);
+        }
+        return new Finite(integers);
     }
 
     /**

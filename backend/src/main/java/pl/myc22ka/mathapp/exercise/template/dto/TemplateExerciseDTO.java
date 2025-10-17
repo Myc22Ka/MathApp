@@ -3,9 +3,12 @@ package pl.myc22ka.mathapp.exercise.template.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 import pl.myc22ka.mathapp.step.dto.StepDTO;
+import pl.myc22ka.mathapp.step.model.StepDefinition;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.repository.StepDefinitionRepository;
 
 import java.util.List;
 
@@ -15,13 +18,13 @@ import java.util.List;
  * answer, and associated steps.
  *
  * @param id             unique identifier of the template exercise
- * @param category       category of the exercise (mapped from {@link PromptType})
+ * @param category       category of the exercise (mapped from {@link TemplatePrefix})
  * @param difficulty     difficulty level (custom string)
  * @param templateText   raw text of the template containing placeholders
  * @param templateAnswer expected answer pattern for the template
  * @param steps          ordered list of steps for solving the exercise
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.3
  * @since 13.09.2025
  */
 @Schema(description = "Represents a template exercise with metadata, text, answer, and steps")
@@ -31,7 +34,7 @@ public record TemplateExerciseDTO(
         Long id,
 
         @Schema(description = "Category of the template exercise", example = "SET")
-        String category,
+        TemplatePrefix category,
 
         @Schema(description = "Difficulty level of the exercise", example = "1")
         String difficulty,
@@ -43,7 +46,10 @@ public record TemplateExerciseDTO(
         String templateAnswer,
 
         @Schema(description = "Steps describing how to solve the exercise in order")
-        List<StepDTO> steps
+        List<StepDTO> steps,
+
+        @Schema(description = "Number of exercises generated from this template", example = "3")
+        Long exerciseCounter
 ) {
     /**
      * Maps a {@link TemplateExercise} entity to a {@link TemplateExerciseDTO}.
@@ -55,7 +61,7 @@ public record TemplateExerciseDTO(
     public static TemplateExerciseDTO fromEntity(@NotNull TemplateExercise exercise) {
         return new TemplateExerciseDTO(
                 exercise.getId(),
-                exercise.getCategory().name(),
+                exercise.getCategory(),
                 exercise.getDifficulty(),
                 exercise.getTemplateText(),
                 exercise.getTemplateAnswer(),
@@ -63,7 +69,8 @@ public record TemplateExerciseDTO(
                         ? exercise.getSteps().stream()
                         .map(StepDTO::fromEntity)
                         .toList()
-                        : List.of()
+                        : List.of(),
+                exercise.getExerciseCounter()
         );
     }
 
@@ -71,21 +78,33 @@ public record TemplateExerciseDTO(
      * Converts this DTO into a {@link TemplateExercise} entity.
      * Steps are mapped back and linked to the template exercise.
      *
+     * @param stepDefinitionRepository repozytorium do pobierania StepDefinition po ID
      * @return new {@link TemplateExercise} entity
      */
     @NotNull
-    public TemplateExercise toEntity() {
+    public TemplateExercise toEntity(@NotNull StepDefinitionRepository stepDefinitionRepository) {
         TemplateExercise exercise = new TemplateExercise();
+
         exercise.setId(this.id());
-        exercise.setCategory(PromptType.valueOf(this.category()));
+        exercise.setCategory(this.category());
         exercise.setDifficulty(this.difficulty());
         exercise.setTemplateText(this.templateText());
         exercise.setTemplateAnswer(this.templateAnswer());
+        exercise.setExerciseCounter(0L);
 
         if (this.steps() != null) {
             exercise.getSteps().addAll(
                     this.steps().stream()
-                            .map(stepDto -> stepDto.toEntityForTemplate(exercise))
+                            .map(stepDto -> {
+                                StepDefinition def = stepDefinitionRepository.findById(stepDto.stepDefinitionId())
+                                        .orElseThrow(() -> new IllegalArgumentException("StepDefinition not found for id: " + stepDto.stepDefinitionId()));
+
+                                return StepWrapper.builder()
+                                        .stepDefinition(def)
+                                        .exercise(exercise)
+                                        .prefixes(stepDto.prefixes())
+                                        .build();
+                            })
                             .toList()
             );
         }

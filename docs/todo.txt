@@ -18,3 +18,12 @@
     - DELETE endpoint doesn't work due to constrains                                            +
 * Variants
     - Simple CRUD like existing one in Templates                                                +
+
+-------------------------------------------------------------------------------------------------
+
+3. Found bugs in Resolving Exercises:
+    - Flush database -> run program -> creates error on getting random exercise endpoint
+    - I'm not sure if in endpoint of creating exercise I check for compatibility of values and template strings,
+      can't tell with one model without debugging
+    - Rating doesn't work XD
+    - Templates/Variants needs to count amount of exercises they have

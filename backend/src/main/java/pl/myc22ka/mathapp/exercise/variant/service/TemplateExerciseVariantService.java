@@ -2,16 +2,22 @@ package pl.myc22ka.mathapp.exercise.variant.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.component.filter.TemplateExerciseVariantSpecification;
 import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
-import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.repository.TemplateExerciseVariantRepository;
-
-import java.util.List;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * Service layer for managing {@link TemplateExerciseVariant} entities.
@@ -19,13 +25,12 @@ import java.util.List;
  * Delegates validation and preparation logic to {@link VariantExerciseHelper}.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @Service
 @RequiredArgsConstructor
 public class TemplateExerciseVariantService {
-
     private final VariantExerciseHelper variantExerciseHelper;
     private final TemplateExerciseVariantRepository variantRepository;
     private final TemplateExerciseHelper templateExerciseHelper;
@@ -51,25 +56,40 @@ public class TemplateExerciseVariantService {
 
         if (request.steps() != null) {
             variant.getSteps().addAll(
-                    request.steps().stream()
-                            .map(stepDto -> stepDto.toEntityForVariant(variant))
-                            .toList()
+                    variantExerciseHelper.createStepWrappers(request.steps(), variant)
             );
         }
 
         variantExerciseHelper.validateUnique(variant);
         variantExerciseHelper.prepareForCreate(variant);
-
         return variantRepository.save(variant);
     }
 
     /**
-     * Retrieves all template exercise variants.
+     * Retrieves a paginated list of all {@link TemplateExerciseVariant} entities
+     * with optional filters for difficulty and category.
      *
-     * @return list of all variants
+     * @param page          zero-based page index (default: 0)
+     * @param size          number of items per page (default: 20)
+     * @param difficulty    optional filter for difficulty level (e.g. "easy", "hard")
+     * @param category      optional filter for exercise category (e.g. {@link TemplatePrefix#SET})
+     * @param sortBy        field name used for sorting (default: "id")
+     * @param sortDirection sorting direction — "asc" or "desc" (default: "asc")
+     * @return a {@link Page} of {@link TemplateExerciseVariantResponse} objects matching the filters
      */
-    public List<TemplateExerciseVariant> getAll() {
-        return variantRepository.findAll();
+    public Page<TemplateExerciseVariantResponse> getAll(int page, int size,
+                                                        String difficulty, TemplatePrefix category,
+                                                        String sortBy, @NotNull String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<TemplateExerciseVariant> spec = TemplateExerciseVariantSpecification.withFilters(
+                difficulty, category);
+
+        return variantRepository.findAll(spec, pageable).map(TemplateExerciseVariantResponse::fromEntity);
     }
 
     /**

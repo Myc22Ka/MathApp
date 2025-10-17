@@ -2,9 +2,10 @@ package pl.myc22ka.mathapp.exercise.variant.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
-import pl.myc22ka.mathapp.step.model.Step;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * Each variant can have its own text, answer, difficulty, steps, and track how many exercises were generated from it.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.1.0
  * @since 13.09.2025
  */
 @Entity
@@ -23,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TemplateExerciseVariant {
+public class TemplateExerciseVariant implements TemplateLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +35,14 @@ public class TemplateExerciseVariant {
     private TemplateExercise templateExercise;
 
     @Enumerated(EnumType.STRING)
-    private PromptType category;
+    private TemplatePrefix category;
 
     private String difficulty;
 
-    @Column(name = "variant_text", columnDefinition = "TEXT")
+    @Column(name = "template_text", columnDefinition = "TEXT")
     private String templateText;
 
-    @Column(name = "variant_answer", columnDefinition = "TEXT")
+    @Column(name = "template_answer", columnDefinition = "TEXT")
     private String templateAnswer;
 
     @Column(name = "clear_text", columnDefinition = "TEXT")
@@ -49,7 +50,7 @@ public class TemplateExerciseVariant {
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Step> steps = new ArrayList<>();
+    private List<StepWrapper> steps = new ArrayList<>();
 
     @Column(name = "exercise_counter")
     private Long exerciseCounter;

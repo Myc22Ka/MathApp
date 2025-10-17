@@ -1,0 +1,22 @@
+[
+  {
+    "stepType": "SET_UNION",
+    "stepText": "Łączenie zbiorów"
+  },
+  {
+    "stepType": "SET_INTERSECTION",
+    "stepText": "Mnożenie zbiorów"
+  },
+  {
+    "stepType": "SET_DIFFERENCE",
+    "stepText": "Różnica zbiorów"
+  },
+  {
+    "stepType": "SET_FIND_ALL_INTEGERS_IN_RANGE",
+    "stepText": "Znajdowanie liczb całkowitych w przedziale"
+  },
+  {
+    "stepType": "SET_COMPLEMENT",
+    "stepText": "Dopełnienie zbioru"
+  }
+]

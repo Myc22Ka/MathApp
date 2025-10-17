@@ -2,10 +2,11 @@ package pl.myc22ka.mathapp.exercise.template.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
-import pl.myc22ka.mathapp.step.model.Step;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  * category, difficulty, solution steps, and possible variants.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.1.2
  * @since 13.09.2025
  */
 @Entity
@@ -25,14 +26,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TemplateExercise {
+public class TemplateExercise implements TemplateLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private PromptType category;
+    private TemplatePrefix category;
 
     private String difficulty;
 
@@ -42,7 +43,7 @@ public class TemplateExercise {
     @Column(name = "template_answer", columnDefinition = "TEXT")
     private String templateAnswer;
 
-    @Column(name = "clear_text", columnDefinition = "TEXT")
+    @Column(name = "clear_text", columnDefinition = "TEXT", unique = true)
     private String clearText;
 
     @ElementCollection
@@ -59,7 +60,7 @@ public class TemplateExercise {
 
     @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private final List<Step> steps = new ArrayList<>();
+    private final List<StepWrapper> steps = new ArrayList<>();
 
     @OneToMany(mappedBy = "templateExercise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();

@@ -4,7 +4,6 @@ import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
 
 import java.util.function.Function;
 
@@ -44,7 +43,6 @@ public class Trigonometric extends pl.myc22ka.mathapp.model.function.Function {
         setExpressions(fullExpr.toString());
     }
 
-    @NotFullyImplemented
     @Override
     public void generateFunctionFromAnswers(List<IExpr> answers) {
         if (answers == null || answers.size() < 2) {

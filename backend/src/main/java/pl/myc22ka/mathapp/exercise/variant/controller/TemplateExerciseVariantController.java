@@ -4,21 +4,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantRequest;
 import pl.myc22ka.mathapp.exercise.variant.dto.TemplateExerciseVariantResponse;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.exercise.variant.service.TemplateExerciseVariantService;
-
-import java.util.List;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 /**
  * REST controller for managing template exercise variants.
  * Provides CRUD operations (create, read, update, delete).
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 13.09.2025
  */
 @RestController
@@ -48,17 +48,23 @@ public class TemplateExerciseVariantController {
     /**
      * Retrieves all variants for all templates.
      */
-    @GetMapping
     @Operation(
-            summary = "Get all template exercise variants",
-            description = "Returns a list of all template exercise variants in the system."
+            summary = "Get template exercise variants",
+            description = "Returns a paginated list of template exercise variants with optional filters and sorting."
     )
-    public ResponseEntity<List<TemplateExerciseVariantResponse>> getAll() {
-        return ResponseEntity.ok(
-                variantService.getAll().stream()
-                        .map(TemplateExerciseVariantResponse::fromEntity)
-                        .toList()
-        );
+    @GetMapping
+    public ResponseEntity<Page<TemplateExerciseVariantResponse>> getAllVariants(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) TemplatePrefix category,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+
+        Page<TemplateExerciseVariantResponse> variants =
+                variantService.getAll(page, size, difficulty, category, sortBy, sortDirection);
+
+        return ResponseEntity.ok(variants);
     }
 
     /**

@@ -1,17 +1,27 @@
 package pl.myc22ka.mathapp.exercise.exercise.component.helper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
+import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
+import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.ai.prompt.dto.PrefixValue;
-import pl.myc22ka.mathapp.ai.prompt.component.TemplateResolver;
-import pl.myc22ka.mathapp.ai.prompt.model.PromptType;
-import pl.myc22ka.mathapp.ai.prompt.service.PromptService;
+import pl.myc22ka.mathapp.utils.resolver.dto.TemplateString;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
+import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.model.expression.ExpressionFactory;
+import pl.myc22ka.mathapp.model.expression.MathExpression;
+import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.step.model.StepWrapper;
+import pl.myc22ka.mathapp.step.service.StepExecutorRegistry;
+import pl.myc22ka.mathapp.step.service.StepMemoryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +31,7 @@ import java.util.List;
  * Provides methods to fetch, build, and verify exercises.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.4
  * @since 13.09.2025
  */
 @Component
@@ -30,8 +40,12 @@ public class ExerciseHelper {
 
     private final ExerciseRepository exerciseRepository;
     private final TemplateResolver templateResolver;
+    private final PromptHelper promptHelper;
     private final ExpressionFactory expressionFactory;
-    private final PromptService promptService;
+    private final StepMemoryService stepMemoryService;
+    private final StepExecutorRegistry registry;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Fetches an exercise by ID.
@@ -51,7 +65,7 @@ public class ExerciseHelper {
      * @param template the template exercise
      * @return list of placeholder entries
      */
-    public List<PrefixModifierEntry> getPlaceholders(@NotNull TemplateExercise template) {
+    public List<PrefixModifierEntry> getPlaceholders(@NotNull TemplateLike template) {
         return templateResolver.findPrefixModifiers(template.getTemplateText());
     }
 
@@ -59,12 +73,25 @@ public class ExerciseHelper {
      * Validates that the number of values matches the number of placeholders.
      *
      * @param placeholders list of placeholders
-     * @param values list of provided values
+     * @param values       list of provided values
      * @throws IllegalArgumentException if counts do not match
      */
-    public void validatePlaceholderCount(@NotNull List<PrefixModifierEntry> placeholders, @NotNull List<String> values) {
+    public void validateExercise(@NotNull List<PrefixModifierEntry> placeholders, @NotNull List<String> values) {
         if (placeholders.size() != values.size()) {
             throw new IllegalArgumentException("Number of values does not match number of placeholders in template");
+        }
+
+        for (int i = 0; i < placeholders.size(); i++) {
+            PrefixModifierEntry placeholder = placeholders.get(i);
+            String value = values.get(i);
+
+            try {
+                expressionFactory.parse(new ContextRecord(placeholder.prefix(), value));
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Value '" + value + "' is not valid for prefix '" + placeholder.prefix() + "'"
+                );
+            }
         }
     }
 
@@ -72,90 +99,121 @@ public class ExerciseHelper {
      * Builds a context mapping placeholders to their parsed values.
      *
      * @param placeholders list of placeholders
-     * @param values list of raw values
+     * @param values       list of raw values
      * @return list of PrefixValue representing the context
      */
-    public List<PrefixValue> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
-        List<PrefixValue> context = new ArrayList<>();
+    public List<ContextRecord> buildContext(@NotNull List<PrefixModifierEntry> placeholders, List<String> values) {
+        List<ContextRecord> context = new ArrayList<>();
         for (int i = 0; i < placeholders.size(); i++) {
             PrefixModifierEntry entry = placeholders.get(i);
-            String parsedText = parseValue(values.get(i));
+
+            var contextRecord = buildContextRecord(entry, values.get(i));
+
+            String parsedText = parseValue(contextRecord).toString();
             values.set(i, parsedText);
-            context.add(new PrefixValue(entry.prefix().getKey() + entry.index(), parsedText));
+
+            context.add(contextRecord);
         }
         return context;
     }
 
     /**
+     * Build context record.
+     *
+     * @param entry the entry
+     * @param value the value
+     * @return the context record
+     */
+    public ContextRecord buildContextRecord(@NotNull PrefixModifierEntry entry, String value) {
+        var prefix = entry.prefix();
+
+        var templateString = new TemplateString(prefix.getKey() + entry.index(), prefix);
+
+        return new ContextRecord(templateString, value);
+    }
+
+    /**
      * Parses a value using the expression factory.
      *
-     * @param value the raw value
-     * @return parsed string representation
+     * @param contextRecord the context record
+     * @return parsed {@link MathExpression} representation
      */
-    public String parseValue(String value) {
-        return expressionFactory.parse(value).toString();
+    public MathExpression parseValue(ContextRecord contextRecord) {
+        return expressionFactory.parse(contextRecord);
     }
 
     /**
      * Resolves the template text with a given context.
      *
      * @param template the template exercise
-     * @param context list of PrefixValue for placeholders
+     * @param context  list of PrefixValue for placeholders
      * @return resolved text
      */
-    public String resolveText(@NotNull TemplateExercise template, List<PrefixValue> context) {
+    public String resolveText(@NotNull TemplateLike template, List<ContextRecord> context) {
         return templateResolver.resolve(template.getTemplateText(), context);
     }
 
     /**
-     * Builds a final Exercise object.
+     * Builds a final Exercise object with context JSON instead of values.
      *
      * @param template the template exercise
-     * @param values list of parsed values
-     * @param text resolved exercise text
+     * @param context  list of PrefixValue representing the context
+     * @param text     resolved exercise text
+     * @param verified tells if exercises values are verified to theirs modifiers
      * @return new Exercise
      */
-    public Exercise buildExercise(TemplateExercise template, List<String> values, String text) {
-        return Exercise.builder()
-                .templateExercise(template)
-                .values(values)
+    public Exercise buildExercise(TemplateLike template, List<ContextRecord> context, String text, boolean verified) {
+        String contextJson = serializeContext(context);
+        String answer = calculateAnswer(template, context);
+
+        Exercise.ExerciseBuilder builder = Exercise.builder()
                 .text(text)
-                .build();
+                .contextJson(contextJson)
+                .verified(verified)
+                .rating(1.0)
+                .answer(answer);
+
+        if (template instanceof TemplateExercise te) {
+            builder.templateExercise(te);
+        } else if (template instanceof TemplateExerciseVariant v) {
+            builder.templateExerciseVariant(v);
+        }
+
+        template.setExerciseCounter(template.getExerciseCounter() + 1);
+
+        return builder.build();
     }
 
     /**
      * Verifies that all placeholders and their modifiers are valid for the given category.
      *
      * @param placeholders list of placeholders
-     * @param values list of values for placeholders
-     * @param context resolved placeholder values
-     * @param category the prompt category for verification
+     * @param context      resolved placeholder values
+     * @param category     the prompt category for verification
      * @return true if all modifiers are verified successfully, false otherwise
      */
     public boolean verifyPlaceholders(
             @NotNull List<PrefixModifierEntry> placeholders,
-            @NotNull List<String> values,
-            @NotNull List<PrefixValue> context,
-            @NotNull PromptType category
+            @NotNull List<ContextRecord> context,
+            @NotNull TemplatePrefix category
     ) {
         boolean allVerified = true;
 
         for (int i = 0; i < placeholders.size(); i++) {
             var placeholder = placeholders.get(i);
-            String currentValue = values.get(i);
 
             for (var modifier : placeholder.modifiers()) {
                 if (modifier.getTemplateInformation() != null) {
-                    var resolved = templateResolver.replaceTemplatePlaceholders(
+                    var resolved = templateResolver.replaceTemplateStrings(
                             "${" + modifier.getTemplateInformation() + "}", context
                     );
                     modifier.setTemplateInformation(resolved);
                 }
             }
 
-            boolean verified = promptService.verifyModifierRequestsWithValue(
+            boolean verified = promptHelper.verifyModifierRequestsWithValue(
                     placeholder.modifiers(),
-                    currentValue,
+                    context.get(i),
                     category
             );
 
@@ -166,6 +224,58 @@ public class ExerciseHelper {
         }
 
         return allVerified;
+    }
+
+    /**
+     * Serialize context string.
+     *
+     * @param context the context
+     * @return the string
+     */
+    public String serializeContext(List<ContextRecord> context) {
+        try {
+            return objectMapper.writeValueAsString(context);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize exercise context", e);
+        }
+    }
+
+    /**
+     * Deserialize context list.
+     *
+     * @param json the json
+     * @return the list
+     */
+    public List<ContextRecord> deserializeContext(String json) {
+        if (json == null || json.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to deserialize exercise context", e);
+        }
+    }
+
+    /**
+     * Calculate answer string.
+     *
+     * @param template the template
+     * @param context  the context
+     * @return the string
+     */
+    public String calculateAnswer(@NotNull TemplateLike template, List<ContextRecord> context) {
+        stepMemoryService.clear();
+        stepMemoryService.putAll(context);
+
+        List<ContextRecord> contextList = new ArrayList<>(stepMemoryService.getMemory().values());
+
+        for (StepWrapper step : template.getSteps()) {
+            registry.executeStep(step, contextList);
+        }
+
+        return contextList.getLast().value();
     }
 }
 

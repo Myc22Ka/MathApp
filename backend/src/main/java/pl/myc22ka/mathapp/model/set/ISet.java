@@ -165,4 +165,12 @@ public interface ISet extends MathExpression {
     default Interval toInterval() {
         throw new UnsupportedOperationException("This set type cannot be converted to interval.");
     }
+
+    @Override
+    default boolean equals(MathExpression other) {
+        if (this == other) return true;
+        if (!(other instanceof ISet otherSet)) return false;
+
+        return this.toString().equals(otherSet.toString());
+    }
 }

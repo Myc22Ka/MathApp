@@ -3,35 +3,88 @@
     "templateExerciseId": 1,
     "text": "Wykonaj A ∪ B dla zbiorów: A = {1,2,3} B = {2,4,6}",
     "verified": true,
-    "values": ["{1,2,3}", "{2,4,6}"],
-    "steps": []
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "{1,2,3}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "{2,4,6}" }
+    ],
+    "answer": "{1,2,3,4,6}",
+    "rating": 5.0
   },
   {
     "templateExerciseId": 2,
-    "text": "Wykonaj A ∩ B dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "text": "Wykonaj A ∩ B dla zbiorów: A = {1,2,3} B = {2,4,6}",
     "verified": true,
-    "values": ["{1,2,3}", "{2,3,4}"],
-    "steps": []
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "{1,2,3}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "{2,4,6}" }
+    ],
+    "answer": "{2}",
+    "rating": 5.0
   },
   {
     "templateExerciseId": 3,
-    "text": "Wykonaj A ∖ B dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "text": "Wykonaj A ∖ B dla zbiorów: A = {1,2,3} B = {2,4,6}",
     "verified": true,
-    "values": ["{1,2,3}", "{2,3,4}"],
-    "steps": []
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "{1,2,3}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "{2,4,6}" }
+    ],
+    "answer": "{1,3}",
+    "rating": 5.0
+  },
+  {
+    "variantExerciseId": 1,
+    "text": "Wykonaj B ∖ A dla zbiorów: A = {1,2,3} B = {2,4,6}",
+    "verified": true,
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "{1,2,3}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "{2,4,6}" }
+    ],
+    "answer": "{4,6}",
+    "rating": 5.0
   },
   {
     "templateExerciseId": 4,
-    "text": "Wykonaj B ∖ A dla zbiorów: A = {1,2,3} B = {2,3,4}",
+    "text": "Wykonaj (A ∩ B) ∪ C dla zbiorów: A = {1,2} B = {2,3} C = {3,4}",
     "verified": true,
-    "values": ["{1,2,3}", "{2,3,4}"],
-    "steps": []
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "{1,2}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "{2,3}" },
+      { "key": { "templateString": "s3", "prefix": "SET" }, "value": "{3,4}" }
+    ],
+    "answer": "{2,3,4}",
+    "rating": 5.0
   },
   {
     "templateExerciseId": 5,
-    "text": "Wykonaj (A ∩ B) ∪ C dla zbiorów: A = {1,2} B = {2,3} C = {3,4}",
+    "text": "Wypisz wszystkie liczby całkowite należące do przedziału: (1,4)",
     "verified": true,
-    "values": ["{1,2}", "{2,3}", "{3,4}"],
-    "steps": []
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "(1,4)" }
+    ],
+    "answer": "{2,3}",
+    "rating": 5.0
+  },
+  {
+    "variantExerciseId": 2,
+    "text": "Niech A = (-5, 3), B = (-7, 4). Ile liczb całkowitych należy do A ∩ B?",
+    "verified": true,
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "(-5,3)" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "(-7,4)" }
+    ],
+    "answer": "{-4,-3,-2,-1,0,1,2}",
+    "rating": 5.0
+  },
+  {
+    "templateExerciseId": 6,
+    "text": "Wyznacz zbiór A' dla zbioru A = (1,3)∪{5} w uniwersum U = [2,5)∪(5,9)",
+    "verified": true,
+    "context": [
+      { "key": { "templateString": "s1", "prefix": "SET" }, "value": "(1,3)∪{5}" },
+      { "key": { "templateString": "s2", "prefix": "SET" }, "value": "[2,5)∪(5,9)" }
+    ],
+    "answer": "[3,5)∪(5,9)",
+    "rating": 5.0
   }
 ]

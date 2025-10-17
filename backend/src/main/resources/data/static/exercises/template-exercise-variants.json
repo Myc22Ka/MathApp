@@ -1,0 +1,52 @@
+[
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Wykonaj B ∖ A dla zbiorów: A = ${s1} B = ${s2}",
+    "templateAnswer": "${s1}",
+    "templateExerciseId": 3,
+    "steps": [
+      {
+        "stepDefinitionId": 3,
+        "prefixes": ["s2", "s1"]
+      }
+    ],
+    "exerciseCounter": 1
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Niech A = ${s1}, B = ${s2}. Ile liczb całkowitych należy do A ∩ B?",
+    "templateAnswer": "${s1}",
+    "templateExerciseId": 5,
+    "steps": [
+      {
+        "stepDefinitionId": 2,
+        "prefixes": ["s1", "s2"]
+      },
+      {
+        "stepDefinitionId": 4,
+        "prefixes": ["context1"]
+      }
+    ],
+    "exerciseCounter": 1
+  },
+  {
+    "category": "SET",
+    "difficulty": "1",
+    "templateText": "Niech A = ${s1}, B = ${s2:T1->${s1}}. Ile liczb całkowitych należy do A ∩ B?",
+    "templateAnswer": "${s1}",
+    "templateExerciseId": 5,
+    "steps": [
+      {
+        "stepDefinitionId": 2,
+        "prefixes": ["s1", "s2"]
+      },
+      {
+        "stepDefinitionId": 4,
+        "prefixes": ["context1"]
+      }
+    ],
+    "exerciseCounter": 1
+  }
+]

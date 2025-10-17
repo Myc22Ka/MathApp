@@ -3,9 +3,8 @@ package pl.myc22ka.mathapp.model.set.utils.checker;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pl.myc22ka.mathapp.ai.prompt.validator.UtilChecker;
+import pl.myc22ka.mathapp.utils.resolver.validator.UtilChecker;
 import pl.myc22ka.mathapp.model.set.ISet;
-import pl.myc22ka.mathapp.model.set.SetSymbols;
 
 import static pl.myc22ka.mathapp.model.set.ISetType.*;
 

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import pl.myc22ka.mathapp.modifier.model.Modifier;
+import pl.myc22ka.mathapp.topic.model.Topic;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
