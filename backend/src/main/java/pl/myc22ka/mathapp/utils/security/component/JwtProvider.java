@@ -31,10 +31,6 @@ public class JwtProvider {
         }
     }
 
-    public <T> T extractClaim(String token, @NotNull Function<Claims, T> claimsResolver) {
-        return jwtHelper.extractClaim(token, claimsResolver);
-    }
-
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }

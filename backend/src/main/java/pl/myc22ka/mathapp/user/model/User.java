@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,6 +50,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Integer dailyTasksCompleted = 0;
 
+    // ====== VERIFICATION ======
+    @Column(nullable = false)
+    private Boolean verified = false;
+
+    private String verificationCode;
+    private LocalDateTime verificationCodeExpiresAt;
+
     // ====== DANE DODATKOWE ======
     @Column(name = "photo_url", columnDefinition = "TEXT")
     private String photoUrl;
@@ -71,5 +79,9 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public boolean isVerified() {
+        return verified;
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.user.dto.UserDTO;
 import pl.myc22ka.mathapp.user.model.User;
-import pl.myc22ka.mathapp.utils.security.component.helper.AuthHelper;
+import pl.myc22ka.mathapp.utils.security.component.helper.CookieHelper;
 import pl.myc22ka.mathapp.utils.security.dto.LoginRequest;
 import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
 import pl.myc22ka.mathapp.utils.security.service.AuthService;
@@ -21,7 +21,7 @@ import pl.myc22ka.mathapp.utils.security.service.AuthService;
 public class AuthController {
 
     private final AuthService authService;
-    private final AuthHelper authHelper;
+    private final CookieHelper cookieHelper;
 
     /**
      * Registers a new user, generates JWT token, sets it in HttpOnly cookie,
@@ -37,7 +37,7 @@ public class AuthController {
             @NotNull HttpServletResponse response
     ) {
         User user = authService.register(registerRequest);
-        authHelper.setAuthCookie(user, response);
+        cookieHelper.setAuthCookie(user, response);
 
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
@@ -48,7 +48,7 @@ public class AuthController {
             @NotNull HttpServletResponse response
     ) {
         User user = authService.login(loginRequest);
-        authHelper.setAuthCookie(user, response);
+        cookieHelper.setAuthCookie(user, response);
 
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
@@ -60,7 +60,7 @@ public class AuthController {
             description = "Logs out the current user by clearing the login cookie."
     )
     public void signOut(@NotNull HttpServletResponse response) {
-        authHelper.clearAuthCookie(response);
+        cookieHelper.clearAuthCookie(response);
     }
 
 
@@ -71,8 +71,22 @@ public class AuthController {
     ) {
         authService.deleteUser(user);
 
-        authHelper.clearAuthCookie(response);
+        cookieHelper.clearAuthCookie(response);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/generate-code")
+    public ResponseEntity<String> generateCode(@RequestParam String email) {
+        String code = authService.generateCode(email);
+
+        return ResponseEntity.ok(code);
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<Void> verifyCode(@RequestParam String email, @RequestParam String code) {
+        authService.verifyCode(email, code);
+
+        return ResponseEntity.ok().build();
     }
 }
