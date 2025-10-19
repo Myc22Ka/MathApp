@@ -11,6 +11,8 @@ spring:
   cors:
     allowed:
       origin: ${PLATFORM_URL}:${FRONTEND_PORT}
+  security:
+    secret-key: ${JWT_SECRET_KEY}
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}

@@ -8,8 +8,6 @@ import pl.myc22ka.mathapp.exceptions.ServerError;
 import pl.myc22ka.mathapp.model.function.FunctionType;
 import pl.myc22ka.mathapp.model.function.Function;
 import pl.myc22ka.mathapp.utils.math.MathUtils;
-import pl.myc22ka.mathapp.utils.annotations.NotFullyImplemented;
-import pl.myc22ka.mathapp.utils.annotations.NotTested;
 
 import java.util.List;
 
@@ -38,8 +36,6 @@ public class Constant extends Function {
         super(FunctionType.CONSTANT, MathUtils.detectFirstVariable(rawExpression), rawExpression);
     }
 
-    @NotFullyImplemented
-    @NotTested
     @Override
     public void generateRandomFunction() {
         value = F.ZZ(1);
