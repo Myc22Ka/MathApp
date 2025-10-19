@@ -57,8 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (cookies != null) {
-                Long userId = cookieProvider.extractUserIdFromCookies(cookies);
-                User user = userRepository.findById(userId)
+                String username = cookieProvider.extractUsernameFromCookies(cookies);
+                User user = userRepository.findByEmail(username)
                         .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
                 UsernamePasswordAuthenticationToken authentication =

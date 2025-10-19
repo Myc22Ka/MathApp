@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import pl.myc22ka.mathapp.exceptions.InvalidTokenException;
 import pl.myc22ka.mathapp.exceptions.custom.CookiesNotFoundException;
 
 @Component
@@ -42,19 +43,23 @@ public class CookieProvider {
                 .build();
     }
 
-    public Long extractUserIdFromCookies(Cookie[] cookies){
-
-        if(cookies == null){
-            throw new CookiesNotFoundException();
+    public String extractUsernameFromCookies(Cookie[] cookies) {
+        if (cookies == null) {
+            throw new CookiesNotFoundException("No cookies present in request");
         }
 
-        for(Cookie cookie: cookies){
-            if(COOKIE_NAME.equals(cookie.getName())){
-                return jwtProvider.extractUserIdFromJwt(cookie.getValue());
+        for (Cookie cookie : cookies) {
+            if (COOKIE_NAME.equals(cookie.getName())) {
+                String token = cookie.getValue();
+                String username = jwtProvider.extractUsername(token);
+                if (username == null) {
+                    throw new InvalidTokenException("Token subject is null or invalid");
+                }
+                return username; // teraz String zamiast Long
             }
         }
 
-        throw new CookiesNotFoundException("AuthToken wasn't found");
+        throw new CookiesNotFoundException("Auth token cookie not found");
     }
 
 }

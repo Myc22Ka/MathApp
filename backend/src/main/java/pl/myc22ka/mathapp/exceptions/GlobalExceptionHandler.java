@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import jakarta.persistence.EntityNotFoundException;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
+import pl.myc22ka.mathapp.exceptions.custom.UserException;
 import pl.myc22ka.mathapp.exceptions.custom.VariantTextMismatch;
 
 import java.util.stream.Collectors;
@@ -89,6 +90,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(VariantTextMismatch.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleVariantTextMismatch(@NotNull VariantTextMismatch ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUserException(@NotNull UserException ex) {
         return new ErrorResponse(ex.getMessage());
     }
 }

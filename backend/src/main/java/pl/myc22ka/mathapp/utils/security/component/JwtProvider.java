@@ -1,45 +1,56 @@
 package pl.myc22ka.mathapp.utils.security.component;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
-import javax.crypto.SecretKey;
-
+import io.jsonwebtoken.JwtException;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import pl.myc22ka.mathapp.utils.security.component.helper.JwtHelper;
 
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${spring.security.secret-key}")
-    private String secret;
+    private final JwtHelper jwtHelper;
 
-    public String generateToken(@NotNull Long userId) {
+    @Value("${spring.security.jwt.expiration}")
+    private long jwtExpiration;
 
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-
-        return Jwts.builder()
-                .subject(userId.toString())
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
-                .signWith(key).compact();
+    public String extractUsername(String token) {
+        try {
+            return jwtHelper.extractClaim(token, Claims::getSubject);
+        } catch (JwtException e) {
+            return null;
+        }
     }
 
-    public Long extractUserIdFromJwt(String jwtToken){
+    public <T> T extractClaim(String token, @NotNull Function<Claims, T> claimsResolver) {
+        return jwtHelper.extractClaim(token, claimsResolver);
+    }
 
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
 
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(jwtToken)
-                .getPayload();
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails
+    ) {
+        return jwtHelper.buildToken(extraClaims, userDetails, jwtExpiration);
+    }
 
-        return Long.parseLong(claims.getSubject());
+    public boolean isTokenValid(String token, @NotNull UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username != null
+                && username.equals(userDetails.getUsername())
+                && !jwtHelper.isTokenExpired(token);
     }
 }
 

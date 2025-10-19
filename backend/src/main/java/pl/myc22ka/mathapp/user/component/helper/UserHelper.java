@@ -23,8 +23,6 @@ public class UserHelper {
     public User buildUser(@NotNull RegisterRequest data) {
         return User.builder()
                 .login(data.login())
-                .firstname(data.firstname())
-                .lastname(data.lastname())
                 .email(data.email())
                 .password(encoder.encode(data.password()))
                 .role(Role.STUDENT)
@@ -32,11 +30,6 @@ public class UserHelper {
                 .level(1)
                 .dailyTasksCompleted(0)
                 .lastDailyTaskDate(null)
-                .gender(data.gender())
-                .dateOfBirth(data.dateOfBirth() != null ? data.dateOfBirth() : LocalDate.now())
-                .address(data.address())
-                .photoUrl(data.photoUrl())
-                .phoneNumber(data.phoneNumber())
                 .build();
     }
 

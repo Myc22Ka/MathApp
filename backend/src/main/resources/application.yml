@@ -12,7 +12,9 @@ spring:
     allowed:
       origin: ${PLATFORM_URL}:${FRONTEND_PORT}
   security:
-    secret-key: ${JWT_SECRET_KEY}
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 3600000 # 1 hour in milliseconds
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}

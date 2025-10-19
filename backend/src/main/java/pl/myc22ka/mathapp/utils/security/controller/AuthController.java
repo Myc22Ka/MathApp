@@ -1,19 +1,16 @@
 package pl.myc22ka.mathapp.utils.security.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.myc22ka.mathapp.exceptions.custom.UnauthorizedException;
 import pl.myc22ka.mathapp.user.dto.UserDTO;
 import pl.myc22ka.mathapp.user.model.User;
-import pl.myc22ka.mathapp.utils.security.component.CookieProvider;
-import pl.myc22ka.mathapp.utils.security.component.JwtProvider;
+import pl.myc22ka.mathapp.utils.security.component.helper.AuthHelper;
 import pl.myc22ka.mathapp.utils.security.dto.LoginRequest;
 import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
 import pl.myc22ka.mathapp.utils.security.service.AuthService;
@@ -24,8 +21,7 @@ import pl.myc22ka.mathapp.utils.security.service.AuthService;
 public class AuthController {
 
     private final AuthService authService;
-    private final CookieProvider cookieProvider;
-    private final JwtProvider jwtProvider;
+    private final AuthHelper authHelper;
 
     /**
      * Registers a new user, generates JWT token, sets it in HttpOnly cookie,
@@ -40,14 +36,10 @@ public class AuthController {
             @RequestBody RegisterRequest registerRequest,
             @NotNull HttpServletResponse response
     ) {
-        UserDTO savedUser = authService.register(registerRequest);
+        User user = authService.register(registerRequest);
+        authHelper.setAuthCookie(user, response);
 
-        String jwtToken = jwtProvider.generateToken(savedUser.id());
-
-        ResponseCookie cookie = cookieProvider.createTokenCookie(jwtToken);
-        response.addHeader("Set-Cookie", cookie.toString());
-
-        return ResponseEntity.ok(savedUser);
+        return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
 
     @PostMapping("/sign-in")
@@ -55,27 +47,31 @@ public class AuthController {
             @RequestBody LoginRequest loginRequest,
             @NotNull HttpServletResponse response
     ) {
-        UserDTO user = authService.login(loginRequest);
-        String jwtToken = jwtProvider.generateToken(user.id());
-        ResponseCookie cookie = cookieProvider.createTokenCookie(jwtToken);
-        response.addHeader("Set-Cookie", cookie.toString());
+        User user = authService.login(loginRequest);
+        authHelper.setAuthCookie(user, response);
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
+
+    @PostMapping("/sign-out")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Sign out",
+            description = "Logs out the current user by clearing the login cookie."
+    )
+    public void signOut(@NotNull HttpServletResponse response) {
+        authHelper.clearAuthCookie(response);
+    }
+
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
             @AuthenticationPrincipal User user,
             HttpServletResponse response
     ) {
-        if (user == null) {
-            throw new UnauthorizedException("User is not authenticated");
-        }
-
         authService.deleteUser(user);
 
-        ResponseCookie cookie = cookieProvider.clearTokenCookie();
-        response.addHeader("Set-Cookie", cookie.toString());
+        authHelper.clearAuthCookie(response);
 
         return ResponseEntity.noContent().build();
     }
