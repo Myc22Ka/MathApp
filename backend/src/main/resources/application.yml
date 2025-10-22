@@ -1,4 +1,10 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  banner:
+    location: 'classpath:mathapp-banner.txt'
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:

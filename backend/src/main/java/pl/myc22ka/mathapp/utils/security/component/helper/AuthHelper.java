@@ -35,6 +35,8 @@ public class AuthHelper {
                 .dailyTasksCompleted(0)
                 .lastDailyTaskDate(null)
                 .verified(false)
+                .twoFactorEnabled(false)
+                .notificationsEnabled(true)
                 .build();
     }
 
@@ -107,5 +109,22 @@ public class AuthHelper {
         user.setVerificationCodeExpiresAt(null);
 
         userRepository.save(user);
+    }
+
+    public void validatePassword(String password) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Hasło nie może być puste");
+        }
+        if (password.length() < 8) {
+            throw new IllegalArgumentException("Hasło musi mieć co najmniej 8 znaków");
+        }
+    }
+
+    public boolean passwordMatches(String rawPassword, String encodedPassword) {
+        return encoder.matches(rawPassword, encodedPassword);
+    }
+
+    public String encodePassword(String rawPassword) {
+        return encoder.encode(rawPassword);
     }
 }

@@ -1,5 +1,6 @@
 package pl.myc22ka.mathapp.utils.security.component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import pl.myc22ka.mathapp.exceptions.ErrorResponse;
 import pl.myc22ka.mathapp.exceptions.custom.CookiesNotFoundException;
 import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.user.repository.UserRepository;
@@ -72,7 +74,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException | CookiesNotFoundException | UsernameNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+
+            ErrorResponse errorResponse = new ErrorResponse("Unauthorized");
+            String json = new ObjectMapper().writeValueAsString(errorResponse);
+
+            response.getWriter().write(json);
         }
     }
 }

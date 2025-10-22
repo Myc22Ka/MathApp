@@ -54,13 +54,16 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Boolean verified = false;
 
+    @Column(nullable = false)
+    private Boolean twoFactorEnabled = false;
+
+    @Column(nullable = false)
+    private Boolean notificationsEnabled = true;
+
     private String verificationCode;
     private LocalDateTime verificationCodeExpiresAt;
 
     // ====== DANE DODATKOWE ======
-    @Column(name = "photo_url", columnDefinition = "TEXT")
-    private String photoUrl;
-
     @Column(name = "phone_number")
     private String phoneNumber;
 

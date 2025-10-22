@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.user.dto;
 
 import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.user.model.User;
 
 import java.time.LocalDate;
 
@@ -13,15 +14,15 @@ public record UserDTO(
         String role,
         Integer points,
         Integer level,
-        String photoUrl,
         String phoneNumber,
         String address,
         LocalDate dateOfBirth,
-        String gender
+        String gender,
+        String profilePhotoUrl // nowa kolumna
 ) {
 
     @NotNull
-    public static UserDTO fromEntity(@NotNull pl.myc22ka.mathapp.user.model.User user) {
+    public static UserDTO fromEntity(@NotNull User user, String profilePhotoUrl) {
         return new UserDTO(
                 user.getId(),
                 user.getLogin(),
@@ -31,11 +32,11 @@ public record UserDTO(
                 user.getRole().name(),
                 user.getPoints(),
                 user.getLevel(),
-                user.getPhotoUrl(),
                 user.getPhoneNumber(),
                 user.getAddress(),
                 user.getDateOfBirth(),
-                user.getGender()
+                user.getGender(),
+                profilePhotoUrl
         );
     }
 }
