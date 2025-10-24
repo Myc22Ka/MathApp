@@ -2,6 +2,8 @@ package pl.myc22ka.mathapp.utils.security.component.helper;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.myc22ka.mathapp.exceptions.custom.UserException;
@@ -64,6 +66,12 @@ public class AuthHelper {
         }
     }
 
+    public void validateUser(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+    }
+
     /**
      * Authenticates a user by email and password.
      *
@@ -72,7 +80,8 @@ public class AuthHelper {
      * @throws UserException if credentials are invalid
      */
     public User authenticateUser(@NotNull LoginRequest loginRequest) {
-        User user = userHelper.getUserByEmail(loginRequest.email());
+        User user = userRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> new UserException("Invalid credentials"));
 
         if (!encoder.matches(loginRequest.password(), user.getPassword())) {
             throw new UserException("Invalid credentials");

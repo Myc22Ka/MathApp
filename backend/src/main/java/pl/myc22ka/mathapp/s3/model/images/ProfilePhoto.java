@@ -6,21 +6,21 @@ import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 import pl.myc22ka.mathapp.s3.model.Image;
-import pl.myc22ka.mathapp.user.model.User;
 
 import java.io.IOException;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "profile_photos")
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ProfilePhoto extends Image {
 
     @NotNull
-    public static ProfilePhoto create(User user, MultipartFile file, String url) throws IOException {
+    public static ProfilePhoto create(Long userId, MultipartFile file, String url, String s3Key) throws IOException {
         ProfilePhoto photo = new ProfilePhoto();
-        photo.setData(user, file, url);
+        photo.setData(userId, file, url, s3Key);
+
         return photo;
     }
 }

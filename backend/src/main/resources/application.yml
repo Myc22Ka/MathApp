@@ -24,7 +24,7 @@ spring:
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}
-      endpoint: http://${PLATFORM_URL:localhost}:${LOCALSTACK_PORT:4566}
+      endpoint: http://minio:${LOCALSTACK_PORT:9000}
       region: ${BUCKET_REGION:eu-central-1}
   ollama:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}

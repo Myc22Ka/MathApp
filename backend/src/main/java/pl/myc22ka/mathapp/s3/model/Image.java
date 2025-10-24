@@ -2,9 +2,7 @@ package pl.myc22ka.mathapp.s3.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
-import pl.myc22ka.mathapp.user.model.User;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,23 +17,24 @@ public abstract class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fileName;
+    @Column(nullable = false)
+    private Long userId;
 
+    private String fileName;
+    private String s3Key;
     private String url;
 
     private String contentType;
 
     private Long size;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
     private LocalDateTime uploadedAt = LocalDateTime.now();
 
-    public void setData(User user, @NotNull MultipartFile file, String url) throws IOException {
-        this.user = user;
+    public void setData(Long userId, MultipartFile file, String url, String s3Key) throws IOException {
+        this.userId = userId;
         this.fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         this.url = url;
+        this.s3Key = s3Key;
         this.contentType = file.getContentType();
         this.size = file.getSize();
         this.uploadedAt = LocalDateTime.now();

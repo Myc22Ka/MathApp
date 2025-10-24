@@ -1,7 +1,6 @@
 package pl.myc22ka.mathapp.s3.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,39 +26,30 @@ public class S3Service {
     private String region;
 
     // ---------------- Upload ----------------
-    public String uploadFile(@NotNull MultipartFile file) {
+    public String uploadFile(@NotNull MultipartFile file, String key) throws IOException {
         s3Helper.ensureBucketExists();
 
-        try {
-            String key = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(file.getContentType())
+                .build();
 
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .contentType(file.getContentType())
-                    .build();
-
-            s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
-
-            return s3Helper.buildFileUrl(key);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload file", e);
-        }
+        s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
+        return s3Helper.buildFileUrl(key);
     }
 
     // ---------------- Download ----------------
-    public byte[] downloadFile(String fileName) {
+    public byte[] downloadFile(String key) {
         try {
             GetObjectRequest request = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileName)
+                    .key(key)
                     .build();
 
             return s3Client.getObject(request).readAllBytes();
-
         } catch (NoSuchKeyException e) {
-            throw new RuntimeException("File not found in S3: " + fileName, e);
+            throw new RuntimeException("File not found in S3: " + key, e);
         } catch (IOException e) {
             throw new RuntimeException("Failed to download file", e);
         }

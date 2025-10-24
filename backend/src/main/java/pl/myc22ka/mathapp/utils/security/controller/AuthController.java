@@ -5,12 +5,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
+import pl.myc22ka.mathapp.s3.dto.ImageResponse;
 import pl.myc22ka.mathapp.user.dto.UserDTO;
 import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.user.service.UserImageService;
@@ -22,6 +21,8 @@ import pl.myc22ka.mathapp.utils.security.dto.TwoFactorRequest;
 import pl.myc22ka.mathapp.utils.security.service.AuthService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,10 +50,11 @@ public class AuthController {
 
         cookieHelper.setAuthCookie(user, response);
 
-        return ResponseEntity.ok(UserDTO.fromEntity(user, imageService.getProfilePhotoUrl(user)));
+        return ResponseEntity.ok(UserDTO.fromEntity(user, imageService.getProfilePhotoUrl(user), null));
     }
 
     @PostMapping("/sign-in")
+    @Operation(summary = "User login")
     public ResponseEntity<UserDTO> login(
             @RequestBody LoginRequest loginRequest,
             @NotNull HttpServletResponse response
@@ -60,17 +62,57 @@ public class AuthController {
         User user = authService.login(loginRequest);
         cookieHelper.setAuthCookie(user, response);
 
-        return ResponseEntity.ok(UserDTO.fromEntity(user, imageService.getProfilePhotoUrl(user)));
+        // Załaduj zdjęcia oddzielnie
+        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
+        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
+
+        return ResponseEntity.ok(
+                UserDTO.fromEntity(
+                        user,
+                        profilePhotoUrl,
+                        exerciseImages
+                )
+        );
     }
 
-    @PostMapping("/sign-out")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    // ====== GET CURRENT USER ======
+    @GetMapping("/me")
     @Operation(
-            summary = "Sign out",
-            description = "Logs out the current user by clearing the login cookie."
+            summary = "Get current user info",
+            description = "Returns the currently authenticated user's data including profile and exercise images."
     )
-    public void signOut(@NotNull HttpServletResponse response) {
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Załaduj zdjęcia oddzielnie - brak problemu z LazyInitializationException
+        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
+        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
+
+        return ResponseEntity.ok(
+                UserDTO.fromEntity(
+                        user,
+                        profilePhotoUrl,
+                        exerciseImages
+                )
+        );
+    }
+
+    // ====== SIGN OUT ======
+    @PostMapping("/sign-out")
+    @Operation(summary = "User logout")
+    public ResponseEntity<DefaultResponse> logout(
+            @NotNull HttpServletResponse response
+    ) {
         cookieHelper.clearAuthCookie(response);
+        return ResponseEntity.ok(
+                new DefaultResponse(
+                        LocalDateTime.now().toString(),
+                        "Logged out successfully",
+                        200
+                )
+        );
     }
 
 
