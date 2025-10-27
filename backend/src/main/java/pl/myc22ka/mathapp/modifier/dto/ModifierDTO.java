@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import pl.myc22ka.mathapp.modifier.model.Modifier;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.modifier.model.ModifierPrefix;
+import pl.myc22ka.mathapp.modifier.model.modifiers.*;
 
 /**
  * Data Transfer Object representing a Modifier.
@@ -32,38 +34,67 @@ public record ModifierDTO(
         @Schema(description = "Associated topic/template prefix", example = "S")
         TemplatePrefix topicName,
 
-        @Schema(description = "Template code used in placeholders", example = "D1")
+        @Schema(description = "Template code used in placeholders", example = "R4")
         String templateCode,
 
-        @Schema(description = "Type of modifier (class name)", example = "DifficultyModifier")
-        String modifierType
+        @Schema(description = "Type of modifier", example = "REQUIREMENT")
+        ModifierPrefix modifierType,
+
+        @Schema(description = "Difficulty level (for type = DIFFICULTY)", example = "1")
+        Integer difficultyLevel,
+
+        @Schema(description = "Requirement constraint (for type = REQUIREMENT)", example = "DISJOINT_SETS")
+        Requirement requirement,
+
+        @Schema(description = "Template type (for type = TEMPLATE)", example = "UNION")
+        Template template,
+
+        @Schema(description = "Optional extra information for TEMPLATE type", example = "(1,4)")
+        String templateInformation
 ) {
 
     /**
      * Converts a {@link Modifier} entity to a {@link ModifierDTO}.
-     *
-     * @param modifier the modifier entity to convert
-     * @return the corresponding DTO, or {@code null} if input is null
      */
     public static ModifierDTO fromEntity(Modifier modifier) {
         if (modifier == null) {
             return null;
         }
 
+        Long id = modifier.getId();
+        String description = modifier.getDescription();
+        TemplatePrefix topicName = modifier.getTopic() != null ? modifier.getTopic().getType() : null;
+        String templateCode = modifier.getTemplateCode();
+        ModifierPrefix modifierType = ModifierPrefix.fromTemplateCode(templateCode);
+
+        Integer difficultyLevel = null;
+        Requirement requirement = null;
+        Template template = null;
+        String templateInformation = null;
+
+        switch (modifier) {
+            case DifficultyModifier diff -> difficultyLevel = diff.getDifficultyLevel();
+            case RequirementModifier req -> requirement = req.getRequirement();
+            case TemplateModifier tmpl -> template = tmpl.getTemplate();
+            default -> {
+            }
+        }
+
         return new ModifierDTO(
-                modifier.getId(),
-                modifier.getDescription(),
-                modifier.getTopic() != null ? modifier.getTopic().getType() : null,
-                modifier.getTemplateCode(),
-                modifier.getClass().getSimpleName()
+                id,
+                description,
+                topicName,
+                templateCode,
+                modifierType,
+                difficultyLevel,
+                requirement,
+                template,
+                templateInformation
         );
     }
 
     /**
      * Converts a {@link Page} of {@link Modifier} entities to a {@link Page} of {@link ModifierDTO}.
-     *
-     * @param modifierPage page of modifier entities
-     * @return page of corresponding DTOs
      */
     @NotNull
     public static Page<ModifierDTO> fromPage(@NotNull Page<Modifier> modifierPage) {

@@ -68,4 +68,8 @@ public class TemplateExercise implements TemplateLike {
     @OneToMany(mappedBy = "templateExercise", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<TemplateExerciseVariant> variants = new ArrayList<>();
+
+    @Column(name = "points", nullable = false)
+    @Builder.Default
+    private Double points = 1.0;
 }

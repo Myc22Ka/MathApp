@@ -14,7 +14,7 @@ public record UserDTO(
         String lastname,
         String email,
         String role,
-        Integer points,
+        Double points,
         Integer level,
         String phoneNumber,
         String address,

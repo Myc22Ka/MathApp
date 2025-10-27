@@ -32,7 +32,7 @@ public class AuthHelper {
                 .email(data.email())
                 .password(encoder.encode(data.password()))
                 .role(Role.STUDENT)
-                .points(0)
+                .points(0.0)
                 .level(1)
                 .dailyTasksCompleted(0)
                 .lastDailyTaskDate(null)

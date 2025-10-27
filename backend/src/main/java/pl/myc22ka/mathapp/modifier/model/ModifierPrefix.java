@@ -26,4 +26,18 @@ public enum ModifierPrefix {
     TEMPLATE("T");
 
     private final String key;
+
+    public static ModifierPrefix fromTemplateCode(String code) {
+        if (code == null || code.isEmpty()) return null;
+
+        String prefix = String.valueOf(code.charAt(0));
+
+        for (ModifierPrefix value : values()) {
+            if (value.key.equalsIgnoreCase(prefix)) {
+                return value;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown modifier prefix: " + prefix);
+    }
 }

@@ -14,6 +14,15 @@ public class UserHelper {
 
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserException("Użytkownik nie istnieje"));
+                .orElseThrow(() -> new UserException("User does not exist"));
+    }
+
+    public User getUserById(Long id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserException("User with id: " + id + " doesn't exist"));
+    }
+
+    public void save(User user){
+        userRepository.save(user);
     }
 }

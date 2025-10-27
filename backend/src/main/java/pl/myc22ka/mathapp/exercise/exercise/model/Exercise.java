@@ -5,9 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.exercise.exercise.annotation.rating.Rating;
+import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
+import pl.myc22ka.mathapp.user.model.UserExercise;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an Exercise entity stored in the database.
@@ -53,5 +59,21 @@ public class Exercise {
 
     @Column(name = "context", columnDefinition = "TEXT")
     private String contextJson;
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    private Set<UserExercise> userExercises = new HashSet<>();
+
+    public TemplateLike getTemplateOrVariant() {
+        if (this.getTemplateExercise() != null) {
+            return this.getTemplateExercise();
+        }
+
+        TemplateLike variant = this.getTemplateExerciseVariant();
+        if (variant == null) {
+            throw new IllegalArgumentException("Exercise must be linked to either template or variant");
+        }
+
+        return variant;
+    }
 }
 

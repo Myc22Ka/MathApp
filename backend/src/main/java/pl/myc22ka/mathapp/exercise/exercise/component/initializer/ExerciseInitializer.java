@@ -61,7 +61,7 @@ public class ExerciseInitializer {
                         .text(record.text())
                         .answer(record.answer())
                         .verified(record.verified())
-                        .rating(record.rating() != null ? record.rating() : 0.0)
+                        .rating(record.rating())
                         .contextJson(record.context() != null ? objectMapper.writeValueAsString(record.context()) : null)
                         .build();
 

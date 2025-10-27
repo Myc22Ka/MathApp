@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
-import pl.myc22ka.mathapp.exceptions.InvalidTokenException;
+import pl.myc22ka.mathapp.exceptions.custom.InvalidTokenException;
 import pl.myc22ka.mathapp.exceptions.custom.CookiesNotFoundException;
 
 @Component

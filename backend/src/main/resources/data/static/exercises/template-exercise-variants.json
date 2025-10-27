@@ -11,7 +11,8 @@
         "prefixes": ["s2", "s1"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   },
   {
     "category": "SET",
@@ -29,7 +30,8 @@
         "prefixes": ["context1"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   },
   {
     "category": "SET",
@@ -47,6 +49,7 @@
         "prefixes": ["context1"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 2
   }
 ]

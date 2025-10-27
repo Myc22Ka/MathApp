@@ -40,7 +40,7 @@ public class User implements UserDetails {
 
     // ====== ELEMENTY GRYWALIZACJI ======
     @Column(nullable = false)
-    private Integer points = 0;
+    private Double points = 0.0;
 
     @Column(nullable = false)
     private Integer level = 1;
@@ -86,5 +86,10 @@ public class User implements UserDetails {
 
     public boolean isVerified() {
         return verified;
+    }
+
+    // ======== ELEMENTY GRYWALIZACJI ==========
+    public void addPoints(Double additionalPoints) {
+        this.points += additionalPoints;
     }
 }

@@ -23,29 +23,29 @@ import java.util.Random;
 public class ExerciseScheduler {
 
     private final ExerciseRepository exerciseRepository;
-    private final Random random = new Random();
+    private final Random daily = new Random();
 
     @Getter
-    private Exercise lastRandomExercise;
+    private Exercise lastDailyExercise;
 
     /**
-     * Initializes the scheduler by picking the first random exercise on startup.
+     * Initializes the scheduler by picking the first Daily exercise on startup.
      */
     @PostConstruct
     public void init() {
-        pickRandomExercise();
+        pickDailyExercise();
     }
 
     /**
-     * Picks a random exercise from all available exercises.
+     * Picks a Daily exercise from all available exercises.
      * Runs every day at 9 AM.
      */
     @Scheduled(cron = "0 0 9 * * *")
-    public void pickRandomExercise() {
+    public void pickDailyExercise() {
         List<Exercise> allExercises = exerciseRepository.findAll();
 
         if (!allExercises.isEmpty()) {
-            lastRandomExercise = allExercises.get(random.nextInt(allExercises.size()));
+            lastDailyExercise = allExercises.get(daily.nextInt(allExercises.size()));
         }
     }
 

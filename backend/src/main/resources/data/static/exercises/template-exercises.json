@@ -10,7 +10,8 @@
         "prefixes": ["s1", "s2"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   },
   {
     "category": "SET",
@@ -23,7 +24,8 @@
         "prefixes": ["s1", "s2"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   },
   {
     "category": "SET",
@@ -36,7 +38,8 @@
         "prefixes": ["s1", "s2"]
       }
     ],
-    "exerciseCounter": 2
+    "exerciseCounter": 2,
+    "points": 1
   },
   {
     "category": "SET",
@@ -53,7 +56,8 @@
         "prefixes": ["context1", "s3"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   },
   {
     "category": "SET",
@@ -66,7 +70,8 @@
         "prefixes": ["s1"]
       }
     ],
-    "exerciseCounter": 2
+    "exerciseCounter": 2,
+    "points": 1
   },
   {
     "category": "SET",
@@ -79,6 +84,7 @@
         "prefixes": ["s1", "s2"]
       }
     ],
-    "exerciseCounter": 1
+    "exerciseCounter": 1,
+    "points": 1
   }
 ]
