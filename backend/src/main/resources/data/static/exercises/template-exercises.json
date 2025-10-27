@@ -11,7 +11,8 @@
       }
     ],
     "exerciseCounter": 1,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 1
   },
   {
     "category": "SET",
@@ -25,7 +26,8 @@
       }
     ],
     "exerciseCounter": 1,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 1
   },
   {
     "category": "SET",
@@ -39,7 +41,8 @@
       }
     ],
     "exerciseCounter": 2,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 1
   },
   {
     "category": "SET",
@@ -57,7 +60,8 @@
       }
     ],
     "exerciseCounter": 1,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 2
   },
   {
     "category": "SET",
@@ -71,7 +75,8 @@
       }
     ],
     "exerciseCounter": 2,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 2
   },
   {
     "category": "SET",
@@ -85,6 +90,7 @@
       }
     ],
     "exerciseCounter": 1,
-    "points": 1
+    "points": 1,
+    "requiredLevel": 3
   }
 ]

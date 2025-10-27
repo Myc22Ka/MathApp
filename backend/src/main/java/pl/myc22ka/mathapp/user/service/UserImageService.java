@@ -31,7 +31,7 @@ public class UserImageService {
 
     // ---------------- Upload ----------------
     @Transactional
-    public void uploadProfilePhoto(User user, @NotNull MultipartFile file) throws IOException {
+    public void uploadProfilePhoto(@NotNull User user, @NotNull MultipartFile file) throws IOException {
         profilePhotoRepository.findByUserId(user.getId()).ifPresent(old -> {
             s3Service.deleteFile(old.getS3Key());
             profilePhotoRepository.delete(old);
@@ -45,7 +45,7 @@ public class UserImageService {
     }
 
     @Transactional
-    public void uploadExerciseImage(User user, @NotNull MultipartFile file, Long exerciseId) throws IOException {
+    public void uploadExerciseImage(@NotNull User user, @NotNull MultipartFile file, Long exerciseId) throws IOException {
         String s3Key = s3Helper.generateS3Key(file.getOriginalFilename());
         String url = s3Service.uploadFile(file, s3Key);
 
@@ -83,7 +83,7 @@ public class UserImageService {
     }
 
     @Transactional(readOnly = true)
-    public String getProfilePhotoUrl(User user) {
+    public String getProfilePhotoUrl(@NotNull User user) {
         return profilePhotoRepository.findByUserId(user.getId())
                 .map(ProfilePhoto::getUrl)
                 .orElse(null);
@@ -123,5 +123,19 @@ public class UserImageService {
         } else {
             exerciseImageRepository.delete((ExerciseImage) img);
         }
+    }
+
+    @Transactional
+    public void deleteAllUserImages(@NotNull User user) {
+        profilePhotoRepository.findByUserId(user.getId()).ifPresent(photo -> {
+            s3Service.deleteFile(photo.getS3Key());
+            profilePhotoRepository.delete(photo);
+        });
+
+        List<ExerciseImage> exerciseImages = exerciseImageRepository.findByUserId(user.getId());
+        for (ExerciseImage img : exerciseImages) {
+            s3Service.deleteFile(img.getS3Key());
+        }
+        exerciseImageRepository.deleteAll(exerciseImages);
     }
 }

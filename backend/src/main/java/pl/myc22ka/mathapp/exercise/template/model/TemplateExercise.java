@@ -72,4 +72,7 @@ public class TemplateExercise implements TemplateLike {
     @Column(name = "points", nullable = false)
     @Builder.Default
     private Double points = 1.0;
+
+    @Column(name = "required_level", nullable = false)
+    private Integer requiredLevel;
 }

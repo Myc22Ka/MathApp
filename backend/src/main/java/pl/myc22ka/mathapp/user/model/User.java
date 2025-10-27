@@ -2,12 +2,15 @@ package pl.myc22ka.mathapp.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.myc22ka.mathapp.level.model.LevelRequirement;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,6 +53,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Integer dailyTasksCompleted = 0;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserExercise> userExercises = new ArrayList<>();
+
     // ====== VERIFICATION ======
     @Column(nullable = false)
     private Boolean verified = false;
@@ -89,7 +95,17 @@ public class User implements UserDetails {
     }
 
     // ======== ELEMENTY GRYWALIZACJI ==========
-    public void addPoints(Double additionalPoints) {
+    public void addPoints(Double additionalPoints, @NotNull List<LevelRequirement> levelRequirements) {
         this.points += additionalPoints;
+
+        int newLevel = levelRequirements.stream()
+                .filter(req -> this.points >= req.getRequiredXp())
+                .mapToInt(LevelRequirement::getLevel)
+                .max()
+                .orElse(this.level);
+
+        if (newLevel > this.level) {
+            this.level = newLevel;
+        }
     }
 }

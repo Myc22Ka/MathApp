@@ -112,10 +112,11 @@ public class ExerciseController {
             @RequestParam(required = false) Long templateId,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(required = false) Boolean solvedFilter){
+            @RequestParam(required = false) Boolean solvedFilter,
+            @RequestParam(required = false) Boolean onlyUserLevel) {
 
         return exerciseService.getAll(
-                user.getId(), page, size, rating, difficulty, category, sortBy, sortDirection, templateId, solvedFilter
+                user, page, size, rating, difficulty, category, sortBy, sortDirection, templateId, solvedFilter, onlyUserLevel
         ).map(exercise -> ExerciseDTO.fromEntity(
                 exercise,
                 user.getId() != null && userExerciseHelper.isSolved(user.getId(), exercise)
@@ -208,6 +209,19 @@ public class ExerciseController {
             @RequestParam String userAnswer) {
 
         boolean correct = exerciseService.solve(user, exerciseId, userAnswer);
+
+        return ResponseEntity.ok(
+                new DefaultResponse(
+                        java.time.Instant.now().toString(),
+                        correct ? "Answer is correct" : "Answer is incorrect",
+                        correct ? 200 : 400
+                )
+        );
+    }
+
+    @PostMapping("/solve-daily")
+    public ResponseEntity<DefaultResponse> solveDaily(@AuthenticationPrincipal User user, @RequestParam String answer) {
+        boolean correct = exerciseService.solveDaily(user, answer);
 
         return ResponseEntity.ok(
                 new DefaultResponse(

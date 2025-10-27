@@ -9,6 +9,7 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.user.model.UserExercise;
 
 import java.util.ArrayList;
@@ -66,6 +67,25 @@ public class ExerciseSpecification {
             Join<TemplateExerciseVariant, TemplateExercise> variantTemplateJoin =
                     variantJoin.join("templateExercise", JoinType.LEFT);
             predicates.add(cb.equal(variantTemplateJoin.get("id"), templateId));
+
+            return cb.or(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    @NotNull
+    private static Specification<Exercise> filterByUserLevel(Integer userLevel, Boolean onlyUserLevel) {
+        return (root, query, cb) -> {
+            if (userLevel == null || onlyUserLevel == null || !onlyUserLevel) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            Join<Exercise, TemplateExercise> templateJoin = root.join("templateExercise", JoinType.LEFT);
+            predicates.add(cb.lessThanOrEqualTo(templateJoin.get("requiredLevel"), userLevel));
+
+            Join<Exercise, TemplateExerciseVariant> variantJoin = root.join("templateExerciseVariant", JoinType.LEFT);
+            predicates.add(cb.lessThanOrEqualTo(variantJoin.get("requiredLevel"), userLevel));
 
             return cb.or(predicates.toArray(new Predicate[0]));
         };
@@ -152,12 +172,14 @@ public class ExerciseSpecification {
     @NotNull
     public static Specification<Exercise> withFilters(Double rating, String difficulty,
                                                       TemplatePrefix category, Long templateId,
-                                                      Long userId, Boolean solvedFilter) {
+                                                      @NotNull User user, Boolean solvedFilter,
+                                                      Boolean onlyUserLevel) {
         return Specification.allOf(
                 hasRating(rating),
                 hasDifficultyOrCategory(difficulty, category),
-                isSolvedByUser(userId, solvedFilter),
-                hasTemplateId(templateId)
+                isSolvedByUser(user.getId(), solvedFilter),
+                hasTemplateId(templateId),
+                filterByUserLevel(user.getLevel(), onlyUserLevel)
         );
     }
 }

@@ -4,10 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import pl.myc22ka.mathapp.s3.component.helper.S3Helper;
-import pl.myc22ka.mathapp.s3.service.S3Service;
 import pl.myc22ka.mathapp.user.component.helper.UserHelper;
+import pl.myc22ka.mathapp.user.service.UserImageService;
 import pl.myc22ka.mathapp.utils.security.component.helper.AuthHelper;
 import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.user.repository.UserRepository;
@@ -23,8 +21,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthHelper authHelper;
     private final UserHelper userHelper;
-    private final S3Helper s3Helper;
-    private final S3Service s3Service;
+    private final UserImageService userImageService;
 
     @Transactional
     public User register(RegisterRequest userData) {
@@ -42,6 +39,8 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(User user) {
+        userImageService.deleteAllUserImages(user);
+
         userRepository.delete(user);
     }
 

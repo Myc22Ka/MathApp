@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 
@@ -23,10 +25,11 @@ import java.util.Random;
 public class ExerciseScheduler {
 
     private final ExerciseRepository exerciseRepository;
+    private final ExerciseHelper exerciseHelper;
     private final Random daily = new Random();
 
     @Getter
-    private Exercise lastDailyExercise;
+    private Long lastDailyExerciseId;
 
     /**
      * Initializes the scheduler by picking the first Daily exercise on startup.
@@ -45,8 +48,12 @@ public class ExerciseScheduler {
         List<Exercise> allExercises = exerciseRepository.findAll();
 
         if (!allExercises.isEmpty()) {
-            lastDailyExercise = allExercises.get(daily.nextInt(allExercises.size()));
+            lastDailyExerciseId = allExercises.get(daily.nextInt(allExercises.size())).getId();
         }
     }
 
+    @Transactional
+    public Exercise getLastDailyExercise() {
+        return exerciseHelper.getExercise(lastDailyExerciseId);
+    }
 }

@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
+import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
+import pl.myc22ka.mathapp.level.service.LevelingService;
 import pl.myc22ka.mathapp.user.component.helper.UserExerciseHelper;
 import pl.myc22ka.mathapp.user.component.helper.UserHelper;
 import pl.myc22ka.mathapp.user.model.User;
@@ -20,7 +22,6 @@ import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
-import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
@@ -28,6 +29,7 @@ import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHel
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,8 @@ public class ExerciseService {
     private final UserHelper userHelper;
     private final ValidationHelper validationHelper;
     private final UserExerciseHelper userExerciseHelper;
+    private final LevelingService levelingService;
+    private final ExerciseScheduler exerciseScheduler;
 
     /**
      * Creates a new Exercise from a template or variant with given values.
@@ -104,8 +108,8 @@ public class ExerciseService {
      * @return page of ExerciseDTO matching criteria
      * @throws IllegalArgumentException if rating or difficulty filters are invalid
      */
-    public Page<Exercise> getAll(Long userId, int page, int size, Double rating, String difficulty,
-                                    TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId, Boolean solvedFilter) {
+    public Page<Exercise> getAll(User user, int page, int size, Double rating, String difficulty,
+                                    TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId, Boolean solvedFilter, Boolean onlyUserLevel) {
 
         validationHelper.validateFilters(rating, difficulty);
 
@@ -116,7 +120,7 @@ public class ExerciseService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Specification<Exercise> spec = ExerciseSpecification.withFilters(
-                rating, difficulty, category, templateId, userId, solvedFilter
+                rating, difficulty, category, templateId, user, solvedFilter, onlyUserLevel
         );
 
         return exerciseRepository.findAll(spec, pageable);
@@ -247,13 +251,40 @@ public class ExerciseService {
 
         boolean result = userAnswer.equals(exerciseAnswer);
 
-        if(result) {
-            user.addPoints(exercise.getTemplateOrVariant().getPoints());
+        if (result) {
+            double earnedPoints = template.getPoints();
+
+            levelingService.addPointsAndCheckLevelUp(user, earnedPoints);
+
             userExerciseHelper.markAsSolved(user, exercise);
+        }
+
+        return result;
+    }
+
+    public boolean solveDaily(User user, String answer) {
+        Exercise dailyExercise = exerciseScheduler.getLastDailyExercise();
+        if (dailyExercise == null) {
+            throw new IllegalStateException("Daily exercise is not set yet.");
+        }
+
+        if (user.getLastDailyTaskDate() != null && user.getLastDailyTaskDate().isEqual(LocalDate.now())) {
+            throw new IllegalStateException("You have already completed today's exercise.");
+        }
+
+        boolean solved = solve(
+                user,
+                dailyExercise.getId(),
+                answer
+        );
+
+        if (solved) {
+            user.setLastDailyTaskDate(LocalDate.now());
+            user.setDailyTasksCompleted(user.getDailyTasksCompleted() + 1);
 
             userHelper.save(user);
         }
 
-        return result;
+        return solved;
     }
 }

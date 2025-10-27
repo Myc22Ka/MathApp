@@ -74,6 +74,7 @@ public class TemplateExerciseVariantInitializer {
                         .clearText(cleanText)
                         .exerciseCounter(dto.exerciseCounter())
                         .steps(dto.steps() != null ? dto.steps() : new ArrayList<>())
+                        .requiredLevel(dto.requiredLevel())
                         .build();
 
                 for (StepWrapper step : variant.getSteps()) {

@@ -32,7 +32,9 @@ public record ExerciseDTO(
 
         String topic,
 
-        Boolean isSolved
+        Boolean isSolved,
+
+        Integer requiredLevel
 
 ) {
 
@@ -50,7 +52,8 @@ public record ExerciseDTO(
                 exercise.isVerified(),
                 exercise.getRating(),
                 exercise.getTemplateOrVariant().getCategory().name(),
-                isSolved
+                isSolved,
+                exercise.getTemplateOrVariant().getRequiredLevel()
         );
     }
 }
