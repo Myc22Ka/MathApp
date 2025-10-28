@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private static final List<String> PUBLIC_PATHS = List.of(
+            "/login",
             "/auth/register",
             "/auth/register/availability",
             "/auth/sign-in",

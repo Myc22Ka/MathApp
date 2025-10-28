@@ -18,6 +18,18 @@ spring:
     allowed:
       origin: ${PLATFORM_URL}:${FRONTEND_PORT}
   security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${OAUTH2_GITHUB_CLIENT_ID}
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+            scope:
+              - read:user
+              - user:email
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
     jwt:
       secret-key: ${JWT_SECRET_KEY}
       expiration: 3600000 # 1 hour in milliseconds
@@ -29,6 +41,8 @@ spring:
   ollama:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
     model: gpt-oss:20b
+  frontend:
+    url: http://${PLATFORM_URL:localhost}:${FRONTEND_PORT:3000}
 
 logging:
   level:
