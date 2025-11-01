@@ -142,11 +142,25 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/change-password")
-    public ResponseEntity<DefaultResponse> changePassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordRequest request) {
-        authService.changePassword(user, request);
+    @PostMapping("/password/request")
+    public ResponseEntity<String> requestPasswordChange(@RequestParam String email) {
+        authService.requestPasswordChange(email);
+        return ResponseEntity.ok("Verification code sent to email.");
+    }
 
-        return ResponseEntity.ok(new DefaultResponse(LocalDate.now().toString(), "Password changed successfully", 200));
+    @PostMapping("/password/confirm")
+    public ResponseEntity<String> confirmPasswordChange(@RequestParam String email,
+                                                        @RequestParam String code,
+                                                        @RequestParam String newPassword) {
+        authService.confirmPasswordChange(email, code, newPassword);
+        return ResponseEntity.ok("Password successfully changed.");
+    }
+
+    @PostMapping("/password/change")
+    public ResponseEntity<String> changePasswordLoggedIn(@AuthenticationPrincipal User user,
+                                                         @NotNull @RequestBody ChangePasswordRequest request) {
+        authService.changePasswordLoggedIn(user, request.oldPassword(), request.newPassword());
+        return ResponseEntity.ok("Password successfully changed.");
     }
 
     @PostMapping("/2fa")
