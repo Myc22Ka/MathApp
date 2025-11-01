@@ -1,7 +1,10 @@
 package pl.myc22ka.mathapp.user.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +17,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Represents a user in the system.
+ * <p>
+ * Stores login info, personal details, role, gamification data (points, level, tasks),
+ * and settings like email verification, 2FA, and notifications.
+ * Implements UserDetails for Spring Security.
+ *
+ * @author Myc22Ka
+ * @version 1.2.0
+ * @since 01.11.2025
+ */
 @Entity
 @Table(name = "users")
 @Data
@@ -90,11 +104,22 @@ public class User implements UserDetails {
         return email;
     }
 
+    /**
+     * Checks if the user's email is verified.
+     *
+     * @return true if verified, false otherwise
+     */
     public boolean isVerified() {
         return verified;
     }
 
     // ======== ELEMENTY GRYWALIZACJI ==========
+    /**
+     * Adds points to the user and updates their level if requirements are met.
+     *
+     * @param additionalPoints  points to add
+     * @param levelRequirements list of level thresholds
+     */
     public void addPoints(Double additionalPoints, @NotNull List<LevelRequirement> levelRequirements) {
         this.points += additionalPoints;
 

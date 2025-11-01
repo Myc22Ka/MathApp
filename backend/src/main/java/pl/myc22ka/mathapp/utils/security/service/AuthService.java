@@ -10,7 +10,6 @@ import pl.myc22ka.mathapp.user.repository.UserRepository;
 import pl.myc22ka.mathapp.user.service.UserImageService;
 import pl.myc22ka.mathapp.utils.microservices.mail.service.EmailService;
 import pl.myc22ka.mathapp.utils.security.component.helper.AuthHelper;
-import pl.myc22ka.mathapp.utils.security.dto.ChangePasswordRequest;
 import pl.myc22ka.mathapp.utils.security.dto.LoginRequest;
 import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
 import pl.myc22ka.mathapp.utils.security.dto.TwoFactorRequest;

@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -18,32 +20,26 @@ import pl.myc22ka.mathapp.user.component.helper.UserHelper;
 import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.utils.security.component.JwtAuthenticationFilter;
 import pl.myc22ka.mathapp.utils.security.component.helper.CookieHelper;
+import pl.myc22ka.mathapp.utils.security.utils.PublicPaths;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+/**
+ * Security configuration class for the application.
+ * <p>
+ * Configures HTTP security, including CSRF protection, session management,
+ * endpoint access rules, OAuth2 login handling, and JWT authentication.
+ * </p>
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 01.11.2025
+ */
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    /**
-     * Publicly accessible endpoints that do not require authentication.
-     * Includes authentication endpoints and Swagger documentation paths.
-     */
-    private static final String[] WHITE_LIST_URL = {"/auth/**",
-            "/v2/api-docs",
-            "/v3/api-docs",
-            "/v3/api-docs/**",
-            "/api/topics/**",
-            "/login/**",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui/**",
-            "/webjars/**",
-            "/swagger-ui.html"};
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final CookieHelper cookieHelper;
@@ -66,7 +62,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers(WHITE_LIST_URL)
+                        .requestMatchers(PublicPaths.getPathsArray())
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -91,5 +87,15 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    /**
+     * Configures the password encoder bean using BCrypt hashing algorithm.
+     *
+     * @return the PasswordEncoder instance
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

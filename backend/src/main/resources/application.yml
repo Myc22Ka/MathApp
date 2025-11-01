@@ -47,6 +47,13 @@ spring:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
       expiration: 3600000 # 1 hour in milliseconds
+    cookie:
+      name: authToken
+      expiration: 3600 # w sekundach
+      path: /
+      same-site: None
+      http-only: true
+      secure: true
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}

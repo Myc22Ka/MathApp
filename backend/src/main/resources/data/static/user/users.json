@@ -1,0 +1,16 @@
+[
+  {
+    "login": "user1",
+    "firstname": "Jan",
+    "lastname": "Kowalski",
+    "email": "jan@example.com",
+    "password": "String123!",
+    "role": "STUDENT",
+    "points": 0.0,
+    "level": 1,
+    "verified": true,
+    "twoFactorEnabled": false,
+    "notificationsEnabled": true,
+    "profilePhotoPath": "data/static/images/avatars/avatar1.png"
+  }
+]

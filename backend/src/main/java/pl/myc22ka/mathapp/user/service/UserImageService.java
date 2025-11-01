@@ -20,6 +20,14 @@ import pl.myc22ka.mathapp.user.model.User;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Service for managing user images, including profile photos and exercise images.
+ * Handles upload, download, listing, and deletion of images in S3 and the database.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 01.11.2025
+ */
 @Service
 @RequiredArgsConstructor
 public class UserImageService {
@@ -29,7 +37,13 @@ public class UserImageService {
     private final ProfilePhotoRepository profilePhotoRepository;
     private final ExerciseImageRepository exerciseImageRepository;
 
-    // ---------------- Upload ----------------
+    /**
+     * Uploads or replaces a user's profile photo.
+     *
+     * @param user the user
+     * @param file the photo file
+     * @throws IOException if upload fails
+     */
     @Transactional
     public void uploadProfilePhoto(@NotNull User user, @NotNull MultipartFile file) throws IOException {
         profilePhotoRepository.findByUserId(user.getId()).ifPresent(old -> {
@@ -44,6 +58,15 @@ public class UserImageService {
         profilePhotoRepository.save(img);
     }
 
+
+    /**
+     * Uploads a new exercise image for a user.
+     *
+     * @param user the user
+     * @param file the image file
+     * @param exerciseId the exercise ID
+     * @throws IOException if upload fails
+     */
     @Transactional
     public void uploadExerciseImage(@NotNull User user, @NotNull MultipartFile file, Long exerciseId) throws IOException {
         String s3Key = s3Helper.generateS3Key(file.getOriginalFilename());
@@ -53,7 +76,14 @@ public class UserImageService {
         exerciseImageRepository.save(img);
     }
 
-    // ---------------- Download ----------------
+    /**
+     * Downloads an image (profile or exercise) for a user.
+     *
+     * @param user the user
+     * @param imageId the image ID (nullable for profile photo)
+     * @param type the image type
+     * @return the image bytes
+     */
     @Transactional(readOnly = true)
     public byte[] downloadImage(User user, Long imageId, @NotNull Class<? extends Image> type) {
         Image img;
@@ -75,13 +105,24 @@ public class UserImageService {
         return s3Service.downloadFile(img.getS3Key());
     }
 
-    // ---------------- Listowanie ----------------
+    /**
+     * Returns a list of a user's exercise images as DTOs.
+     *
+     * @param userId the user ID
+     * @return list of image responses
+     */
     @Transactional(readOnly = true)
     public List<ImageResponse> getExerciseImages(Long userId) {
         List<ExerciseImage> images = exerciseImageRepository.findByUserId(userId);
         return ImageResponse.fromEntity(images);
     }
 
+    /**
+     * Returns the URL of the user's profile photo.
+     *
+     * @param user the user
+     * @return profile photo URL or null
+     */
     @Transactional(readOnly = true)
     public String getProfilePhotoUrl(@NotNull User user) {
         return profilePhotoRepository.findByUserId(user.getId())
@@ -89,7 +130,13 @@ public class UserImageService {
                 .orElse(null);
     }
 
-    // ---------------- Usuwanie ----------------
+    /**
+     * Deletes a single image (profile or exercise) of a user.
+     *
+     * @param user the user
+     * @param id the image ID (nullable for profile photo)
+     * @param type the image type
+     */
     @Transactional
     public void deleteImage(User user, Long id, @NotNull Class<? extends Image> type) {
         Image img;
@@ -125,6 +172,11 @@ public class UserImageService {
         }
     }
 
+    /**
+     * Deletes all images (profile + exercises) of a user.
+     *
+     * @param user the user
+     */
     @Transactional
     public void deleteAllUserImages(@NotNull User user) {
         profilePhotoRepository.findByUserId(user.getId()).ifPresent(photo -> {

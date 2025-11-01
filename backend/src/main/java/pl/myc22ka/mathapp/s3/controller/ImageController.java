@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.s3.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
@@ -22,16 +23,34 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * REST controller for managing user images, including upload, download,
+ * listing, and deletion of profile and exercise images.
+ *
+ * @author Myc22Ka
+ * @version 1.0.0
+ * @since 01.11.2025
+ */
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
+@Tag(name = "Images", description = "APIs for managing user images")
 public class ImageController {
 
     private final UserImageService imageService;
     private final AuthHelper authHelper;
     private final ImageHelper imageHelper;
 
-    // ---------------- Upload ----------------
+    /**
+     * Uploads an image for the authenticated user.
+     *
+     * @param user       the authenticated user
+     * @param file       the image file to upload
+     * @param type       the type of image (PROFILE or EXERCISE)
+     * @param exerciseId the ID of the exercise (required if type is EXERCISE)
+     * @return a response indicating success or failure
+     * @throws IOException if an I/O error occurs during upload
+     */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload an image")
     public ResponseEntity<DefaultResponse> uploadImage(
@@ -65,7 +84,14 @@ public class ImageController {
         ));
     }
 
-    // ---------------- Download ----------------
+    /**
+     * Downloads an image for the authenticated user.
+     *
+     * @param user the authenticated user
+     * @param type the type of image (PROFILE or EXERCISE)
+     * @param id   the ID of the image to download (optional for PROFILE)
+     * @return the image file as a byte array with appropriate headers
+     */
     @GetMapping("/download")
     @Operation(summary = "Download an image")
     public ResponseEntity<byte[]> downloadImage(
@@ -97,7 +123,13 @@ public class ImageController {
         return new ResponseEntity<>(data, headers, HttpStatus.OK);
     }
 
-    // ---------------- Listowanie ----------------
+    /**
+     * Retrieves all exercise images for the authenticated user.
+     *
+     * @param user       the authenticated user
+     * @param exerciseId the ID of the exercise
+     * @return a list of image responses
+     */
     @GetMapping("/exercise/{exerciseId}")
     @Operation(summary = "Get all images for an exercise")
     public ResponseEntity<List<ImageResponse>> getExerciseImages(
@@ -109,7 +141,14 @@ public class ImageController {
         return ResponseEntity.ok(images);
     }
 
-    // ---------------- Usuwanie ----------------
+    /**
+     * Deletes an image for the authenticated user.
+     *
+     * @param user the authenticated user
+     * @param type the type of image (PROFILE or EXERCISE)
+     * @param id   the ID of the image to delete (optional for PROFILE)
+     * @return a response indicating success or failure
+     */
     @DeleteMapping("/delete")
     @Operation(summary = "Delete an image")
     public ResponseEntity<DefaultResponse> deleteImage(
