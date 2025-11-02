@@ -18,6 +18,7 @@ services:
     container_name: backend_app
     depends_on:
       - postgresql_database
+      - minio
     env_file:
       - .env
     environment:

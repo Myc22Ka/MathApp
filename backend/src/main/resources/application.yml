@@ -57,14 +57,14 @@ spring:
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}
-      endpoint: http://minio:${LOCALSTACK_PORT:9000}
       region: ${BUCKET_REGION:eu-central-1}
   ollama:
-    base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
     model: gpt-oss:20b
   frontend:
     url: http://${PLATFORM_URL:localhost}:${FRONTEND_PORT:3000}
-
+  minio:
+    username: ${MINIO_ROOT_USER}
+    password: ${MINIO_ROOT_PASSWORD}
 logging:
   level:
     root: INFO
