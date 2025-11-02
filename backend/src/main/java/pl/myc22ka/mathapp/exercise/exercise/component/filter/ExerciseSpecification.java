@@ -9,6 +9,8 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.exercise.variant.model.TemplateExerciseVariant;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.user.model.User;
+import pl.myc22ka.mathapp.user.model.UserExercise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +72,47 @@ public class ExerciseSpecification {
         };
     }
 
+    @NotNull
+    private static Specification<Exercise> filterByUserLevel(Integer userLevel, Boolean onlyUserLevel) {
+        return (root, query, cb) -> {
+            if (userLevel == null || onlyUserLevel == null || !onlyUserLevel) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            Join<Exercise, TemplateExercise> templateJoin = root.join("templateExercise", JoinType.LEFT);
+            predicates.add(cb.lessThanOrEqualTo(templateJoin.get("requiredLevel"), userLevel));
+
+            Join<Exercise, TemplateExerciseVariant> variantJoin = root.join("templateExerciseVariant", JoinType.LEFT);
+            predicates.add(cb.lessThanOrEqualTo(variantJoin.get("requiredLevel"), userLevel));
+
+            return cb.or(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    @NotNull
+    public static Specification<Exercise> isSolvedByUser(Long userId, Boolean solvedFilter) {
+        return (root, query, cb) -> {
+            if (userId == null || solvedFilter == null) {
+                return cb.conjunction();
+            }
+
+            Join<Exercise, UserExercise> userExerciseJoin = root.join("userExercises", JoinType.LEFT);
+
+            userExerciseJoin.on(cb.equal(userExerciseJoin.get("user").get("id"), userId));
+
+            if (solvedFilter) {
+                return cb.and(
+                        cb.isNotNull(userExerciseJoin.get("id")),
+                        cb.equal(userExerciseJoin.get("solved"), true)
+                );
+            } else {
+                return cb.isNull(userExerciseJoin.get("id"));
+            }
+        };
+    }
+
     /**
      * Filter exercises by difficulty and/or category.
      *
@@ -128,11 +171,15 @@ public class ExerciseSpecification {
      */
     @NotNull
     public static Specification<Exercise> withFilters(Double rating, String difficulty,
-                                                      TemplatePrefix category, Long templateId) {
+                                                      TemplatePrefix category, Long templateId,
+                                                      @NotNull User user, Boolean solvedFilter,
+                                                      Boolean onlyUserLevel) {
         return Specification.allOf(
                 hasRating(rating),
                 hasDifficultyOrCategory(difficulty, category),
-                hasTemplateId(templateId)
+                isSolvedByUser(user.getId(), solvedFilter),
+                hasTemplateId(templateId),
+                filterByUserLevel(user.getLevel(), onlyUserLevel)
         );
     }
 }

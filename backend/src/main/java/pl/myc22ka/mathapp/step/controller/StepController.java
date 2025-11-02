@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +20,7 @@ import pl.myc22ka.mathapp.step.service.StepService;
  * Provides an endpoint for retrieving steps with filtering, sorting and pagination.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 24.09.2025
  */
 @RestController
@@ -46,8 +47,9 @@ public class StepController {
      */
     @Operation(
             summary = "Get steps",
-            description = "Returns a paginated list of steps with optional filters, sorting and pagination parameters."
+            description = "Returns a paginated list of steps."
     )
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'TEACHER')")
     @GetMapping
     public Page<StepDTO> getSteps(
             @RequestParam(defaultValue = "0") int page,

@@ -72,4 +72,8 @@ public interface TemplateLike {
      * @param counter the new exercise counter
      */
     void setExerciseCounter(Long counter);
+
+    Double getPoints();
+
+    Integer getRequiredLevel();
 }

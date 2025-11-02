@@ -6,13 +6,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.exercise.exercise.annotation.rating.Rating;
 import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
+import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.service.ExerciseService;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
+import pl.myc22ka.mathapp.user.component.helper.UserExerciseHelper;
+import pl.myc22ka.mathapp.user.model.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,6 +42,7 @@ public class ExerciseController {
 
     private final ExerciseService exerciseService;
     private final ExerciseScheduler exerciseScheduler;
+    private final UserExerciseHelper userExerciseHelper;
 
     /**
      * Creates a new exercise based on user-provided values.
@@ -52,7 +57,7 @@ public class ExerciseController {
             @RequestParam(required = false) Long variantId,
             @RequestBody List<String> values
     ) {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.create(templateId, variantId, values)));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.create(templateId, variantId, values), false));
     }
 
     /**
@@ -67,7 +72,7 @@ public class ExerciseController {
             @RequestParam(required = false) Long templateId,
             @RequestParam(required = false) Long variantId
     ) {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.generate(templateId, variantId)));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.generate(templateId, variantId), false));
     }
 
     /**
@@ -78,19 +83,25 @@ public class ExerciseController {
             description = "Returns the exercise with the given ID."
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ExerciseDTO> get(@PathVariable Long id) {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.getById(id)));
+    public ResponseEntity<ExerciseDTO> get(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id) {
+        Exercise exercise = exerciseService.getById(id);
+        Boolean isSolved = userExerciseHelper.isSolved(user, exercise);
+
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exercise, isSolved));
     }
 
     /**
      * Retrieves a paginated list of exercises with optional filtering and sorting.
      */
+    @GetMapping
     @Operation(
             summary = "Get exercises",
             description = "Returns a paginated list of exercises with optional filters, sorting and pagination parameters."
     )
-    @GetMapping
     public Page<ExerciseDTO> getAll(
+            @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "Filter by rating", example = "1.0")
@@ -100,9 +111,16 @@ public class ExerciseController {
             @RequestParam(required = false) TemplatePrefix category,
             @RequestParam(required = false) Long templateId,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) Boolean solvedFilter,
+            @RequestParam(required = false) Boolean onlyUserLevel) {
 
-        return exerciseService.getAll(page, size, rating, difficulty, category, sortBy, sortDirection, templateId);
+        return exerciseService.getAll(
+                user, page, size, rating, difficulty, category, sortBy, sortDirection, templateId, solvedFilter, onlyUserLevel
+        ).map(exercise -> ExerciseDTO.fromEntity(
+                exercise,
+                user.getId() != null && userExerciseHelper.isSolved(user.getId(), exercise)
+        ));
     }
 
     /**
@@ -112,9 +130,12 @@ public class ExerciseController {
             summary = "Get random exercise",
             description = "Returns a random exercise from the database."
     )
-    @GetMapping("/random")
-    public ResponseEntity<ExerciseDTO> getRandom() {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseScheduler.getLastRandomExercise()));
+    @GetMapping("/daily")
+    public ResponseEntity<ExerciseDTO> getDaily(@AuthenticationPrincipal User user) {
+        Exercise exercise = exerciseScheduler.getLastDailyExercise();
+        Boolean isSolved = userExerciseHelper.isSolved(user, exercise);
+
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exercise, isSolved));
     }
 
     /**
@@ -171,7 +192,7 @@ public class ExerciseController {
             @PathVariable Long id,
             @RequestBody List<String> values
     ) {
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.update(id, values)));
+        return ResponseEntity.ok(ExerciseDTO.fromEntity(exerciseService.update(id, values), false));
     }
 
     /**
@@ -183,10 +204,24 @@ public class ExerciseController {
             description = "Executes all steps of the exercise and returns whether the answer is correct."
     )
     public ResponseEntity<DefaultResponse> solve(
+            @AuthenticationPrincipal User user,
             @PathVariable Long exerciseId,
             @RequestParam String userAnswer) {
 
-        boolean correct = exerciseService.solve(exerciseId, userAnswer);
+        boolean correct = exerciseService.solve(user, exerciseId, userAnswer);
+
+        return ResponseEntity.ok(
+                new DefaultResponse(
+                        java.time.Instant.now().toString(),
+                        correct ? "Answer is correct" : "Answer is incorrect",
+                        correct ? 200 : 400
+                )
+        );
+    }
+
+    @PostMapping("/solve-daily")
+    public ResponseEntity<DefaultResponse> solveDaily(@AuthenticationPrincipal User user, @RequestParam String answer) {
+        boolean correct = exerciseService.solveDaily(user, answer);
 
         return ResponseEntity.ok(
                 new DefaultResponse(

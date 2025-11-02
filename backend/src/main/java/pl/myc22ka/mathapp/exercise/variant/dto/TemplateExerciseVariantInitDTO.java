@@ -27,6 +27,7 @@ public record TemplateExerciseVariantInitDTO(
         String templateText,
         String templateAnswer,
         List<StepWrapper> steps,
-        Long exerciseCounter
+        Long exerciseCounter,
+        Integer requiredLevel
 ) {
 }

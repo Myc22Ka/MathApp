@@ -12,20 +12,24 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
+import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
+import pl.myc22ka.mathapp.level.service.LevelingService;
+import pl.myc22ka.mathapp.user.component.helper.UserExerciseHelper;
+import pl.myc22ka.mathapp.user.component.helper.UserHelper;
+import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
 import pl.myc22ka.mathapp.ai.prompt.model.Prompt;
 import pl.myc22ka.mathapp.exercise.exercise.component.filter.ExerciseSpecification;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.component.helper.ValidationHelper;
-import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
-import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +38,7 @@ import java.util.List;
  * Handles creation, generation, update, retrieval, and deletion of exercises.
  *
  * @author Myc22Ka
- * @version 1.0.7
+ * @version 1.0.8
  * @since 13.09.2025
  */
 @Service
@@ -45,8 +49,11 @@ public class ExerciseService {
     private final OllamaService ollamaService;
     private final ExerciseHelper exerciseHelper;
     private final TemplateExerciseHelper templateExerciseHelper;
-    private final VariantExerciseHelper variantExerciseHelper;
+    private final UserHelper userHelper;
     private final ValidationHelper validationHelper;
+    private final UserExerciseHelper userExerciseHelper;
+    private final LevelingService levelingService;
+    private final ExerciseScheduler exerciseScheduler;
 
     /**
      * Creates a new Exercise from a template or variant with given values.
@@ -61,9 +68,7 @@ public class ExerciseService {
     public Exercise create(Long templateId, Long variantId, @NotNull List<String> values) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateLike template = templateId != null
-                ? templateExerciseHelper.getTemplate(templateId)
-                : variantExerciseHelper.getVariant(variantId);
+        TemplateLike template = exerciseHelper.resolveTemplate(templateId, variantId);
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
         exerciseHelper.validateExercise(placeholders, values);
@@ -103,8 +108,8 @@ public class ExerciseService {
      * @return page of ExerciseDTO matching criteria
      * @throws IllegalArgumentException if rating or difficulty filters are invalid
      */
-    public Page<ExerciseDTO> getAll(int page, int size, Double rating, String difficulty,
-                                    TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId) {
+    public Page<Exercise> getAll(User user, int page, int size, Double rating, String difficulty,
+                                    TemplatePrefix category, String sortBy, @NotNull String sortDirection, Long templateId, Boolean solvedFilter, Boolean onlyUserLevel) {
 
         validationHelper.validateFilters(rating, difficulty);
 
@@ -115,12 +120,10 @@ public class ExerciseService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Specification<Exercise> spec = ExerciseSpecification.withFilters(
-                rating, difficulty, category, templateId
+                rating, difficulty, category, templateId, user, solvedFilter, onlyUserLevel
         );
 
-        Page<Exercise> exercises = exerciseRepository.findAll(spec, pageable);
-
-        return exercises.map(ExerciseDTO::fromEntity);
+        return exerciseRepository.findAll(spec, pageable);
     }
 
     /**
@@ -170,9 +173,7 @@ public class ExerciseService {
     public Exercise generate(Long templateId, Long variantId) {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
-        TemplateLike template = templateId != null
-                ? templateExerciseHelper.getTemplate(templateId)
-                : variantExerciseHelper.getVariant(variantId);
+        TemplateLike template = exerciseHelper.resolveTemplate(templateId, variantId);
 
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
@@ -240,16 +241,50 @@ public class ExerciseService {
      * @return true if the answer is correct, false otherwise
      * @throws IllegalStateException if exercise not found
      */
-    public boolean solve(Long exerciseId, String answer) {
+    public boolean solve(User user, Long exerciseId, String answer) {
         Exercise exercise = exerciseHelper.getExercise(exerciseId);
 
-        TemplateLike template = exercise.getTemplateExercise() != null
-                ? exercise.getTemplateExercise()
-                : exercise.getTemplateExerciseVariant();
+        TemplateLike template = exercise.getTemplateOrVariant();
 
         var userAnswer = exerciseHelper.parseValue(new ContextRecord(template.getCategory(), answer));
         var exerciseAnswer = exerciseHelper.parseValue(new ContextRecord(template.getCategory(), exercise.getAnswer()));
 
-        return userAnswer.equals(exerciseAnswer);
+        boolean result = userAnswer.equals(exerciseAnswer);
+
+        if (result) {
+            double earnedPoints = template.getPoints();
+
+            levelingService.addPointsAndCheckLevelUp(user, earnedPoints);
+
+            userExerciseHelper.markAsSolved(user, exercise);
+        }
+
+        return result;
+    }
+
+    public boolean solveDaily(User user, String answer) {
+        Exercise dailyExercise = exerciseScheduler.getLastDailyExercise();
+        if (dailyExercise == null) {
+            throw new IllegalStateException("Daily exercise is not set yet.");
+        }
+
+        if (user.getLastDailyTaskDate() != null && user.getLastDailyTaskDate().isEqual(LocalDate.now())) {
+            throw new IllegalStateException("You have already completed today's exercise.");
+        }
+
+        boolean solved = solve(
+                user,
+                dailyExercise.getId(),
+                answer
+        );
+
+        if (solved) {
+            user.setLastDailyTaskDate(LocalDate.now());
+            user.setDailyTasksCompleted(user.getDailyTasksCompleted() + 1);
+
+            userHelper.save(user);
+        }
+
+        return solved;
     }
 }

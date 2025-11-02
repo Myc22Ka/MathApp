@@ -54,4 +54,11 @@ public class TemplateExerciseVariant implements TemplateLike {
 
     @Column(name = "exercise_counter")
     private Long exerciseCounter;
+
+    @Column(name = "points", nullable = false)
+    @Builder.Default
+    private Double points = 1.0;
+
+    @Column(name = "required_level", nullable = false)
+    private Integer requiredLevel;
 }

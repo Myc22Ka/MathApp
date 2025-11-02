@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pl.myc22ka.mathapp.exercise.template.component.helper.TemplateExerciseHelper;
+import pl.myc22ka.mathapp.exercise.variant.component.helper.VariantExerciseHelper;
 import pl.myc22ka.mathapp.utils.resolver.component.TemplateResolver;
 import pl.myc22ka.mathapp.ai.prompt.component.helper.PromptHelper;
 import pl.myc22ka.mathapp.utils.resolver.dto.ContextRecord;
@@ -44,6 +46,8 @@ public class ExerciseHelper {
     private final ExpressionFactory expressionFactory;
     private final StepMemoryService stepMemoryService;
     private final StepExecutorRegistry registry;
+    private final TemplateExerciseHelper templateExerciseHelper;
+    private final VariantExerciseHelper variantExerciseHelper;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -276,6 +280,19 @@ public class ExerciseHelper {
         }
 
         return contextList.getLast().value();
+    }
+
+    public TemplateLike resolveTemplate(Long templateId, Long variantId) {
+        if (templateId != null) {
+            return templateExerciseHelper.getTemplate(templateId);
+        }
+
+        TemplateLike variant = variantExerciseHelper.getVariant(variantId);
+        if (variant == null) {
+            throw new IllegalArgumentException("Variant with id " + variantId + " not found");
+        }
+
+        return variant;
     }
 }
 

@@ -3,6 +3,7 @@ package pl.myc22ka.mathapp.exercise.exercise.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
+import pl.myc22ka.mathapp.topic.model.Topic;
 
 /**
  * Data Transfer Object for Exercise.
@@ -27,7 +28,13 @@ public record ExerciseDTO(
         boolean verified,
 
         @Schema(description = "The rating of the exercise", example = "4.5")
-        Double rating
+        Double rating,
+
+        String topic,
+
+        Boolean isSolved,
+
+        Integer requiredLevel
 
 ) {
 
@@ -38,12 +45,15 @@ public record ExerciseDTO(
      * @return the ExerciseDTO with relevant fields
      */
     @NotNull
-    public static ExerciseDTO fromEntity(@NotNull Exercise exercise) {
+    public static ExerciseDTO fromEntity(@NotNull Exercise exercise, Boolean isSolved) {
         return new ExerciseDTO(
                 exercise.getId(),
                 exercise.getText(),
                 exercise.isVerified(),
-                exercise.getRating()
+                exercise.getRating(),
+                exercise.getTemplateOrVariant().getCategory().name(),
+                isSolved,
+                exercise.getTemplateOrVariant().getRequiredLevel()
         );
     }
 }

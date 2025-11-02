@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
  * @version 1.0.0
  * @since 17.10.2025
  */
-
 @Configuration
 @RequiredArgsConstructor
 public class OpenAPIConfig {

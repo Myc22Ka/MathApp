@@ -1,4 +1,24 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USER}
+    password: ${GMAIL_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  banner:
+    location: 'classpath:mathapp-banner.txt'
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
@@ -11,15 +31,40 @@ spring:
   cors:
     allowed:
       origin: ${PLATFORM_URL}:${FRONTEND_PORT}
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${OAUTH2_GITHUB_CLIENT_ID}
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+            scope:
+              - read:user
+              - user:email
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 3600000 # 1 hour in milliseconds
+    cookie:
+      name: authToken
+      expiration: 3600 # w sekundach
+      path: /
+      same-site: None
+      http-only: true
+      secure: true
   aws:
     s3:
       bucket: ${BUCKET_NAME:mathapp-bucket}
-      endpoint: http://${PLATFORM_URL:localhost}:${LOCALSTACK_PORT:4566}
       region: ${BUCKET_REGION:eu-central-1}
   ollama:
-    base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
     model: gpt-oss:20b
-
+  frontend:
+    url: http://${PLATFORM_URL:localhost}:${FRONTEND_PORT:3000}
+  minio:
+    username: ${MINIO_ROOT_USER}
+    password: ${MINIO_ROOT_PASSWORD}
 logging:
   level:
     root: INFO

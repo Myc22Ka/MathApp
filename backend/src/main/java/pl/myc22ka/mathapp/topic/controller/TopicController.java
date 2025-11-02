@@ -18,7 +18,7 @@ import java.util.List;
  * Provides endpoints to view available topics used in math templates.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 17.10.2025
  */
 @RestController
@@ -34,7 +34,7 @@ public class TopicController {
      *
      * @return a list of {@link TopicDTO} objects
      */
-    @Operation(summary = "Get all topics", description = "Retrieve all topics without filters")
+    @Operation(summary = "Get all topics", description = "Retrieve all topics")
     @GetMapping
     public ResponseEntity<List<TopicDTO>> getAllTopics() {
         return ResponseEntity.ok(topicService.getAllTopics());

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import jakarta.persistence.EntityNotFoundException;
 import pl.myc22ka.mathapp.exceptions.custom.PromptValidatorException;
 import pl.myc22ka.mathapp.exceptions.custom.TemplateAlreadyExistsException;
+import pl.myc22ka.mathapp.exceptions.custom.UserException;
 import pl.myc22ka.mathapp.exceptions.custom.VariantTextMismatch;
 
 import java.util.stream.Collectors;
@@ -90,5 +92,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleVariantTextMismatch(@NotNull VariantTextMismatch ex) {
         return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUserException(@NotNull UserException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDenied(@NotNull AccessDeniedException ex) {
+        return new ErrorResponse("You do not have permission to access this resource");
     }
 }

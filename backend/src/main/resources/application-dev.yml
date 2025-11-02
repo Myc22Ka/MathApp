@@ -4,3 +4,8 @@ spring:
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  aws:
+    s3:
+      endpoint: http://localhost:${BUCKET_PORT:9000}
+  ollama:
+    base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}

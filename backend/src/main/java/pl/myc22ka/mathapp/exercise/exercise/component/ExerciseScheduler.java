@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.exercise.exercise.component.helper.ExerciseHelper;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.repository.ExerciseRepository;
 
@@ -23,30 +25,35 @@ import java.util.Random;
 public class ExerciseScheduler {
 
     private final ExerciseRepository exerciseRepository;
-    private final Random random = new Random();
+    private final ExerciseHelper exerciseHelper;
+    private final Random daily = new Random();
 
     @Getter
-    private Exercise lastRandomExercise;
+    private Long lastDailyExerciseId;
 
     /**
-     * Initializes the scheduler by picking the first random exercise on startup.
+     * Initializes the scheduler by picking the first Daily exercise on startup.
      */
     @PostConstruct
     public void init() {
-        pickRandomExercise();
+        pickDailyExercise();
     }
 
     /**
-     * Picks a random exercise from all available exercises.
+     * Picks a Daily exercise from all available exercises.
      * Runs every day at 9 AM.
      */
     @Scheduled(cron = "0 0 9 * * *")
-    public void pickRandomExercise() {
+    public void pickDailyExercise() {
         List<Exercise> allExercises = exerciseRepository.findAll();
 
         if (!allExercises.isEmpty()) {
-            lastRandomExercise = allExercises.get(random.nextInt(allExercises.size()));
+            lastDailyExerciseId = allExercises.get(daily.nextInt(allExercises.size())).getId();
         }
     }
 
+    @Transactional
+    public Exercise getLastDailyExercise() {
+        return exerciseHelper.getExercise(lastDailyExerciseId);
+    }
 }

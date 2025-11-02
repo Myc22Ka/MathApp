@@ -1,6 +1,23 @@
 FROM ollama/ollama
 
-COPY ./scripts/ollama-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ARG OLLAMA_MODEL=gpt-oss:20b
+
+RUN echo '#!/bin/sh' > /entrypoint.sh && \
+    echo '' >> /entrypoint.sh && \
+    echo '# Start server in background' >> /entrypoint.sh && \
+    echo 'ollama serve &' >> /entrypoint.sh && \
+    echo '' >> /entrypoint.sh && \
+    echo '# Wait for server to be ready' >> /entrypoint.sh && \
+    echo 'sleep 10' >> /entrypoint.sh && \
+    echo '' >> /entrypoint.sh && \
+    echo '# Pull model' >> /entrypoint.sh && \
+    echo 'ollama pull '"${OLLAMA_MODEL}"'' >> /entrypoint.sh && \
+    echo '' >> /entrypoint.sh && \
+    echo '# Kill initial server' >> /entrypoint.sh && \
+    echo 'pkill ollama' >> /entrypoint.sh && \
+    echo '' >> /entrypoint.sh && \
+    echo '# Start server again in foreground' >> /entrypoint.sh && \
+    echo 'exec ollama serve' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
