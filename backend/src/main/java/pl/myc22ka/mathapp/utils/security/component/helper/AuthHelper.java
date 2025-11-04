@@ -14,6 +14,7 @@ import pl.myc22ka.mathapp.utils.security.dto.LoginRequest;
 import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Random;
  * </p>
  *
  * @author Myc22Ka
- * @version 1.0.3
+ * @version 1.0.4
  * @since 01.11.2025
  */
 @Component
@@ -102,14 +103,31 @@ public class AuthHelper {
      * @throws UserException if credentials are invalid
      */
     public User authenticateUser(@NotNull LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new UserException("Invalid credentials"));
+        String identifier = loginRequest.identifier();
+
+        User user = findUserByEmailOrLogin(identifier)
+                .orElseThrow(() -> new UserException("User not found"));
 
         if (!encoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new UserException("Invalid credentials");
+            throw new UserException("Incorrect password");
         }
 
         return user;
+    }
+
+    /**
+     * Tries to find user via email then login in database
+     *
+     * @param identifier the email or login from user
+     * @return user if exists
+     */
+    private Optional<User> findUserByEmailOrLogin(String identifier) {
+        Optional<User> userByEmail = userRepository.findByEmail(identifier);
+        if (userByEmail.isPresent()) {
+            return userByEmail;
+        }
+
+        return userRepository.findByLogin(identifier);
     }
 
     /**

@@ -31,7 +31,7 @@ import java.util.List;
  * password management, and two-factor authentication.
  *
  * @author Myc22Ka
- * @version 1.0.2
+ * @version 1.0.3
  * @since 01.11.2025
  */
 @RestController
@@ -170,10 +170,17 @@ public class AuthController {
             summary = "Generate verification code",
             description = "Generates a new verification code for the provided email address."
     )
-    @PostMapping("/generate-code")
-    public ResponseEntity<String> generateCode(@RequestParam String email) {
-        String code = authService.generateCode(email);
-        return ResponseEntity.ok(code);
+    @PostMapping("/resend-code")
+    public ResponseEntity<DefaultResponse> resendCode(@RequestParam String email) {
+        authService.resendCode(email);
+
+        return ResponseEntity.ok(
+                new DefaultResponse(
+                        LocalDateTime.now().toString(),
+                        "A new verification code has been sent to your email.",
+                        200
+                )
+        );
     }
 
     /**

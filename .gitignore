@@ -43,3 +43,5 @@ localstack
 
 .ollama/*
 .ollama
+
+/data/minio/**

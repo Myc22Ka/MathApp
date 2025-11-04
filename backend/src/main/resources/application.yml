@@ -30,7 +30,7 @@ spring:
     show-sql: true
   cors:
     allowed:
-      origin: ${PLATFORM_URL}:${FRONTEND_PORT}
+      origin: http://${PLATFORM_URL:localhost}:${FRONTEND_PORT:3000}
   security:
     oauth2:
       client:

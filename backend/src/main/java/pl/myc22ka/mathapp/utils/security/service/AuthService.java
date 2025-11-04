@@ -33,7 +33,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String verificationCode = generateCode(user.getEmail());
+        String verificationCode = authHelper.generateVerificationCode(user);
 
         userRepository.save(user);
 
@@ -71,10 +71,22 @@ public class AuthService {
         );
     }
 
-    public String generateCode(String email) {
+    public void resendCode(String email) {
         User user = userHelper.getUserByEmail(email);
 
-        return authHelper.generateVerificationCode(user);
+        String verificationCode = authHelper.generateVerificationCode(user);
+
+        userRepository.save(user);
+
+        String verificationLink = emailService.generateVerificationLink("verify") + "?code=" + verificationCode;
+        emailService.sendEmailFromTemplate(
+                user.getEmail(),
+                "Account Verification",
+                "welcome.html",
+                Map.of("name", user.getLogin(),
+                        "verificationCode", verificationCode,
+                        "verificationLink", verificationLink)
+        );
     }
 
     public void verifyCode(String email, String code) {
@@ -87,7 +99,7 @@ public class AuthService {
     public void requestPasswordChange(@NotNull String email) {
         User user = userHelper.getUserByEmail(email);
 
-        String verificationCode = generateCode(user.getEmail());
+        String verificationCode = authHelper.generateVerificationCode(user);
         userRepository.save(user);
 
         emailService.sendEmailFromTemplate(

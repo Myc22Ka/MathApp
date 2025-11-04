@@ -22,6 +22,7 @@ import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.utils.security.utils.PublicPaths;
 
 import java.io.IOException;
+import java.time.Instant;
 
 /**
  * Filter that authenticates requests using JWT tokens stored in cookies.
@@ -30,7 +31,7 @@ import java.io.IOException;
  * If authentication fails, it responds with a 401 Unauthorized status and an error message.
  *
  * @author Myc22Ka
- * @version 1.0.0
+ * @version 1.0.1
  * @since 01.11.2025
  */
 @Component
@@ -76,13 +77,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-        } catch (JwtException | CookiesNotFoundException | UsernameNotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+        } catch (UsernameNotFoundException | CookiesNotFoundException | JwtException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
 
-            ErrorResponse errorResponse = new ErrorResponse("Unauthorized: " + e.getMessage());
-            String json = new ObjectMapper().writeValueAsString(errorResponse);
-            response.getWriter().write(json);
+        } catch (Exception e) {
+            logger.error("Unexpected authentication error", e);
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected authentication error");
         }
+    }
+
+    private void sendErrorResponse(@NotNull HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now().toString(),
+                message,
+                status
+        );
+
+        new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }

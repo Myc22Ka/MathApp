@@ -62,7 +62,10 @@ public record UserDTO(
         String profilePhotoUrl,
 
         @Schema(description = "List of images associated with user's exercises")
-        List<ImageResponse> exerciseImages
+        List<ImageResponse> exerciseImages,
+
+        @Schema(description = "User is verified by email", example = "false")
+        boolean verified
 ) {
 
     /**
@@ -90,7 +93,8 @@ public record UserDTO(
                 user.getDateOfBirth(),
                 user.getGender(),
                 profilePhotoUrl,
-                exerciseImages
+                exerciseImages,
+                user.getVerified()
         );
     }
 }

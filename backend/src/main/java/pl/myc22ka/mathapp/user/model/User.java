@@ -25,7 +25,7 @@ import java.util.List;
  * Implements UserDetails for Spring Security.
  *
  * @author Myc22Ka
- * @version 1.2.0
+ * @version 1.2.1
  * @since 01.11.2025
  */
 @Entity
@@ -40,6 +40,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String login;
 
     private String firstname;

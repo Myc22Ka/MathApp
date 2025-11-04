@@ -16,7 +16,7 @@ public record LoginRequest(
                 description = "User's email address used for login.",
                 example = "user@example.com"
         )
-        String email,
+        String identifier,
 
         @Schema(
                 description = "User's password.",

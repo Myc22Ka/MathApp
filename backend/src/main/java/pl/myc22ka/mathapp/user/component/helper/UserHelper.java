@@ -1,6 +1,7 @@
 package pl.myc22ka.mathapp.user.component.helper;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +29,11 @@ public class UserHelper {
      *
      * @param email the email of the user
      * @return the User entity
-     * @throws UserException if no user with the given email exists
+     * @throws UsernameNotFoundException if no user with the given email exists
      */
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserException("User does not exist"));
+                .orElseThrow(() -> new UsernameNotFoundException("User does not exist"));
     }
 
     /**
@@ -40,11 +41,11 @@ public class UserHelper {
      *
      * @param id the ID of the user
      * @return the User entity
-     * @throws UserException if no user with the given ID exists
+     * @throws UsernameNotFoundException if no user with the given ID exists
      */
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserException("User with id: " + id + " doesn't exist"));
+                .orElseThrow(() -> new UsernameNotFoundException("User with id: " + id + " doesn't exist"));
     }
 
     /**

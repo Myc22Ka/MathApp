@@ -16,7 +16,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Error response structure for API endpoints",
         example = "{ \"error\": \"Invalid request data\" }")
 public record ErrorResponse (
+        @Schema(description = "Timestamp of the response", example = "2025-10-17T15:30:00Z")
+        String timestamp,
 
-        @Schema(description = "Error message describing what went wrong", example = "Invalid request data")
-        String error
+        @Schema(description = "Message describing the response", example = "Operation successful")
+        String message,
+
+        @Schema(description = "HTTP status code", example = "200")
+        int status
 ) {}
