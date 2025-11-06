@@ -4,6 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
+import { toast } from "sonner";
 
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PLATFORM_URL && process.env.NEXT_PUBLIC_BACKEND_PORT
@@ -28,19 +29,13 @@ export interface RequestConfig {
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
   withCredentials: true,
-  paramsSerializer: {
-    indexes: null,
-  },
+  paramsSerializer: { indexes: null },
 });
 
 apiClient.interceptors.request.use(
-  (config) => {
-    return config;
-  },
+  (config) => config,
   (error) => Promise.reject(error)
 );
 
@@ -63,11 +58,8 @@ export const request = <T>({
     withCredentials: true,
   };
 
-  if (method === "GET" || method === "PUT") {
-    config.params = params;
-  } else {
-    config.data = data;
-  }
+  if (method === "GET" || method === "PUT") config.params = params;
+  else config.data = data;
 
   return apiClient(config);
 };
@@ -109,6 +101,24 @@ export function getApiErrorMessage(error: unknown): string {
   }
 
   return "An unexpected error occurred.";
+}
+
+export function appendParamsToUrl(
+  url: string,
+  params?: Record<string, unknown>
+): string {
+  if (!params || Object.keys(params).length === 0) return url;
+
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      query.append(key, String(value));
+    }
+  }
+
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}${query.toString()}`;
 }
 
 export default apiClient;

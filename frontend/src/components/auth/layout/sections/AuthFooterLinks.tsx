@@ -17,7 +17,7 @@ export default function AuthFooterLinks({ type }: AuthFooterLinksProps) {
           <>
             <span>Nie masz konta?</span>
             <Button variant="link" size="sm" asChild>
-              <a href="/register" className="font-semibold">
+              <a href="/uath/register" className="font-semibold">
                 Zarejestruj się
               </a>
             </Button>
@@ -26,7 +26,7 @@ export default function AuthFooterLinks({ type }: AuthFooterLinksProps) {
           <>
             <span>Masz już konto?</span>
             <Button variant="link" size="sm" asChild>
-              <a href="/login" className="font-semibold">
+              <a href="/auth/login" className="font-semibold">
                 Zaloguj się
               </a>
             </Button>

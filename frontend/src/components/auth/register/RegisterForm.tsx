@@ -7,17 +7,16 @@ import { Button } from "@/components/ui/button";
 import EmailInput from "@/components/inputs/auth/EmailInput";
 import PasswordInput from "@/components/inputs/auth/PasswordInput";
 import { registerSchema, RegisterRequest } from "@/lib/zod";
-import { useAuthentication } from "@/hooks/auth/useAuthentication";
 import { ErrorMessage } from "@/components/responses/ErrorResponse";
-import LoginSuccess from "../login/LoginSuccess";
 import FormFooter from "../layout/FormFooter";
 import { Input } from "@/components/ui/input";
 import TextInput from "@/components/inputs/auth/TextInput";
-import { useRouter } from "next/navigation";
+import { LoaderCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import CheckboxInput from "@/components/inputs/auth/CheckboxInput";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RegisterForm() {
-  const router = useRouter();
-
   const form = useForm<RegisterRequest>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -25,27 +24,18 @@ export default function RegisterForm() {
       password: "",
       confirmPassword: "",
       login: "",
+      acceptTerms: false,
     },
   });
 
-  const { authenticate, isLoading, submitted, error } =
-    useAuthentication("/auth/register");
+  const { register, isSubmitted, error } = useAuth();
 
   const onSubmit = async (data: RegisterRequest) => {
-    const loggedUser = await authenticate({
-      email: data.email,
-      password: data.password,
-      login: data.login,
-    });
-    if (loggedUser && !loggedUser.verified) {
-      router.push("/verify");
-    }
+    await register(data);
   };
 
   const getFieldError = (fieldName: keyof RegisterRequest) =>
     form.formState.errors[fieldName]?.message;
-
-  if (submitted) return <LoginSuccess />;
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -103,19 +93,45 @@ export default function RegisterForm() {
           />
         </PasswordInput>
 
+        <CheckboxInput
+          id="acceptTerms"
+          label={
+            <>
+              Akceptuję{" "}
+              <a
+                href="/terms"
+                className="text-(--main) underline!"
+                target="_blank"
+              >
+                regulamin serwisu
+              </a>
+            </>
+          }
+          error={getFieldError("acceptTerms")}
+        >
+          <Checkbox
+            id="acceptTerms"
+            {...form.register("acceptTerms")}
+            className="cursor-pointer"
+          />
+        </CheckboxInput>
         <ErrorMessage error={error} />
 
         <Button
           animated
           type="submit"
           className="w-full flex items-center justify-center gap-2"
-          disabled={isLoading}
+          disabled={isSubmitted}
           variant="main"
         >
-          <>
-            Zarejestruj się
-            <AiOutlineArrowRight className="h-5 w-5" />
-          </>
+          {isSubmitted ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <>
+              Zarejestruj się
+              <AiOutlineArrowRight className="h-5 w-5" />
+            </>
+          )}
         </Button>
       </form>
       <FormFooter type="register" />

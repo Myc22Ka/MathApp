@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -39,6 +38,20 @@ const buttonVariants = cva(
   }
 );
 
+interface ButtonProps
+  extends React.ComponentProps<"button">,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+  animated?: boolean;
+}
+
+const buttonVariantsAnimation = {
+  initial: { scale: 1 },
+  whileTap: { scale: 0.97 },
+  whileHover: { scale: 1.02 },
+  disabled: { scale: 1 },
+};
+
 function Button({
   className,
   variant,
@@ -46,11 +59,7 @@ function Button({
   asChild = false,
   animated = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-    animated?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : "button";
   const content = (
     <Comp
@@ -60,12 +69,21 @@ function Button({
     />
   );
 
-  if (!animated || variant === "link") return content;
+  const animationState = props.disabled ? "disabled" : "initial";
+
+  if (!animated || variant === "link") {
+    return content;
+  }
 
   return (
     <motion.div
-      whileTap={{ scale: 0.97 }}
-      whileHover={{ scale: 1.02 }}
+      initial={animationState}
+      whileTap={
+        animationState === "disabled" ? {} : buttonVariantsAnimation.whileTap
+      }
+      whileHover={
+        animationState === "disabled" ? {} : buttonVariantsAnimation.whileHover
+      }
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       className={className}
     >

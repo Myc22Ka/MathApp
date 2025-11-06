@@ -15,4 +15,5 @@ export type User = {
   profilePhotoUrl: string;
   exerciseImages: { url: string; name: string }[]; // TODO: Do zmiany potem
   verified: boolean;
+  twoFactorEnabled: boolean;
 };
