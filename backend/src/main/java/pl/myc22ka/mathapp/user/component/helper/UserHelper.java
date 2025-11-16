@@ -49,6 +49,20 @@ public class UserHelper {
     }
 
     /**
+     * Retrieves a user by verification code.
+     *
+     * @param code the verification code
+     * @return the User entity
+     * @throws UserException if no user with the given code exists or code has expired
+     */
+    @Transactional
+    public User getUserByCode(String code) {
+        return userRepository.findByVerificationCode(code)
+                .filter(User::isVerificationCodeValid)
+                .orElseThrow(() -> new UserException("Invalid or expired verification code"));
+    }
+
+    /**
      * Saves a user to the database.
      *
      * @param user the User entity to save
@@ -77,12 +91,13 @@ public class UserHelper {
                     .login(uniqueLogin)
                     .firstname(oauthUser.getAttribute("given_name"))
                     .lastname(oauthUser.getAttribute("family_name"))
-                    .password("") // OAuth users do not have a password
+                    .password("")
                     .role(Role.STUDENT)
                     .verified(true)
                     .points(0.0)
                     .level(1)
                     .dailyTasksCompleted(0)
+                    .streak(0)
                     .twoFactorEnabled(false)
                     .notificationsEnabled(true)
                     .build();

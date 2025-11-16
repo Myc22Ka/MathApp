@@ -12,9 +12,11 @@ public final class PublicPaths {
     public static final List<String> PATHS = List.of(
             "/login",
             "/auth/register",
-            "/auth/register/availability",
             "/auth/sign-in",
-            "/auth/reset-password/**",
+            "/auth/verify-code",
+            "/auth/resend-code",
+            "/auth/password/request",
+            "/auth/password/confirm",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/uploads/**",

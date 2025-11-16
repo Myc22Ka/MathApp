@@ -9,3 +9,5 @@ spring:
       endpoint: http://localhost:${BUCKET_PORT:9000}
   ollama:
     base-url: http://${PLATFORM_URL:localhost}:${OLLAMA_PORT:11434}
+  scheduler:
+    daily-exercise-cron: "0 */10 * * * *"

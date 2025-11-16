@@ -35,7 +35,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     restart: always
     volumes:
-      - database-data:/var/lib/postgresql/data/
+      - database-data:/var/lib/postgresql
   dbeaver:
     image: dbeaver/cloudbeaver:latest
     container_name: dbeaver

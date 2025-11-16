@@ -80,7 +80,7 @@ public class SecurityConfig {
                             cookieHelper.setAuthCookie(user, response);
 
                             SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
-                            String redirectUrl = (savedRequest != null) ? savedRequest.getRedirectUrl() : "http://localhost:8080/";
+                            String redirectUrl = (savedRequest != null) ? savedRequest.getRedirectUrl() : frontendUrl;
 
                             response.sendRedirect(redirectUrl);
                         })

@@ -5,25 +5,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.s3.dto.ImageResponse;
+import pl.myc22ka.mathapp.user.component.helper.UserHelper;
 import pl.myc22ka.mathapp.user.dto.UserDTO;
 import pl.myc22ka.mathapp.user.model.User;
 import pl.myc22ka.mathapp.user.service.UserImageService;
 import pl.myc22ka.mathapp.utils.security.component.helper.CookieHelper;
-import pl.myc22ka.mathapp.utils.security.dto.ChangePasswordRequest;
-import pl.myc22ka.mathapp.utils.security.dto.LoginRequest;
-import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
-import pl.myc22ka.mathapp.utils.security.dto.TwoFactorRequest;
+import pl.myc22ka.mathapp.utils.security.dto.*;
 import pl.myc22ka.mathapp.utils.security.service.AuthService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for authentication and user management.
@@ -43,6 +41,17 @@ public class AuthController {
     private final AuthService authService;
     private final UserImageService imageService;
     private final CookieHelper cookieHelper;
+    private final UserHelper userHelper;
+
+    @Value("${spring.scheduler.daily-exercise-cron}")
+    private String cronExpression;
+
+    @NotNull
+    private UserDTO buildUserDTO(User user, HttpServletResponse response) {
+        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
+        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
+        return UserDTO.fromEntity(user, profilePhotoUrl, exerciseImages, cronExpression);
+    }
 
     /**
      * Registers a new user, generates a JWT token, sets it in an HttpOnly cookie,
@@ -67,8 +76,9 @@ public class AuthController {
         return ResponseEntity.ok(
                 UserDTO.fromEntity(
                         user,
-                        imageService.getProfilePhotoUrl(user),
-                        null
+                        null,
+                        null,
+                        cronExpression
                 )
         );
     }
@@ -87,15 +97,17 @@ public class AuthController {
     @PostMapping("/sign-in")
     public ResponseEntity<UserDTO> login(
             @RequestBody LoginRequest loginRequest,
-            @NotNull HttpServletResponse response
+            HttpServletResponse response
     ) {
         User user = authService.login(loginRequest);
+
+        if (user.getTwoFactorEnabled()) {
+            return ResponseEntity.ok(UserDTO.forTwoFactorAuth(user));
+        }
+
         cookieHelper.setAuthCookie(user, response);
 
-        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
-        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
-
-        return ResponseEntity.ok(UserDTO.fromEntity(user, profilePhotoUrl, exerciseImages));
+        return ResponseEntity.ok(buildUserDTO(user, response));
     }
 
     /**
@@ -109,15 +121,16 @@ public class AuthController {
             description = "Returns the currently authenticated user's data, including profile and exercise images."
     )
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserDTO> getCurrentUser(
+            @AuthenticationPrincipal User user,
+            @NotNull HttpServletResponse response
+    ) {
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            cookieHelper.clearAuthCookie(response);
+            return ResponseEntity.ok(null);
         }
 
-        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
-        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
-
-        return ResponseEntity.ok(UserDTO.fromEntity(user, profilePhotoUrl, exerciseImages));
+        return ResponseEntity.ok(buildUserDTO(user, response));
     }
 
     /**
@@ -153,9 +166,10 @@ public class AuthController {
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
             @AuthenticationPrincipal User user,
+            @RequestBody DeleteAccountRequest deleteAccountRequest,
             HttpServletResponse response
     ) {
-        authService.deleteUser(user);
+        authService.deleteUser(user, deleteAccountRequest);
         cookieHelper.clearAuthCookie(response);
         return ResponseEntity.noContent().build();
     }
@@ -195,15 +209,19 @@ public class AuthController {
             description = "Validates the provided verification code for the specified email."
     )
     @PostMapping("/verify-code")
-    public ResponseEntity<Void> verifyCode(@RequestParam String email, @RequestParam String code) {
-        authService.verifyCode(email, code);
+    public ResponseEntity<Void> verifyCode(@RequestParam String email, @RequestParam String code, HttpServletResponse response) {
+        User user = userHelper.getUserByEmail(email);
+
+        authService.verifyCode(user, code);
+        cookieHelper.setAuthCookie(user, response);
+
         return ResponseEntity.ok().build();
     }
 
     /**
      * Sends a password reset verification code to the given email.
      *
-     * @param email user email
+     * @param forgotPasswordRequest user's email
      * @return confirmation message
      */
     @Operation(
@@ -211,17 +229,19 @@ public class AuthController {
             description = "Sends a password reset verification code to the user's email address."
     )
     @PostMapping("/password/request")
-    public ResponseEntity<String> requestPasswordChange(@RequestParam String email) {
-        authService.requestPasswordChange(email);
-        return ResponseEntity.ok("Verification code sent to email.");
+    public ResponseEntity<DefaultResponse> requestPasswordChange(@NotNull @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        authService.requestPasswordChange(forgotPasswordRequest.email());
+        return ResponseEntity.ok(new DefaultResponse(
+                LocalDateTime.now().toString(),
+                "A new verification code has been sent to your email.",
+                200
+        ));
     }
 
     /**
      * Confirms a password reset by verifying the code and updating the password.
      *
-     * @param email       user email
-     * @param code        verification code
-     * @param newPassword new password to set
+     * @param confirmChangePasswordRequest code with new password
      * @return confirmation message
      */
     @Operation(
@@ -229,13 +249,16 @@ public class AuthController {
             description = "Verifies the reset code sent by email and updates the user's password."
     )
     @PostMapping("/password/confirm")
-    public ResponseEntity<String> confirmPasswordChange(
-            @RequestParam String email,
-            @RequestParam String code,
-            @RequestParam String newPassword
+    public ResponseEntity<DefaultResponse> confirmPasswordChange(
+            @NotNull @RequestBody ConfirmChangePasswordRequest confirmChangePasswordRequest
     ) {
-        authService.confirmPasswordChange(email, code, newPassword);
-        return ResponseEntity.ok("Password successfully changed.");
+        authService.confirmPasswordChange(confirmChangePasswordRequest.code(), confirmChangePasswordRequest.newPassword());
+
+        return ResponseEntity.ok(new DefaultResponse(
+                LocalDateTime.now().toString(),
+                "Password successfully changed.",
+                200
+        ));
     }
 
     /**
@@ -250,35 +273,40 @@ public class AuthController {
             description = "Allows a logged-in user to change their password after validating their current password."
     )
     @PostMapping("/password/change")
-    public ResponseEntity<String> changePasswordLoggedIn(
+    public ResponseEntity<DefaultResponse> changePasswordLoggedIn(
             @AuthenticationPrincipal User user,
             @NotNull @RequestBody ChangePasswordRequest request
     ) {
         authService.changePasswordLoggedIn(user, request.oldPassword(), request.newPassword());
-        return ResponseEntity.ok("Password successfully changed.");
+
+        return ResponseEntity.ok(new DefaultResponse(
+                LocalDateTime.now().toString(),
+                "Password successfully changed.",
+                200
+        ));
     }
 
     /**
-     * Enables or disables two-factor authentication (2FA) for the authenticated user.
+     * Endpoint to update user's data
      *
-     * @param user    authenticated user
-     * @param request contains desired 2FA status
-     * @return confirmation message with updated status
+     * @param user                 authenticated user
+     * @param updateProfileRequest contains data used to update user's profile
+     * @return success message
      */
     @Operation(
-            summary = "Update two-factor authentication (2FA) status",
-            description = "Enables or disables two-factor authentication for the logged-in user."
+            summary = "Endpoint to update user's data",
+            description = "Endpoint to update user's data"
     )
-    @PostMapping("/2fa")
-    public ResponseEntity<DefaultResponse> updateTwoFactor(
+    @PatchMapping("/update")
+    public ResponseEntity<UserDTO> updateTwoFactor(
             @AuthenticationPrincipal User user,
-            @RequestBody TwoFactorRequest request
+            @RequestBody UpdateProfileRequest updateProfileRequest
     ) {
-        authService.updateTwoFactorStatus(user, request);
+        var response = authService.updateProfile(user, updateProfileRequest);
 
-        String status = request.enabled() ? "enabled" : "disabled";
-        return ResponseEntity.ok(
-                new DefaultResponse(LocalDate.now().toString(), "Two-factor authentication " + status, 200)
-        );
+        String profilePhotoUrl = imageService.getProfilePhotoUrl(user);
+        List<ImageResponse> exerciseImages = imageService.getExerciseImages(user.getId());
+
+        return ResponseEntity.ok(UserDTO.fromEntity(response, profilePhotoUrl, exerciseImages, cronExpression));
     }
 }

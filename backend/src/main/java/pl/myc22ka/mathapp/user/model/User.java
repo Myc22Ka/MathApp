@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.level.model.LevelRequirement;
 
 import java.time.LocalDate;
@@ -63,10 +65,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Integer level = 1;
 
-    private LocalDate lastDailyTaskDate;
+    private LocalDateTime lastDailyTaskDate;
 
     @Column(nullable = false)
     private Integer dailyTasksCompleted = 0;
+
+    @Column(nullable = false)
+    private Integer streak = 0;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserExercise> userExercises = new ArrayList<>();
@@ -133,5 +138,53 @@ public class User implements UserDetails {
         if (newLevel > this.level) {
             this.level = newLevel;
         }
+    }
+
+    /**
+     * Checks if the current verification code is valid (not expired).
+     *
+     * @return true if code exists and is not expired
+     */
+    public boolean isVerificationCodeValid() {
+        return verificationCode != null
+                && verificationCodeExpiresAt != null
+                && verificationCodeExpiresAt.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * Aktualizuje streak użytkownika na podstawie czasu wykonania i interwału cron'a
+     *
+     * @param executionTime czas wykonania crona (np. LocalDateTime.now())
+     * @param intervalMinutes interwał między wykonaniami w minutach (z parsowania cron'a)
+     */
+    public void updateStreak(@NotNull LocalDateTime executionTime, long intervalMinutes) {
+        this.dailyTasksCompleted++;
+
+        if (lastDailyTaskDate == null) {
+            this.streak = 1;
+            this.lastDailyTaskDate = executionTime;
+            return;
+        }
+
+        LocalDateTime expectedNextDateTime = lastDailyTaskDate.plusMinutes(intervalMinutes);
+
+        if (executionTime.isBefore(expectedNextDateTime)) {
+            return;
+        }
+
+        LocalDateTime tooLateDeadline = expectedNextDateTime.plusMinutes(intervalMinutes);
+
+        if (executionTime.isAfter(tooLateDeadline)) {
+            this.streak = 1;
+            this.lastDailyTaskDate = executionTime;
+            return;
+        }
+
+        this.streak++;
+        this.lastDailyTaskDate = executionTime;
+    }
+
+    public boolean matchesPassword(String rawPassword, @NotNull PasswordEncoder encoder) {
+        return encoder.matches(rawPassword, this.password);
     }
 }

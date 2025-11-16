@@ -48,7 +48,7 @@ spring:
       secret-key: ${JWT_SECRET_KEY}
       expiration: 3600000 # 1 hour in milliseconds
     cookie:
-      name: authToken
+      name: auth_token
       expiration: 3600 # w sekundach
       path: /
       same-site: None
@@ -59,7 +59,7 @@ spring:
       bucket: ${BUCKET_NAME:mathapp-bucket}
       region: ${BUCKET_REGION:eu-central-1}
   ollama:
-    model: gpt-oss:20b
+    model: falcon3:7b
   frontend:
     url: http://${PLATFORM_URL:localhost}:${FRONTEND_PORT:3000}
   minio:

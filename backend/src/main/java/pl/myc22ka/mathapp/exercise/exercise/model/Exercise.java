@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import pl.myc22ka.mathapp.exercise.daily.model.DailyExerciseSchedule;
 import pl.myc22ka.mathapp.exercise.exercise.annotation.rating.Rating;
 import pl.myc22ka.mathapp.exercise.template.component.TemplateLike;
 import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
@@ -62,6 +62,9 @@ public class Exercise {
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     private Set<UserExercise> userExercises = new HashSet<>();
+
+    @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<DailyExerciseSchedule> dailyExerciseSchedules = new HashSet<>();
 
     public TemplateLike getTemplateOrVariant() {
         if (this.getTemplateExercise() != null) {

@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.exercise.exercise.annotation.rating.Rating;
-import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.exercise.exercise.service.ExerciseService;
@@ -41,7 +40,6 @@ import java.util.List;
 public class ExerciseController {
 
     private final ExerciseService exerciseService;
-    private final ExerciseScheduler exerciseScheduler;
     private final UserExerciseHelper userExerciseHelper;
 
     /**
@@ -124,21 +122,6 @@ public class ExerciseController {
     }
 
     /**
-     * Retrieves a random exercise from the database.
-     */
-    @Operation(
-            summary = "Get random exercise",
-            description = "Returns a random exercise from the database."
-    )
-    @GetMapping("/daily")
-    public ResponseEntity<ExerciseDTO> getDaily(@AuthenticationPrincipal User user) {
-        Exercise exercise = exerciseScheduler.getLastDailyExercise();
-        Boolean isSolved = userExerciseHelper.isSolved(user, exercise);
-
-        return ResponseEntity.ok(ExerciseDTO.fromEntity(exercise, isSolved));
-    }
-
-    /**
      * Rates an exercise with a given rating (1 - 5, step 0.5).
      */
     @Operation(
@@ -209,19 +192,6 @@ public class ExerciseController {
             @RequestParam String userAnswer) {
 
         boolean correct = exerciseService.solve(user, exerciseId, userAnswer);
-
-        return ResponseEntity.ok(
-                new DefaultResponse(
-                        java.time.Instant.now().toString(),
-                        correct ? "Answer is correct" : "Answer is incorrect",
-                        correct ? 200 : 400
-                )
-        );
-    }
-
-    @PostMapping("/solve-daily")
-    public ResponseEntity<DefaultResponse> solveDaily(@AuthenticationPrincipal User user, @RequestParam String answer) {
-        boolean correct = exerciseService.solveDaily(user, answer);
 
         return ResponseEntity.ok(
                 new DefaultResponse(

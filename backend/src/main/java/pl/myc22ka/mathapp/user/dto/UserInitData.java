@@ -27,6 +27,7 @@ public record UserInitData(
                 .twoFactorEnabled(false)
                 .notificationsEnabled(true)
                 .points(0.0)
+                .streak(0)
                 .level(1)
                 .dailyTasksCompleted(0)
                 .build();

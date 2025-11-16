@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -82,7 +83,7 @@ public class EmailService {
     }
 
     public String generateVerificationLink(String endpoint) {
-        return "http://" + "localhost:8080" + "/" + endpoint;
+        return frontendUrl + "/" + endpoint;
     }
 
     /**
@@ -91,15 +92,17 @@ public class EmailService {
      */
     @Async
     public void sendEmailFromTemplate(String to, String subject, String templateName, Map<String, String> variables) {
-        Map<String, String> modifiableVariables = new HashMap<>(variables);
+        CompletableFuture.runAsync(() -> {
+            Map<String, String> modifiableVariables = new HashMap<>(variables);
 
-        if (!modifiableVariables.containsKey("verificationCode")) {
-            modifiableVariables.put("verificationCode", generateVerificationCode());
-        }
+            if (!modifiableVariables.containsKey("verificationCode")) {
+                modifiableVariables.put("verificationCode", generateVerificationCode());
+            }
 
-        String template = loadTemplate(templateName);
-        String populatedHtml = populateTemplate(template, modifiableVariables);
-        sendHtmlEmail(to, subject, populatedHtml);
+            String template = loadTemplate(templateName);
+            String populatedHtml = populateTemplate(template, modifiableVariables);
+            sendHtmlEmail(to, subject, populatedHtml);
+        });
     }
 
 }

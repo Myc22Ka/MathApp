@@ -62,7 +62,7 @@ public class FindAllIntegers implements StepExecutor {
 
             context.add(new ContextRecord(newKey, allIntegers.getTemplatePrefix(), allIntegers.toString()));
         } else {
-            context.add(new ContextRecord(newKey, first.getTemplatePrefix(), first.size().toString()));
+            context.add(new ContextRecord(newKey, first.getTemplatePrefix(), first.toString()));
         }
     }
 }

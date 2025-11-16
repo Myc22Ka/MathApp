@@ -1,38 +1,36 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get("auth_token")?.value;
+    const { pathname } = request.nextUrl;
+    const token = request.cookies.get('auth_token')?.value;
 
-  const staticPublicRoutes = ["/"];
+    const staticPublicRoutes = ['/'];
+    const prefixPublicRoutes = ['/auth', '/forgot-password', '/verify'];
 
-  const prefixPublicRoutes = ["/auth", "/forgot-password", "/verify"];
+    const isStaticPublic = staticPublicRoutes.includes(pathname);
+    const isPrefixPublic = prefixPublicRoutes.some(route => pathname.startsWith(route));
 
-  const isStaticPublic = staticPublicRoutes.includes(pathname);
+    const isPublic = isStaticPublic || isPrefixPublic;
 
-  const isPrefixPublic = prefixPublicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+    // Nie zalogowany i nie na publicznej stronie
+    if (!token && !isPublic) {
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = '/auth/login';
+        loginUrl.searchParams.set('from', pathname);
+        return NextResponse.redirect(loginUrl);
+    }
 
-  const isPublic = isStaticPublic || isPrefixPublic;
+    // Zalogowany i na stronie publicznej (nie home)
+    if (token && isPublic && pathname !== '/') {
+        const homeUrl = request.nextUrl.clone();
+        homeUrl.pathname = '/';
+        return NextResponse.redirect(homeUrl);
+    }
 
-  if (!token && !isPublic) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("from", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (token && isPublic && pathname !== "/") {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
-    return NextResponse.redirect(homeUrl);
-  }
-
-  return NextResponse.next();
+    return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

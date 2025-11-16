@@ -1,6 +1,6 @@
 FROM ollama/ollama
 
-ARG OLLAMA_MODEL=gpt-oss:20b
+ARG OLLAMA_MODEL=falcon3:7b
 
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo '' >> /entrypoint.sh && \

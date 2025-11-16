@@ -16,6 +16,7 @@ import pl.myc22ka.mathapp.utils.security.dto.RegisterRequest;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Helper class for authentication-related operations.
@@ -53,6 +54,7 @@ public class AuthHelper {
                 .level(1)
                 .dailyTasksCompleted(0)
                 .lastDailyTaskDate(null)
+                .streak(0)
                 .verified(false)
                 .twoFactorEnabled(false)
                 .notificationsEnabled(true)
@@ -108,8 +110,8 @@ public class AuthHelper {
         User user = findUserByEmailOrLogin(identifier)
                 .orElseThrow(() -> new UserException("User not found"));
 
-        if (!encoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new UserException("Incorrect password");
+        if (!user.matchesPassword(loginRequest.password(), encoder)){
+            throw new UserException("Password is incorrect");
         }
 
         return user;
@@ -128,6 +130,21 @@ public class AuthHelper {
         }
 
         return userRepository.findByLogin(identifier);
+    }
+
+    /**
+     * Generates a 6-digit verification code for the user keeps user verified.
+     *
+     * @param user the user to generate the code for
+     * @return the generated verification code
+     */
+    public String generatePasswordResetToken(@NotNull User user) {
+        String token = UUID.randomUUID().toString();
+        user.setVerificationCode(token);
+        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(30));
+
+        userRepository.save(user);
+        return token;
     }
 
     /**
@@ -186,17 +203,6 @@ public class AuthHelper {
         if (password.length() < 8) {
             throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
-    }
-
-    /**
-     * Checks whether a raw password matches an encoded password.
-     *
-     * @param rawPassword     the raw password
-     * @param encodedPassword the encoded password
-     * @return true if matches, false otherwise
-     */
-    public boolean passwordMatches(String rawPassword, String encodedPassword) {
-        return encoder.matches(rawPassword, encodedPassword);
     }
 
     /**

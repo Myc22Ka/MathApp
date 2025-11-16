@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (cookies == null) throw new CookiesNotFoundException("No cookies present in request");
 
             String token = cookieProvider.extractTokenFromCookies(cookies);
-            if (token == null) throw new JwtException("Auth token cookie not found");
+            if (token == null) throw new CookiesNotFoundException("Auth token cookie not found");
 
             String username = jwtProvider.extractUsername(token);
             if (username == null) throw new JwtException("Token subject is null or invalid");
@@ -77,7 +77,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-        } catch (UsernameNotFoundException | CookiesNotFoundException | JwtException e) {
+        } catch (CookiesNotFoundException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_NO_CONTENT, e.getMessage());
+        }
+        catch (UsernameNotFoundException | JwtException e) {
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
 
         } catch (Exception e) {

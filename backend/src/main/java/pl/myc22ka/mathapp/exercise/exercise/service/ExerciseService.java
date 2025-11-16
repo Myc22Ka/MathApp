@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.myc22ka.mathapp.ai.ollama.service.OllamaService;
 import pl.myc22ka.mathapp.ai.prompt.dto.MathExpressionChatRequest;
 import pl.myc22ka.mathapp.ai.prompt.dto.PrefixModifierEntry;
-import pl.myc22ka.mathapp.exercise.exercise.component.ExerciseScheduler;
+import pl.myc22ka.mathapp.exceptions.custom.DuplicateExerciseException;
 import pl.myc22ka.mathapp.level.service.LevelingService;
 import pl.myc22ka.mathapp.user.component.helper.UserExerciseHelper;
 import pl.myc22ka.mathapp.user.component.helper.UserHelper;
@@ -30,6 +30,7 @@ import pl.myc22ka.mathapp.exercise.template.model.TemplateExercise;
 import pl.myc22ka.mathapp.model.expression.TemplatePrefix;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,6 @@ public class ExerciseService {
     private final ValidationHelper validationHelper;
     private final UserExerciseHelper userExerciseHelper;
     private final LevelingService levelingService;
-    private final ExerciseScheduler exerciseScheduler;
 
     /**
      * Creates a new Exercise from a template or variant with given values.
@@ -174,34 +174,46 @@ public class ExerciseService {
         validationHelper.validateTemplateOrVariant(templateId, variantId);
 
         TemplateLike template = exerciseHelper.resolveTemplate(templateId, variantId);
-
         List<PrefixModifierEntry> placeholders = exerciseHelper.getPlaceholders(template);
 
-        List<ContextRecord> context = new ArrayList<>();
-        boolean allVerified = true;
+        int maxRetries = 3;
 
-        for (var entry : placeholders) {
-            Prompt prompt = ollamaService.generatePrompt(
-                    new MathExpressionChatRequest(
-                            entry.prefix(),
-                            entry.modifiers() == null ? new ArrayList<>() : entry.modifiers()
-                    ).withContext(context)
-            );
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            List<ContextRecord> context = new ArrayList<>();
+            boolean allVerified = true;
 
-            String response = prompt.getResponseText();
+            for (var entry : placeholders) {
+                Prompt prompt = ollamaService.generatePrompt(
+                        new MathExpressionChatRequest(
+                                entry.prefix(),
+                                entry.modifiers() == null ? new ArrayList<>() : entry.modifiers()
+                        ).withContext(context)
+                );
 
-            context.add(exerciseHelper.buildContextRecord(entry, response));
+                String response = prompt.getResponseText();
+                context.add(exerciseHelper.buildContextRecord(entry, response));
 
-            if (!prompt.isVerified()) {
-                allVerified = false;
+                if (!prompt.isVerified()) {
+                    allVerified = false;
+                }
+            }
+
+            String finalText = exerciseHelper.resolveText(template, context);
+
+            if (!exerciseRepository.existsByText(finalText)) {
+                Exercise exercise = exerciseHelper.buildExercise(template, context, finalText, allVerified);
+                return exerciseRepository.save(exercise);
+            }
+
+            if (attempt == maxRetries) {
+                throw new DuplicateExerciseException(
+                        "Nie udało się wygenerować unikalnego ćwiczenia po " + maxRetries + " próbach. " +
+                                "Ostatni tekst: " + finalText
+                );
             }
         }
 
-        String finalText = exerciseHelper.resolveText(template, context);
-
-        Exercise exercise = exerciseHelper.buildExercise(template, context, finalText, allVerified);
-
-        return exerciseRepository.save(exercise);
+        throw new RuntimeException("Nie udało się wygenerować ćwiczenia");
     }
 
     /**
@@ -260,31 +272,5 @@ public class ExerciseService {
         }
 
         return result;
-    }
-
-    public boolean solveDaily(User user, String answer) {
-        Exercise dailyExercise = exerciseScheduler.getLastDailyExercise();
-        if (dailyExercise == null) {
-            throw new IllegalStateException("Daily exercise is not set yet.");
-        }
-
-        if (user.getLastDailyTaskDate() != null && user.getLastDailyTaskDate().isEqual(LocalDate.now())) {
-            throw new IllegalStateException("You have already completed today's exercise.");
-        }
-
-        boolean solved = solve(
-                user,
-                dailyExercise.getId(),
-                answer
-        );
-
-        if (solved) {
-            user.setLastDailyTaskDate(LocalDate.now());
-            user.setDailyTasksCompleted(user.getDailyTasksCompleted() + 1);
-
-            userHelper.save(user);
-        }
-
-        return solved;
     }
 }

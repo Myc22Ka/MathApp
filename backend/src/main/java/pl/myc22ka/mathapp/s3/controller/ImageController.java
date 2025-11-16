@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.s3.component.helper.ImageHelper;
+import pl.myc22ka.mathapp.s3.dto.DeleteImageRequest;
 import pl.myc22ka.mathapp.s3.dto.ImageResponse;
 import pl.myc22ka.mathapp.s3.model.Image;
 import pl.myc22ka.mathapp.s3.model.ImageType;
@@ -108,7 +109,6 @@ public class ImageController {
 
         byte[] data = imageService.downloadImage(user, id, clazz);
 
-        // Pobranie informacji o pliku (nazwa, typ)
         Image img = imageHelper.getImageInfo(user, id, clazz);
 
         HttpHeaders headers = new HttpHeaders();
@@ -145,25 +145,24 @@ public class ImageController {
      * Deletes an image for the authenticated user.
      *
      * @param user the authenticated user
-     * @param type the type of image (PROFILE or EXERCISE)
-     * @param id   the ID of the image to delete (optional for PROFILE)
+     * @param deleteImageRequest the type of image (PROFILE or EXERCISE), and id of exercise
      * @return a response indicating success or failure
      */
     @DeleteMapping("/delete")
     @Operation(summary = "Delete an image")
     public ResponseEntity<DefaultResponse> deleteImage(
             @AuthenticationPrincipal User user,
-            @NotNull @RequestParam("type") ImageType type,
-            @RequestParam(value = "id", required = false) Long id
+            @NotNull @RequestBody DeleteImageRequest deleteImageRequest
     ) {
         authHelper.validateUser(user);
 
-        Class<? extends Image> clazz = switch (type) {
+        Class<? extends Image> clazz = switch (deleteImageRequest.type()) {
             case PROFILE -> ProfilePhoto.class;
             case EXERCISE -> ExerciseImage.class;
         };
 
-        imageService.deleteImage(user, id, clazz);
+        imageService.deleteImage(user, deleteImageRequest.id(), clazz);
+
         return ResponseEntity.ok(new DefaultResponse(
                 LocalDateTime.now().toString(),
                 "Image deleted successfully",

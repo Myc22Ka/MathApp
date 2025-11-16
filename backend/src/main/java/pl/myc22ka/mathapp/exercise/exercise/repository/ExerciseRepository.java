@@ -15,4 +15,5 @@ import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
  */
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long>, JpaSpecificationExecutor<Exercise> {
+    boolean existsByText(String text);
 }
