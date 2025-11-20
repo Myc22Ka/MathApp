@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import pl.myc22ka.mathapp.exercise.daily.component.CronParser;
 import pl.myc22ka.mathapp.level.model.LevelRequirement;
 
 import java.time.LocalDate;
@@ -186,5 +187,19 @@ public class User implements UserDetails {
 
     public boolean matchesPassword(String rawPassword, @NotNull PasswordEncoder encoder) {
         return encoder.matches(rawPassword, this.password);
+    }
+
+    public boolean hasSolvedTaskToday(@NotNull String cronExpression) {
+        LocalDateTime lastTaskDateTime = this.lastDailyTaskDate;
+        if (lastTaskDateTime == null) {
+            return false;
+        }
+
+        LocalDateTime previousExecution = CronParser.getPreviousExecution(cronExpression);
+        return lastTaskDateTime.isAfter(previousExecution);
+    }
+
+    public boolean canSolveDailyTask(@NotNull String cronExpression) {
+        return !hasSolvedTaskToday(cronExpression);
     }
 }

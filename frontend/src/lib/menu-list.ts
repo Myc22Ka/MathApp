@@ -37,16 +37,16 @@ export function getMenuList(role: UserRole = 'STUDENT'): Group[] {
 
     // Menu dla wszystkich ról
     const contentMenu: Group = {
-        groupLabel: 'Contents',
+        groupLabel: 'Exercises',
         menus: [
             {
                 href: '',
-                label: 'Posts',
+                label: 'Exercises',
                 icon: SquarePen,
                 submenus: [
                     {
-                        href: '/posts',
-                        label: 'All Posts',
+                        href: '/dashboard/exercises/daily',
+                        label: 'Daily',
                     },
                     ...(role !== 'STUDENT' ? [{ href: '/posts/new', label: 'New Post' }] : []),
                 ],

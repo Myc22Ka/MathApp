@@ -50,7 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            // Pełne logowanie
             setUser(response);
             toast.success('Zalogowano pomyślnie');
             router.push('/');
@@ -151,9 +150,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (err) {
             toast.error(getApiErrorMessage(err));
         } finally {
-            setUser(null);
-            setPending2FA(null);
             router.push('/auth/login');
+
+            setTimeout(() => {
+                setUser(null);
+                setPending2FA(null);
+            }, 300);
         }
     };
 

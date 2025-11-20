@@ -4,7 +4,9 @@ import { SidebarProvider } from '@/components/providers/use-sidebar';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
-            <AdminPanelLayout>{children}</AdminPanelLayout>
+            <AdminPanelLayout>
+                {children}
+            </AdminPanelLayout>
         </SidebarProvider>
     );
 }

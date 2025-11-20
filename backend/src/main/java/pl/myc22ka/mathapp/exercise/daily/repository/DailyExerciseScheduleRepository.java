@@ -7,8 +7,5 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface DailyExerciseScheduleRepository extends JpaRepository<DailyExerciseSchedule, Long> {
-    Optional<DailyExerciseSchedule> findByScheduleDate(LocalDateTime date);
-
-    boolean existsByScheduleDateBetween(LocalDateTime start, LocalDateTime end);
     Optional<DailyExerciseSchedule> findTopByScheduleDateBetweenOrderByScheduleDateDesc(LocalDateTime start, LocalDateTime end);
 }

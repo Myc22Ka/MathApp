@@ -2,12 +2,14 @@ package pl.myc22ka.mathapp.exercise.daily.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.myc22ka.mathapp.exceptions.DefaultResponse;
 import pl.myc22ka.mathapp.exercise.daily.DailyExerciseService;
 import pl.myc22ka.mathapp.exercise.daily.component.ExerciseScheduler;
+import pl.myc22ka.mathapp.exercise.daily.dto.DailySolveDTO;
 import pl.myc22ka.mathapp.exercise.exercise.dto.ExerciseDTO;
 import pl.myc22ka.mathapp.exercise.exercise.model.Exercise;
 import pl.myc22ka.mathapp.user.component.helper.UserExerciseHelper;
@@ -38,8 +40,8 @@ public class DailyExerciseController {
     }
 
     @PostMapping("/solve-daily")
-    public ResponseEntity<DefaultResponse> solveDaily(@AuthenticationPrincipal User user, @RequestParam String answer) {
-        boolean correct = dailyExerciseService.solveDaily(user, answer);
+    public ResponseEntity<DefaultResponse> solveDaily(@AuthenticationPrincipal User user, @NotNull @RequestBody DailySolveDTO dailySolveDTO) {
+        boolean correct = dailyExerciseService.solveDaily(user, dailySolveDTO.answer());
 
         return ResponseEntity.ok(
                 new DefaultResponse(

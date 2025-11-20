@@ -24,11 +24,16 @@ public class DailyExerciseService {
     @Value("${spring.scheduler.daily-exercise-cron}")
     private String cronExpression;
 
+
     @Transactional
     public boolean solveDaily(User user, String answer) {
         Exercise dailyExercise = exerciseScheduler.getLastDailyExercise();
         if (dailyExercise == null) {
             throw new IllegalStateException("Daily exercise is not set yet.");
+        }
+
+        if (!user.canSolveDailyTask(cronExpression)) {
+            throw new IllegalStateException("You have already completed today's daily task. Try again tomorrow.");
         }
 
         boolean solved = exerciseService.solve(

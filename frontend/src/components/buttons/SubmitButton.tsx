@@ -1,19 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
 interface SubmitButtonProps {
   isLoading: boolean;
   label: string;
-  loadingLabel?: string;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
 export function SubmitButton({
   isLoading,
   label,
-  loadingLabel = label,
+  onClick
 }: SubmitButtonProps) {
   return (
     <Button
@@ -21,18 +21,11 @@ export function SubmitButton({
       className="w-full flex items-center justify-center gap-2"
       disabled={isLoading}
       variant="main"
+      loading={isLoading}
+      onClick={onClick}
     >
-      {isLoading ? (
-        <>
-          <Loader2 className="h-5 w-5 animate-spin" />
-          {loadingLabel}...
-        </>
-      ) : (
-        <>
-          {label}
-          <AiOutlineArrowRight className="h-5 w-5" />
-        </>
-      )}
+      {label}
+      <AiOutlineArrowRight className="h-5 w-5" />
     </Button>
   );
 }

@@ -1,11 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/providers/auth-provider';
 import React, { useEffect } from 'react';
+import { Navbar } from '@/components/layout/navbar/navbar';
+import Chat from '@/components/chat/chat';
 
 const Home = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     useEffect(() => {
         console.log(user);
@@ -13,10 +14,8 @@ const Home = () => {
 
     return (
         <div>
-            <div>Home</div>
-            <Button variant="ghostMain" onClick={() => logout()}>
-                Wyloguj
-            </Button>
+            <Navbar title="Home" />
+            <Chat />
         </div>
     );
 };
